@@ -32,13 +32,14 @@
       <div class="bg-slate-900 rounded-[22px] overflow-hidden shadow-lg border border-slate-800 relative aspect-video flex items-center justify-center">
         <% if (videoPlayerInfo.type === 'video') { %>
           <!-- HTML5 Video Player untuk File yang Diunggah Langsung -->
-          <video controls autoplay class="w-full h-full object-cover rounded-[22px]">
+          <video id="localLessonVideo" controls autoplay class="w-full h-full object-cover rounded-[22px]">
             <source src="<%= videoPlayerInfo.embedUrl %>" type="video/mp4">
             Peramban Anda tidak mendukung pemutar video HTML5.
           </video>
         <% } else if (videoPlayerInfo.type === 'iframe') { %>
           <!-- Responsive Iframe Player untuk YouTube / Vimeo / Drive -->
           <iframe 
+            id="lessonIframePlayer"
             src="<%= videoPlayerInfo.embedUrl %>" 
             title="<%= activeLesson.title %>" 
             class="w-full h-full border-0" 
@@ -92,7 +93,7 @@
         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
           <div>
             <h1 class="text-xl font-bold text-slate-900"><%= activeLesson.title %></h1>
-            <p class="text-xs text-slate-400 font-medium mt-0.5">Estimasi Durasi: <%= activeLesson.duration_minutes %> menit</p>
+            <p id="lessonHeaderDuration" class="text-xs text-slate-400 font-medium mt-0.5">Estimasi Durasi: <%= activeLesson.duration_minutes %> menit</p>
           </div>
           <span class="text-xs font-bold px-3 py-1 bg-violet-50 text-violet-700 rounded-full border border-violet-100">
             <%= activeLesson.video_source === 'upload' ? 'Video Lokal MP4' : 'Streaming Online' %>
@@ -156,7 +157,7 @@
                       <span class="truncate"><%= l.title %></span>
                     </div>
 
-                    <span class="text-[10px] opacity-75 shrink-0 ml-2"><%= l.duration_minutes %>m</span>
+                    <span id="lessonDuration-<%= l.id %>" class="text-[10px] opacity-75 shrink-0 ml-2"><%= l.duration_minutes %>m</span>
                   </a>
                 <% }) %>
               </div>
@@ -222,4 +223,125 @@
       showToast("Gagal memperbarui progres materi.", "error");
     }
   }
+
+  // ==============================================================
+  // SISTEM DETEKSI & SINKRONISASI OTOMATIS DURASI VIDEO (YT & LOKAL)
+  // ==============================================================
+  const currentActiveLessonId = <%= activeLesson.id %>;
+  let currentDbMinutes = <%= activeLesson.duration_minutes || 0 %>;
+  let hasSyncedDuration = false;
+
+  function syncDetectedDuration(lessonId, totalSeconds) {
+    if (!totalSeconds || totalSeconds <= 0 || hasSyncedDuration) return;
+    const minutes = Math.max(1, Math.round(totalSeconds / 60));
+    const minsFormatted = Math.floor(totalSeconds / 60);
+    const secsFormatted = Math.floor(totalSeconds % 60);
+    const timeDisplay = `${minsFormatted}:${secsFormatted < 10 ? '0' : ''}${secsFormatted}`;
+
+    // 1. Update Teks di Header Panduan Belajar
+    const headerDur = document.getElementById('lessonHeaderDuration');
+    if (headerDur) {
+      headerDur.textContent = `Estimasi Durasi: ${minutes} menit (${timeDisplay})`;
+    }
+
+    // 2. Update Badge di Sidebar Daftar Modul & Materi
+    const durationBadge = document.getElementById('lessonDuration-' + lessonId);
+    if (durationBadge) {
+      durationBadge.textContent = minutes + 'm';
+      durationBadge.title = `Durasi video asli: ${timeDisplay}`;
+    }
+
+    // 3. Kirim ke Database jika berbeda dari data awal
+    if (minutes !== currentDbMinutes) {
+      hasSyncedDuration = true;
+      fetch(`/api/lessons/${lessonId}/sync-duration`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ duration_minutes: minutes })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          currentDbMinutes = minutes;
+          console.log(`[Kyzoo LMS] Durasi video berhasil disinkronkan ke DB: ${minutes} menit (${timeDisplay})`);
+        }
+      })
+      .catch(err => console.error('Gagal sinkronisasi durasi video:', err));
+    }
+  }
+
+  // A. Deteksi untuk Video Lokal (HTML5 <video>)
+  const localVideoEl = document.getElementById('localLessonVideo');
+  if (localVideoEl) {
+    localVideoEl.addEventListener('loadedmetadata', function() {
+      if (localVideoEl.duration && localVideoEl.duration > 0) {
+        syncDetectedDuration(currentActiveLessonId, localVideoEl.duration);
+      }
+    });
+    if (localVideoEl.duration && localVideoEl.duration > 0) {
+      syncDetectedDuration(currentActiveLessonId, localVideoEl.duration);
+    }
+  }
+
+  // B. Deteksi untuk YouTube via postMessage Broadcast (Instan & Tanpa API Key)
+  window.addEventListener('message', function(event) {
+    try {
+      const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+      if (data && data.info && typeof data.info.duration === 'number' && data.info.duration > 0) {
+        syncDetectedDuration(currentActiveLessonId, data.info.duration);
+      }
+    } catch (e) {}
+  });
+
+  // C. Deteksi untuk YouTube via IFrame Player API
+  let ytPlayer = null;
+  let ytCheckTimer = null;
+  let ytCheckAttempts = 0;
+
+  function initYtPlayerListener() {
+    const iframeEl = document.getElementById('lessonIframePlayer');
+    if (!iframeEl || typeof YT === 'undefined' || !YT.Player) return;
+
+    try {
+      ytPlayer = new YT.Player('lessonIframePlayer', {
+        events: {
+          'onReady': onYtReady,
+          'onStateChange': onYtStateChange
+        }
+      });
+    } catch (e) {}
+  }
+
+  function checkYtDuration(player) {
+    if (!player || typeof player.getDuration !== 'function') return false;
+    const dur = player.getDuration();
+    if (dur && dur > 0) {
+      syncDetectedDuration(currentActiveLessonId, dur);
+      if (ytCheckTimer) clearInterval(ytCheckTimer);
+      return true;
+    }
+    return false;
+  }
+
+  function onYtReady(event) {
+    if (!checkYtDuration(event.target)) {
+      ytCheckTimer = setInterval(() => {
+        ytCheckAttempts++;
+        if (checkYtDuration(event.target) || ytCheckAttempts > 8) {
+          clearInterval(ytCheckTimer);
+        }
+      }, 1000);
+    }
+  }
+
+  function onYtStateChange(event) {
+    checkYtDuration(event.target);
+  }
+
+  window.onYouTubeIframeAPIReady = initYtPlayerListener;
+  if (window.YT && window.YT.Player) {
+    initYtPlayerListener();
+  }
 </script>
+<!-- YouTube IFrame API Script -->
+<script src="https://www.youtube.com/iframe_api"></script>

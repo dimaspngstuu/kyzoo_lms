@@ -274,3 +274,7 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   - `2026-11-20`: Pembaruan Tipografi Sistem ke Urbanist:
     * Menerapkan font **`Urbanist`** (Google Fonts weights 400-900) pada seluruh antarmuka (`layout.ejs`, `login.ejs`, `register.ejs`).
     * Memberikan karakter geometris yang bersih, modern, stylish, dan estetik tanpa kesan kaku.
+  - `2026-11-20`: Fitur Deteksi & Sinkronisasi Durasi Video Otomatis (Auto-Detect Duration):
+    * **Untuk Video YouTube**: Mengaktifkan `enablejsapi=1` pada embed player dan memasang listener `postMessage` serta YouTube Iframe API. Begitu video dimuat atau diputar, durasi detik aslinya langsung terdeteksi, teks estimasi header dan badge di sidebar otomatis terbarui (misal `53m`), dan tersimpan otomatis ke database via endpoint `POST /api/lessons/:id/sync-duration`.
+    * **Untuk Video Lokal (MP4/WebM)**: Menggunakan event `loadedmetadata` pada elemen HTML5 `<video>` untuk membaca durasi asli file secara instan dan menyinkronkannya ke UI serta database.
+    * **Di Panel Admin Kelola Materi**: Saat admin menginput link YouTube atau memilih file video lokal, sistem otomatis mendeteksi durasi asli video dan mengisi input `Durasi (Menit)` secara otomatis tanpa perlu dihitung manual.

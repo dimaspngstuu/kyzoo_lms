@@ -18,7 +18,9 @@ function formatVideoEmbed(source, url) {
     if (match && match[1]) {
       return {
         type: 'iframe',
-        embedUrl: `https://www.youtube-nocookie.com/embed/${match[1]}?rel=0&modestbranding=1&playsinline=1`
+        provider: 'youtube',
+        videoId: match[1],
+        embedUrl: `https://www.youtube-nocookie.com/embed/${match[1]}?enablejsapi=1&rel=0&modestbranding=1&playsinline=1`
       };
     }
   }
@@ -86,6 +88,33 @@ router.get('/api/search', (req, res) => {
   `, `%${q}%`, `%${q}%`);
 
   res.json({ courses, lessons });
+});
+
+// Endpoint Sinkronisasi Otomatis Durasi Video (YouTube & File Lokal)
+router.post('/api/lessons/:id/sync-duration', (req, res) => {
+  try {
+    const lessonId = req.params.id;
+    const durationMinutes = parseInt(req.body.duration_minutes, 10);
+    if (!durationMinutes || durationMinutes <= 0) {
+      return res.status(400).json({ success: false, message: 'Durasi menit tidak valid' });
+    }
+
+    const lesson = DB.get('SELECT id, duration_minutes FROM lessons WHERE id = ?', lessonId);
+    if (!lesson) {
+      return res.status(404).json({ success: false, message: 'Materi tidak ditemukan' });
+    }
+
+    // Hanya update basis data jika durasi berbeda
+    if (lesson.duration_minutes !== durationMinutes) {
+      DB.run('UPDATE lessons SET duration_minutes = ? WHERE id = ?', durationMinutes, lessonId);
+      console.log(`[Auto-Sync] Durasi lesson ID ${lessonId} otomatis diperbarui dari ${lesson.duration_minutes}m ke ${durationMinutes}m`);
+    }
+
+    res.json({ success: true, lessonId, duration_minutes: durationMinutes });
+  } catch (err) {
+    console.error('Error sync duration:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 // Katalog Semua Kursus

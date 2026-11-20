@@ -251,3 +251,4 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   - `2026-11-20`: Penyederhanaan Navigasi Sidebar & Bottom Bar:
     * Penghapusan menu Chapter, Help, dan FAQ dari bilah navigasi samping (Sidebar) dan bottom bar mobile.
     * Menu utama kini terfokus padat: Dashboard, Courses, Settings, Panel Admin (khusus role Admin), dan Logout.
+    * Perbaikan parameter binding SQL pada perhitungan total user dashboard admin.

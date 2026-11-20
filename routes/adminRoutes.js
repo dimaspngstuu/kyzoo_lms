@@ -74,7 +74,7 @@ router.get('/admin', (req, res) => {
   const totalCourses = DB.get('SELECT COUNT(*) as count FROM courses').count;
   const totalChapters = DB.get('SELECT COUNT(*) as count FROM chapters').count;
   const totalLessons = DB.get('SELECT COUNT(*) as count FROM lessons').count;
-  const totalUsers = DB.get('SELECT COUNT(*) as count FROM users WHERE role = "pelanggan"').count;
+  const totalUsers = DB.get('SELECT COUNT(1) as count FROM users WHERE role = ?', 'pelanggan').count;
 
   const courses = DB.all(`
     SELECT c.*, 

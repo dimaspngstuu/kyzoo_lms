@@ -278,3 +278,8 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
     * **Untuk Video YouTube**: Mengaktifkan `enablejsapi=1` pada embed player dan memasang listener `postMessage` serta YouTube Iframe API. Begitu video dimuat atau diputar, durasi detik aslinya langsung terdeteksi, teks estimasi header dan badge di sidebar otomatis terbarui (misal `53m`), dan tersimpan otomatis ke database via endpoint `POST /api/lessons/:id/sync-duration`.
     * **Untuk Video Lokal (MP4/WebM)**: Menggunakan event `loadedmetadata` pada elemen HTML5 `<video>` untuk membaca durasi asli file secara instan dan menyinkronkannya ke UI serta database.
     * **Di Panel Admin Kelola Materi**: Saat admin menginput link YouTube atau memilih file video lokal, sistem otomatis mendeteksi durasi asli video dan mengisi input `Durasi (Menit)` secara otomatis tanpa perlu dihitung manual.
+  - `2026-11-20`: Implementasi Database Explorer Panel di Web Admin (`/admin/database`):
+    * Menyediakan antarmuka visual tabel lengkap untuk melihat data langsung dari SQLite (`users`, `courses`, `chapters`, `lessons`, `user_progress`).
+    * Konsol eksekusi query SQL interaktif untuk menjalankan perintah query langsung dari browser.
+    * Tombol 1-klik unduh berkas cadangan database (`kyzoo-backup-*.db`).
+    * Menambahkan tautan menu cepat "Database Explorer" pada sidebar Panel Admin.

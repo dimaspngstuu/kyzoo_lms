@@ -273,4 +273,120 @@ router.post('/admin/lessons/:id/delete', (req, res) => {
   res.redirect('/admin');
 });
 
+// 12. Database Explorer: Tampilkan Data Tabel & Skema
+router.get('/admin/database', (req, res) => {
+  try {
+    const rawTables = DB.all(`
+      SELECT name FROM sqlite_master 
+      WHERE type='table' AND name NOT LIKE 'sqlite_%'
+      ORDER BY name ASC
+    `);
+    const tables = rawTables.map(t => {
+      const countRow = DB.get(`SELECT COUNT(*) as count FROM "${t.name}"`);
+      return {
+        name: t.name,
+        count: countRow ? countRow.count : 0
+      };
+    });
+
+    const activeTable = req.query.table || (tables.length > 0 ? tables[0].name : null);
+    let columns = [];
+    let rows = [];
+
+    if (activeTable) {
+      const validTable = tables.find(t => t.name === activeTable);
+      if (validTable) {
+        columns = DB.all(`PRAGMA table_info("${activeTable}")`);
+        rows = DB.all(`SELECT * FROM "${activeTable}" ORDER BY rowid DESC LIMIT 100`);
+      }
+    }
+
+    res.render('admin/database', {
+      title: 'Database Explorer - Kyzoo Admin',
+      user: req.session.user,
+      tables,
+      activeTable,
+      columns,
+      rows,
+      queryResult: null,
+      customQuery: '',
+      error: req.query.error || null,
+      success: req.query.success || null
+    });
+  } catch (err) {
+    console.error('Error in database explorer:', err);
+    res.redirect('/admin?error=' + encodeURIComponent(err.message));
+  }
+});
+
+// 13. Eksekusi Custom SQL Query Langsung
+router.post('/admin/database/query', (req, res) => {
+  const { sql } = req.body;
+  if (!sql || !sql.trim()) {
+    return res.redirect('/admin/database?error=Query+SQL+tidak+boleh+kosong');
+  }
+
+  const rawTables = DB.all(`
+    SELECT name FROM sqlite_master 
+    WHERE type='table' AND name NOT LIKE 'sqlite_%'
+    ORDER BY name ASC
+  `);
+  const tables = rawTables.map(t => {
+    const countRow = DB.get(`SELECT COUNT(*) as count FROM "${t.name}"`);
+    return { name: t.name, count: countRow ? countRow.count : 0 };
+  });
+
+  try {
+    const trimmed = sql.trim();
+    let queryResult = null;
+    let message = '';
+
+    if (trimmed.toUpperCase().startsWith('SELECT') || trimmed.toUpperCase().startsWith('PRAGMA')) {
+      const rows = DB.all(trimmed);
+      const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
+      queryResult = { rows, columns };
+      message = `Query berhasil dieksekusi: ${rows.length} baris data ditemukan.`;
+    } else {
+      const info = DB.run(trimmed);
+      message = `Perintah SQL berhasil dijalankan. Baris yang berubah: ${info.changes || 0}`;
+    }
+
+    res.render('admin/database', {
+      title: 'Database Explorer - Kyzoo Admin',
+      user: req.session.user,
+      tables,
+      activeTable: null,
+      columns: [],
+      rows: [],
+      queryResult,
+      customQuery: trimmed,
+      error: null,
+      success: message
+    });
+  } catch (err) {
+    res.render('admin/database', {
+      title: 'Database Explorer - Kyzoo Admin',
+      user: req.session.user,
+      tables,
+      activeTable: tables.length > 0 ? tables[0].name : null,
+      columns: [],
+      rows: [],
+      queryResult: null,
+      customQuery: sql,
+      error: 'SQL Error: ' + err.message,
+      success: null
+    });
+  }
+});
+
+// 14. Download File Backup Database Langsung
+router.get('/admin/database/download', (req, res) => {
+  const dbFile = path.join(__dirname, '../data/kyzoo.db');
+  if (fs.existsSync(dbFile)) {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    return res.download(dbFile, `kyzoo-backup-${timestamp}.db`);
+  }
+  res.redirect('/admin/database?error=File+database+tidak+ditemukan');
+});
+
 module.exports = router;

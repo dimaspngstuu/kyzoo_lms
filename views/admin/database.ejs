@@ -1,0 +1,235 @@
+<!-- Halaman Database Explorer (Panel Akses & Kelola Basis Data Langsung) -->
+
+<div class="space-y-6">
+
+  <!-- Header & Navigasi Breadcrumbs -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+    <div>
+      <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
+        <a href="/admin" class="hover:text-violet-600">Panel Admin</a>
+        <span>/</span>
+        <span class="text-slate-900 font-bold">Database Explorer</span>
+      </div>
+      <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+        <span>🗄️ Database Explorer</span>
+        <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">SQLite (WAL Active)</span>
+      </h1>
+      <p class="text-xs text-slate-500 font-medium mt-0.5">
+        Akses data tabel langsung, eksekusi query SQL, dan unduh berkas cadangan database <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700 font-mono text-[11px]">data/kyzoo.db</code>.
+      </p>
+    </div>
+
+    <!-- Tombol Download Backup Database -->
+    <div class="flex items-center gap-2">
+      <a href="/admin/database/download" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-all shadow-sm">
+        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+        </svg>
+        <span>Download Backup (.db)</span>
+      </a>
+      <a href="/admin" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold text-xs transition-colors">
+        Kembali ke Admin
+      </a>
+    </div>
+  </div>
+
+  <!-- Alert Notifikasi -->
+  <% if (error) { %>
+    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-2xl flex items-center gap-2 shadow-xs">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+  <% if (success) { %>
+    <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-2xl flex items-center gap-2 shadow-xs">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+      <span><%= success %></span>
+    </div>
+  <% } %>
+
+  <!-- PILIHAN TABEL DATABASE -->
+  <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
+    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Tabel Tersedia dalam Basis Data:</div>
+    <div class="flex items-center gap-2 overflow-x-auto pb-1">
+      <% tables.forEach(t => { %>
+        <a href="/admin/database?table=<%= t.name %>" 
+           class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap <%= activeTable === t.name ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' %>">
+          <span>📊</span>
+          <span><%= t.name %></span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] <%= activeTable === t.name ? 'bg-white/20 text-white' : 'bg-white text-slate-600 border border-slate-200' %>">
+            <%= t.count %> baris
+          </span>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+
+  <!-- HASIL QUERY KUSTOM (JIKA ADA) -->
+  <% if (queryResult && queryResult.rows) { %>
+    <div class="bg-white rounded-2xl border border-indigo-200 p-5 shadow-xs space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <span>🔍 Hasil Eksekusi Query SQL</span>
+          <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold"><%= queryResult.rows.length %> Baris</span>
+        </h3>
+      </div>
+
+      <div class="overflow-x-auto max-h-[500px]">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="sticky top-0 bg-slate-100 text-slate-700 font-bold uppercase text-[10px] tracking-wider z-10">
+            <tr>
+              <% queryResult.columns.forEach(col => { %>
+                <th class="p-3 border-b border-slate-200"><%= col %></th>
+              <% }) %>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 font-mono text-[11px]">
+            <% queryResult.rows.forEach(r => { %>
+              <tr class="hover:bg-slate-50 transition-colors">
+                <% queryResult.columns.forEach(col => { %>
+                  <td class="p-3 max-w-xs truncate text-slate-700">
+                    <%= r[col] !== null ? r[col] : 'NULL' %>
+                  </td>
+                <% }) %>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- TAMPILAN DATA TABEL AKTIF -->
+  <% if (activeTable && columns.length > 0) { %>
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+            <span>Isi Data Tabel:</span>
+            <span class="text-indigo-600 font-mono bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-100"><%= activeTable %></span>
+          </h3>
+          <p class="text-xs text-slate-400 font-medium mt-0.5">Menampilkan 100 baris data terbaru (Urutan ID DESC)</p>
+        </div>
+        
+        <!-- Info Skema Kolom -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <% columns.forEach(c => { %>
+            <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-1 rounded-md border border-slate-200/60" title="Tipe: <%= c.type %><%= c.pk ? ' (PRIMARY KEY)' : '' %>">
+              <%= c.name %>: <span class="text-indigo-600 font-bold"><%= c.type %></span>
+            </span>
+          <% }) %>
+        </div>
+      </div>
+
+      <!-- Tabel Data Responsif -->
+      <div class="overflow-x-auto max-h-[550px] border border-slate-100 rounded-xl">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="sticky top-0 bg-slate-100 text-slate-700 font-bold uppercase text-[10px] tracking-wider z-10 shadow-2xs">
+            <tr>
+              <% columns.forEach(c => { %>
+                <th class="p-3 border-b border-slate-200 whitespace-nowrap">
+                  <%= c.name %>
+                  <% if (c.pk) { %><span class="text-amber-500 font-extrabold" title="Primary Key">🔑</span><% } %>
+                </th>
+              <% }) %>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 font-mono text-[11px]">
+            <% if (rows.length > 0) { %>
+              <% rows.forEach(r => { %>
+                <tr class="hover:bg-indigo-50/40 transition-colors">
+                  <% columns.forEach(c => { %>
+                    <td class="p-3 max-w-xs truncate text-slate-700">
+                      <% if (c.name === 'password') { %>
+                        <span class="bg-amber-50 text-amber-700 px-2 py-0.5 rounded font-bold text-[10px]"><%= r[c.name] %></span>
+                      <% } else if (c.name === 'role') { %>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold <%= r[c.name] === 'admin' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800' %>">
+                          <%= r[c.name] %>
+                        </span>
+                      <% } else if (c.name === 'thumbnail' || c.name === 'avatar') { %>
+                        <div class="flex items-center gap-1.5 truncate">
+                          <% if (r[c.name]) { %>
+                            <img src="<%= r[c.name] %>" class="w-5 h-5 rounded object-cover shrink-0 border border-slate-200">
+                          <% } %>
+                          <span class="truncate max-w-[140px] text-[10px] text-slate-400"><%= r[c.name] %></span>
+                        </div>
+                      <% } else if (c.name === 'duration_minutes') { %>
+                        <span class="px-2 py-0.5 rounded bg-violet-50 text-violet-700 font-bold text-[10px]">
+                          ⏱️ <%= r[c.name] %>m
+                        </span>
+                      <% } else { %>
+                        <span class="<%= r[c.name] === null ? 'text-slate-300 italic' : '' %>">
+                          <%= r[c.name] !== null ? r[c.name] : 'null' %>
+                        </span>
+                      <% } %>
+                    </td>
+                  <% }) %>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="<%= columns.length %>" class="p-8 text-center text-slate-400 font-sans italic">
+                  Belum ada baris data di tabel ini.
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- KONSOL QUERY SQL INTERAKTIF -->
+  <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+      <div>
+        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <span>⚡ Konsol Query SQL</span>
+          <span class="text-[10px] bg-slate-100 text-slate-500 font-semibold px-2 py-0.5 rounded">Mode Interaktif</span>
+        </h3>
+        <p class="text-xs text-slate-400 font-medium mt-0.5">Jalankan perintah SQL kustom langsung ke database SQLite</p>
+      </div>
+
+      <!-- Template Cepat -->
+      <div class="hidden sm:flex items-center gap-1.5 text-xs font-semibold">
+        <span class="text-slate-400 text-[11px]">Template Cepat:</span>
+        <button type="button" onclick="setQuery('SELECT * FROM users;')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px]">users</button>
+        <button type="button" onclick="setQuery('SELECT * FROM courses;')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px]">courses</button>
+        <button type="button" onclick="setQuery('SELECT * FROM lessons;')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px]">lessons</button>
+        <button type="button" onclick="setQuery('SELECT * FROM user_progress;')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px]">progress</button>
+      </div>
+    </div>
+
+    <form action="/admin/database/query" method="POST" class="space-y-3">
+      <div>
+        <textarea 
+          name="sql" 
+          id="sqlQueryInput" 
+          rows="3" 
+          required 
+          placeholder="Tuliskan query SQL di sini (misal: SELECT * FROM users WHERE role = 'pelanggan';)" 
+          class="w-full px-4 py-3 bg-slate-950 text-emerald-400 font-mono text-xs sm:text-sm rounded-xl border border-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-inner"
+        ><%= customQuery || '' %></textarea>
+      </div>
+      
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] text-slate-400">💡 Tip: Anda bisa menjalankan query <code class="text-indigo-600 font-bold font-mono">SELECT</code>, <code class="text-emerald-600 font-bold font-mono">INSERT</code>, <code class="text-amber-600 font-bold font-mono">UPDATE</code>, atau <code class="text-rose-600 font-bold font-mono">DELETE</code>.</span>
+        <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-200 flex items-center gap-1.5 transition-all">
+          <span>Jalankan Query</span>
+          <span>▶</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<script>
+  function setQuery(sql) {
+    const input = document.getElementById('sqlQueryInput');
+    if (input) {
+      input.value = sql;
+      input.focus();
+    }
+  }
+</script>

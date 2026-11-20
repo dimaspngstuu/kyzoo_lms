@@ -234,3 +234,7 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
     * Implementasi Bottom Navigation Bar khusus perangkat mobile (HP) untuk akses cepat jempol (Dashboard, Kursus, Admin, Bantuan, Profil).
     * Transformasi tampilan daftar kursus menjadi kartu responsif (Course Cards) pada layar HP agar tidak ada teks kepotong atau scroll horizontal.
     * Penyesuaian tombol aksi video player & silabus agar ramah layar sentuh ponsel.
+  - `2026-11-20`: Penambahan Hero Greeting Banner (Sesuai Referensi Gambar 2):
+    * Sapaan hangat personal & dinamis berdasarkan waktu ("Selamat Pagi / Siang / Sore / Malam, Dimas Pangestu!").
+    * Subjudul motivasi belajar: "Mau belajar atau praktik membuat web app AI apa hari ini?".
+    * Kotak pencarian materi interaktif bergaya gelap modern dilengkapi shortcut shortcut keyboard `Ctrl + K`.

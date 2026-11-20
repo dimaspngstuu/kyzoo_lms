@@ -99,8 +99,11 @@ function seedDatabase() {
       INSERT INTO users (name, email, password, role, avatar)
       VALUES 
         ('Admin Kyzoo', 'admin@kyzoo.com', 'admin123', 'admin', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'),
-        ('Dipu Paul', 'user@kyzoo.com', 'user123', 'pelanggan', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80')
+        ('Dimas Pangestu', 'user@kyzoo.com', 'user123', 'pelanggan', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80')
     `);
+  } else {
+    // Update existing pelanggan name to Dimas Pangestu
+    DB.run("UPDATE users SET name = 'Dimas Pangestu' WHERE role = 'pelanggan'");
   }
 
   const courseCount = DB.get('SELECT COUNT(*) as count FROM courses');

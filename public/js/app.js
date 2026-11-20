@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
   if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeSidebar);
 
-  // Auto close sidebar when tapping a link on mobile
+  // Auto close sidebar saat link diklik pada layar mobile
   if (sidebarMenu) {
     const navLinks = sidebarMenu.querySelectorAll('a');
     navLinks.forEach(link => {
@@ -32,9 +32,21 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
+
+  // 2. Shortcut Keyboard Ctrl + K untuk Fokus ke Search Bar (Persis Gambar 2)
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      const heroSearch = document.getElementById('heroSearchInput');
+      if (heroSearch) {
+        heroSearch.focus();
+        heroSearch.select();
+      }
+    }
+  });
 });
 
-// 2. Toast Notification Function
+// 3. Toast Notification Function
 function showToast(message, type = 'success') {
   const container = document.getElementById('toastContainer');
   if (!container) return;

@@ -5,9 +5,33 @@ const { requireAuth } = require('../middleware/auth');
 
 router.use(requireAuth);
 
-// Dashboard Utama (Layout Persis Gambar Quyl)
+// Dashboard Utama (Layout Persis Gambar Quyl + Hero Greeting Gambar 2)
 router.get('/dashboard', (req, res) => {
   const userId = req.session.user.id;
+
+  // Sinkronisasi data profil terbaru dari basis data
+  const freshUser = DB.get('SELECT * FROM users WHERE id = ?', userId);
+  if (freshUser) {
+    req.session.user = {
+      id: freshUser.id,
+      name: freshUser.name,
+      email: freshUser.email,
+      role: freshUser.role,
+      avatar: freshUser.avatar
+    };
+    res.locals.currentUser = req.session.user;
+  }
+
+  // Hitung Ucapan Waktu Dinamis (Pagi / Siang / Sore / Malam)
+  const hour = new Date().getHours();
+  let greeting = 'Selamat Pagi';
+  if (hour >= 11 && hour < 15) {
+    greeting = 'Selamat Siang';
+  } else if (hour >= 15 && hour < 18) {
+    greeting = 'Selamat Sore';
+  } else if (hour >= 18 || hour < 4) {
+    greeting = 'Selamat Malam';
+  }
 
   // 1. Hitung Metrik Statistik Pengguna
   const totalLessonsRow = DB.get('SELECT COUNT(*) as count FROM lessons');
@@ -116,6 +140,7 @@ router.get('/dashboard', (req, res) => {
   res.render('dashboard', {
     title: 'Dashboard - Kyzoo LMS',
     user: req.session.user,
+    greeting,
     stats: {
       totalLessons,
       completedLessons,

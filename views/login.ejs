@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
+  <link rel="icon" type="image/png" href="/images/logo-icon.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style> body { font-family: 'Inter', sans-serif; } </style>
@@ -13,14 +14,10 @@
   <div class="w-full max-w-md bg-white rounded-3xl border border-slate-100 p-8 shadow-xl shadow-slate-200/50">
     <!-- Brand Logo Kyzoo -->
     <div class="text-center mb-6">
-      <div class="w-12 h-12 mx-auto mb-3 flex items-center justify-center text-slate-900">
-        <svg class="w-10 h-10" viewBox="0 0 40 40" fill="currentColor">
-          <path d="M12 28C10 24 9 19 12 12C15 5 22 2 30 2C30 10 27 17 20 20C17 21.3 14 24 12 28Z" />
-          <path d="M18 24C16 27 13 32 10 38C12 36 14 34 16 32C19 29 20 27 21 24H18Z" opacity="0.8" />
-        </svg>
+      <div class="flex justify-center mb-3">
+        <img src="/images/logo.png" alt="Kyzoo" class="w-28 h-auto object-contain mx-auto transition-transform hover:scale-105" />
       </div>
-      <h1 class="text-2xl font-black text-slate-900 tracking-tight">Kyzoo<span class="text-violet-600">.</span></h1>
-      <p class="text-xs text-slate-500 mt-1">Pusat Belajar & Video Tutorial Pelanggan</p>
+      <p class="text-xs text-slate-500 font-medium">Pusat Belajar & Video Tutorial Pelanggan</p>
     </div>
 
     <!-- Pesan Notifikasi Error / Sukses -->

@@ -1,14 +1,18 @@
 <!-- Topbar Header ala Quyl / Kyzoo -->
 <header class="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between gap-4 sticky top-0 z-30">
-  <div class="flex items-center gap-4">
+  <div class="flex items-center gap-3">
     <!-- Tombol Hamburger Mobile -->
     <button id="openSidebarBtn" class="md:hidden text-slate-600 hover:text-slate-900 p-1.5 rounded-lg hover:bg-slate-100">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
       </svg>
     </button>
-    <!-- Judul Halaman -->
-    <h1 class="text-xl font-bold text-slate-800 tracking-tight">
+    <!-- Logo Brand di Topbar Mobile -->
+    <a href="/dashboard" class="md:hidden flex items-center">
+      <img src="/images/logo-horizontal.png" alt="Kyzoo" class="h-8 w-auto object-contain" />
+    </a>
+    <!-- Judul Halaman Desktop -->
+    <h1 class="text-xl font-bold text-slate-800 tracking-tight hidden md:block">
       <%= typeof pageTitle !== 'undefined' ? pageTitle : (typeof title !== 'undefined' ? title.split('-')[0].trim() : 'Dashboard') %>
     </h1>
   </div>

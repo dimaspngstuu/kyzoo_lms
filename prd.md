@@ -229,3 +229,8 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   - `2026-11-20`: Inisialisasi awal arsitektur dan penyusunan modul Kyzoo LMS v1.0.0.
   - `2026-11-20`: Implementasi lengkap seluruh fitur (Dashboard Quyl 1:1, Ruang Belajar Video, AJAX Checklist Progress, Admin CMS CRUD, Otentikasi Sesi & 1-Click Demo).
   - `2026-11-20`: Revisi UI (Penghapusan section sidebar kanan: Status Kalender & Upcoming Tasks agar layout konten utama lebih lapang dan fokus).
+  - `2026-11-20`: Revisi Mobile-First & UI Cleanup:
+    * Penghapusan ikon pesan & notifikasi di topbar sesuai tangkapan layar pengguna.
+    * Implementasi Bottom Navigation Bar khusus perangkat mobile (HP) untuk akses cepat jempol (Dashboard, Kursus, Admin, Bantuan, Profil).
+    * Transformasi tampilan daftar kursus menjadi kartu responsif (Course Cards) pada layar HP agar tidak ada teks kepotong atau scroll horizontal.
+    * Penyesuaian tombol aksi video player & silabus agar ramah layar sentuh ponsel.

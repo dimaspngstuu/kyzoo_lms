@@ -55,12 +55,12 @@
       </div>
 
       <!-- Bar Aksi Materi (Tandai Selesai & Navigasi Sebelumnya/Selanjutnya) -->
-      <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+      <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <!-- Tombol Tandai Selesai (Checklist Interaktif) -->
         <button 
           id="btnToggleComplete" 
           onclick="toggleLessonCompletion(<%= activeLesson.id %>)" 
-          class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm <%= activeLesson.is_completed ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' %>">
+          class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm <%= activeLesson.is_completed ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' %>">
           <svg id="completeCheckIcon" class="w-4 h-4 <%= activeLesson.is_completed ? 'block' : 'hidden' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
           </svg>
@@ -70,16 +70,16 @@
         </button>
 
         <!-- Navigasi Next & Prev -->
-        <div class="flex items-center gap-2">
+        <div class="flex items-center justify-between sm:justify-end gap-2">
           <% if (prevLesson) { %>
-            <a href="/learn/<%= course.slug %>/<%= prevLesson.id %>" class="px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold text-xs transition-colors flex items-center gap-1.5">
+            <a href="/learn/<%= course.slug %>/<%= prevLesson.id %>" class="flex-1 sm:flex-initial text-center justify-center px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold text-xs transition-colors flex items-center gap-1.5">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
               <span>Sebelumnya</span>
             </a>
           <% } %>
 
           <% if (nextLesson) { %>
-            <a href="/learn/<%= course.slug %>/<%= nextLesson.id %>" class="px-4 py-2 rounded-xl bg-[#6c5dd3] text-white hover:bg-violet-700 font-bold text-xs transition-colors flex items-center gap-1.5 shadow-sm shadow-violet-200">
+            <a href="/learn/<%= course.slug %>/<%= nextLesson.id %>" class="flex-1 sm:flex-initial text-center justify-center px-4 py-2.5 rounded-xl bg-[#6c5dd3] text-white hover:bg-violet-700 font-bold text-xs transition-colors flex items-center gap-1.5 shadow-sm shadow-violet-200">
               <span>Materi Lanjut</span>
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>

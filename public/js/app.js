@@ -20,6 +20,18 @@ document.addEventListener('DOMContentLoaded', () => {
   if (openSidebarBtn) openSidebarBtn.addEventListener('click', openSidebar);
   if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
   if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeSidebar);
+
+  // Auto close sidebar when tapping a link on mobile
+  if (sidebarMenu) {
+    const navLinks = sidebarMenu.querySelectorAll('a');
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth < 768) {
+          closeSidebar();
+        }
+      });
+    });
+  }
 });
 
 // 2. Toast Notification Function

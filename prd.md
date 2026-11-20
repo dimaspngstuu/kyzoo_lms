@@ -257,3 +257,7 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
     * Penerapan pada halaman Login (`/login`) & Register (`/register`) dengan proporsi ideal (lebar 112px, elegan dan terpusat).
     * Penerapan pada bilah atas / sidebar header (`views/partials/sidebar.ejs` dan `views/partials/topbar.ejs`) dengan format horizontal yang pas (tinggi 40px) menggantikan logo lama.
     * Penambahan ikon favicon browser (`logo-icon.png`) pada tab peramban.
+  - `2026-11-20`: Peningkatan Halaman Pengaturan Profil (`/settings`):
+    * Penguncian permanen field alamat email dengan status `readonly`, ikon gembok 🔒, dan styling `cursor-not-allowed` sehingga email tidak dapat diubah sembarangan.
+    * Penambahan kotak informasi edukatif terkait email sebagai identitas tunggal akun untuk akses login, data progres, dan keamanan.
+    * Implementasi formulir penggantian kata sandi (Password Saat Ini, Password Baru minimal 6 karakter, Konfirmasi Password Baru) lengkap dengan tombol intip/sembunyikan kata sandi (eye icon) dan validasi database instan.

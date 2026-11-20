@@ -17,26 +17,33 @@
         Mau belajar atau praktik membuat web app AI apa hari ini?
       </p>
 
-      <!-- Input Pencarian Sesuai Gambar 2 (dengan Shortcut Ctrl K) -->
-      <form action="/courses" method="GET" class="pt-5 max-w-2xl mx-auto">
-        <div class="relative flex items-center">
-          <div class="absolute inset-y-0 left-0 pl-4 sm:pl-5 flex items-center pointer-events-none text-slate-400">
-            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
+      <!-- Input Pencarian (Fungsional Live Search & Shortcut Ctrl K) -->
+      <div class="pt-5 max-w-2xl mx-auto relative">
+        <form action="/courses" method="GET" id="heroSearchForm" autocomplete="off">
+          <div class="relative flex items-center">
+            <div class="absolute inset-y-0 left-0 pl-4 sm:pl-5 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <input 
+              type="text" 
+              name="q" 
+              id="heroSearchInput"
+              placeholder="Cari materi video, modul, atau catatan panduan..." 
+              class="w-full pl-11 sm:pl-13 pr-20 sm:pr-24 py-3 sm:py-3.5 bg-slate-900/90 hover:bg-slate-900 border border-slate-700/80 rounded-2xl text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 transition-all shadow-inner"
+            />
+            <div class="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center pointer-events-none">
+              <kbd class="px-2 sm:px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-slate-400 bg-slate-800 border border-slate-700 rounded-lg shadow-sm">Ctrl K</kbd>
+            </div>
           </div>
-          <input 
-            type="text" 
-            name="q" 
-            id="heroSearchInput"
-            placeholder="Cari materi video, modul, catatan, atau Zettbos Library..." 
-            class="w-full pl-11 sm:pl-13 pr-20 sm:pr-24 py-3 sm:py-3.5 bg-slate-900/90 hover:bg-slate-900 border border-slate-700/80 rounded-2xl text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 transition-all shadow-inner"
-          />
-          <div class="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center pointer-events-none">
-            <kbd class="px-2 sm:px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-slate-400 bg-slate-800 border border-slate-700 rounded-lg shadow-sm">Ctrl K</kbd>
-          </div>
+        </form>
+
+        <!-- Dropdown Live Search Hasil Cepat -->
+        <div id="heroSearchResults" class="hidden absolute top-full left-0 right-0 mt-2 bg-slate-900/95 backdrop-blur-md border border-slate-700/90 rounded-2xl shadow-2xl z-50 overflow-hidden text-left max-h-96 overflow-y-auto divide-y divide-slate-800">
+          <!-- Diisi secara dinamis melalui JavaScript -->
         </div>
-      </form>
+      </div>
     </div>
   </div>
 
@@ -199,5 +206,137 @@
         }
       });
     }
+  }
+
+  // Live Search Input Handler
+  const heroSearchInput = document.getElementById('heroSearchInput');
+  const heroSearchResults = document.getElementById('heroSearchResults');
+  let searchTimer = null;
+
+  if (heroSearchInput && heroSearchResults) {
+    heroSearchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim();
+      clearTimeout(searchTimer);
+
+      // 1. Live Filter Kursus di Halaman Dashboard (Tabel & Kartu Mobile)
+      const filterTerm = query.toLowerCase();
+      const courseItems = document.querySelectorAll('.course-row, .course-card-mobile');
+      courseItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (!filterTerm || text.includes(filterTerm)) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+
+      // 2. Jika query kosong, sembunyikan dropdown
+      if (!query) {
+        heroSearchResults.classList.add('hidden');
+        heroSearchResults.innerHTML = '';
+        return;
+      }
+
+      // 3. Debounce AJAX Live Search ke /api/search
+      searchTimer = setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+          const data = await res.json();
+          renderSearchResults(data, query);
+        } catch (err) {
+          console.error('Search error:', err);
+        }
+      }, 200);
+    });
+
+    // Sembunyikan dropdown jika klik di luar
+    document.addEventListener('click', (e) => {
+      if (!heroSearchInput.contains(e.target) && !heroSearchResults.contains(e.target)) {
+        heroSearchResults.classList.add('hidden');
+      }
+    });
+
+    // Tombol Escape menutup dropdown
+    heroSearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        heroSearchResults.classList.add('hidden');
+      }
+    });
+  }
+
+  function renderSearchResults(data, query) {
+    const { courses, lessons } = data;
+    if (courses.length === 0 && lessons.length === 0) {
+      heroSearchResults.innerHTML = `
+        <div class="p-4 text-xs text-slate-400 text-center">
+          Tidak ditemukan modul atau video yang cocok dengan "<span class="text-white font-bold">${escapeHtml(query)}</span>"
+        </div>
+      `;
+      heroSearchResults.classList.remove('hidden');
+      return;
+    }
+
+    let html = '';
+
+    // Modul Kursus
+    if (courses.length > 0) {
+      html += `
+        <div class="p-3 bg-slate-950/60 text-[11px] font-bold uppercase tracking-wider text-violet-400">
+          📚 Modul Kursus
+        </div>
+        <div class="p-1 space-y-0.5">
+      `;
+      courses.forEach(c => {
+        html += `
+          <a href="/courses/${c.slug}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-800 transition-colors group">
+            <img src="${c.thumbnail}" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-slate-700">
+            <div class="min-w-0 flex-1">
+              <h5 class="text-xs font-bold text-white group-hover:text-violet-400 truncate">${escapeHtml(c.title)}</h5>
+              <span class="text-[10px] text-slate-400">${escapeHtml(c.category)}</span>
+            </div>
+          </a>
+        `;
+      });
+      html += `</div>`;
+    }
+
+    // Video Tutorial & Materi
+    if (lessons.length > 0) {
+      html += `
+        <div class="p-3 bg-slate-950/60 text-[11px] font-bold uppercase tracking-wider text-emerald-400">
+          🎥 Video Tutorial
+        </div>
+        <div class="p-1 space-y-0.5">
+      `;
+      lessons.forEach(l => {
+        html += `
+          <a href="/learn/${l.course_slug}/${l.id}" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-800 transition-colors group">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-xs font-bold">▶</span>
+              <div class="min-w-0">
+                <h5 class="text-xs font-bold text-white group-hover:text-emerald-400 truncate">${escapeHtml(l.title)}</h5>
+                <span class="text-[10px] text-slate-400">${escapeHtml(l.course_title)}</span>
+              </div>
+            </div>
+            <span class="text-[10px] text-slate-400 shrink-0 ml-2">${l.duration_minutes}m</span>
+          </a>
+        `;
+      });
+      html += `</div>`;
+    }
+
+    heroSearchResults.innerHTML = html;
+    heroSearchResults.classList.remove('hidden');
+  }
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/[&<>"']/g, m => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    })[m]);
   }
 </script>

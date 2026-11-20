@@ -241,3 +241,7 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   - `2026-11-20`: Penyederhanaan Layout Dashboard Utama:
     * Penghapusan kartu 'Lanjutkan Belajar' (Resume Banner) dan 3 kartu status pastel (Lessons, Assignments, Tests).
     * Alur dashboard menjadi sangat bersih & langsung: Hero Greeting ("Selamat Pagi, Dimas Pangestu!") langsung tersambung ke daftar modul pembelajaran ("My Courses").
+  - `2026-11-20`: Fungsionalitas Live Search & Pembersihan Placeholder:
+    * Penghapusan teks "atau Zettbos Library" dari input pencarian.
+    * Pembuatan endpoint `/api/search` untuk pencarian instan modul kursus dan video materi.
+    * Implementasi live search dropdown interaktif dan in-page live filter pada daftar kursus.

@@ -62,6 +62,32 @@ function formatVideoEmbed(source, url) {
   };
 }
 
+// API Pencarian Cepat (Live Search untuk Hero Search Bar & Dropdown)
+router.get('/api/search', (req, res) => {
+  const q = req.query.q ? req.query.q.trim().toLowerCase() : '';
+  if (!q) {
+    return res.json({ courses: [], lessons: [] });
+  }
+
+  const courses = DB.all(`
+    SELECT id, title, slug, category, thumbnail
+    FROM courses
+    WHERE is_active = 1 AND (LOWER(title) LIKE ? OR LOWER(description) LIKE ? OR LOWER(category) LIKE ?)
+    LIMIT 5
+  `, `%${q}%`, `%${q}%`, `%${q}%`);
+
+  const lessons = DB.all(`
+    SELECT l.id, l.title, l.duration_minutes, l.video_source, c.slug as course_slug, c.title as course_title
+    FROM lessons l
+    JOIN chapters ch ON l.chapter_id = ch.id
+    JOIN courses c ON ch.course_id = c.id
+    WHERE c.is_active = 1 AND (LOWER(l.title) LIKE ? OR LOWER(l.content_text) LIKE ?)
+    LIMIT 6
+  `, `%${q}%`, `%${q}%`);
+
+  res.json({ courses, lessons });
+});
+
 // Katalog Semua Kursus
 router.get('/courses', (req, res) => {
   const userId = req.session.user.id;

@@ -245,3 +245,6 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
     * Penghapusan teks "atau Zettbos Library" dari input pencarian.
     * Pembuatan endpoint `/api/search` untuk pencarian instan modul kursus dan video materi.
     * Implementasi live search dropdown interaktif dan in-page live filter pada daftar kursus.
+  - `2026-11-20`: Perbaikan Bug Potongan Dropdown Pencarian:
+    * Mengatasi pemotongan visual dropdown hasil pencarian akibat `overflow-hidden` pada hero banner.
+    * Memisahkan ambient glow ke layer independen sehingga dropdown mengambang bebas di atas kartu kursus tanpa terpotong.

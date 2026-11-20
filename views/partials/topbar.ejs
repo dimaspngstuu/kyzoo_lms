@@ -1,0 +1,71 @@
+<!-- Topbar Header ala Quyl / Kyzoo -->
+<header class="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between gap-4 sticky top-0 z-30">
+  <div class="flex items-center gap-4">
+    <!-- Tombol Hamburger Mobile -->
+    <button id="openSidebarBtn" class="md:hidden text-slate-600 hover:text-slate-900 p-1.5 rounded-lg hover:bg-slate-100">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
+    <!-- Judul Halaman -->
+    <h1 class="text-xl font-bold text-slate-800 tracking-tight">
+      <%= typeof pageTitle !== 'undefined' ? pageTitle : (typeof title !== 'undefined' ? title.split('-')[0].trim() : 'Dashboard') %>
+    </h1>
+  </div>
+
+  <!-- Search Bar Tengah (Persis Layout Gambar) -->
+  <div class="flex-1 max-w-md mx-4 hidden sm:block">
+    <form action="/courses" method="GET" class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+      <input 
+        type="text" 
+        name="q" 
+        placeholder="Search here..." 
+        value="<%= typeof search !== 'undefined' ? search : '' %>"
+        class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all"
+      />
+    </form>
+  </div>
+
+  <!-- Profil Pengguna & Ikon Notifikasi Kanan -->
+  <div class="flex items-center gap-3">
+    <!-- Message Icon -->
+    <button title="Pesan" class="w-9 h-9 rounded-xl border border-slate-200/70 flex items-center justify-center text-slate-500 hover:text-violet-600 hover:border-violet-200 hover:bg-violet-50/50 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+      </svg>
+    </button>
+
+    <!-- Notification Icon -->
+    <button title="Notifikasi" class="relative w-9 h-9 rounded-xl border border-slate-200/70 flex items-center justify-center text-slate-500 hover:text-violet-600 hover:border-violet-200 hover:bg-violet-50/50 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+      </svg>
+      <span class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+    </button>
+
+    <!-- User Profile Dropdown -->
+    <div class="relative flex items-center gap-2 pl-2 border-l border-slate-100">
+      <img 
+        src="<%= (currentUser && currentUser.avatar) ? currentUser.avatar : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80' %>" 
+        alt="Avatar" 
+        class="w-9 h-9 rounded-full object-cover ring-2 ring-violet-100"
+      />
+      <div class="hidden lg:block text-left">
+        <div class="text-xs font-bold text-slate-800 leading-tight">
+          <%= currentUser ? currentUser.name : 'Dipu Paul' %>
+        </div>
+        <div class="text-[10px] font-semibold text-violet-600 uppercase tracking-wider">
+          <%= currentUser ? (currentUser.role === 'admin' ? 'Administrator' : 'Pelanggan') : 'Pelanggan' %>
+        </div>
+      </div>
+      <svg class="w-3.5 h-3.5 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </div>
+  </div>
+</header>

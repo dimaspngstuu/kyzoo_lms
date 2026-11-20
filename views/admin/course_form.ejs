@@ -1,0 +1,72 @@
+<!-- Admin: Form Tambah / Edit Kursus -->
+
+<div class="max-w-2xl mx-auto space-y-6">
+
+  <div class="bg-white rounded-[22px] border border-slate-100 p-6 shadow-sm">
+    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+      <h2 class="text-lg font-bold text-slate-900">
+        <%= course ? 'Edit Kursus: ' + course.title : 'Tambah Kursus Baru' %>
+      </h2>
+      <a href="/admin" class="text-xs font-semibold text-slate-400 hover:text-slate-700">← Kembali</a>
+    </div>
+
+    <% if (error) { %>
+      <div class="mb-4 p-3 bg-rose-50 text-rose-700 text-xs rounded-xl"><%= error %></div>
+    <% } %>
+
+    <form action="<%= course ? '/admin/courses/' + course.id + '/edit' : '/admin/courses/new' %>" method="POST" enctype="multipart/form-data" class="space-y-4">
+      
+      <!-- Kode Kursus -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Kode Unik Kursus</label>
+        <input type="text" name="code" value="<%= generatedCode %>" readonly class="w-full px-4 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-600">
+      </div>
+
+      <!-- Judul Kursus -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Judul Kursus / Modul *</label>
+        <input type="text" name="title" required value="<%= course ? course.title : '' %>" placeholder="Contoh: Panduan Menggunakan Dashboard" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500">
+      </div>
+
+      <!-- Kategori -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Kategori *</label>
+        <input type="text" name="category" required value="<%= course ? course.category : '' %>" placeholder="Contoh: Tutorial Penggunaan, Fitur Dasar, Lanjutan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500">
+      </div>
+
+      <!-- Deskripsi -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Deskripsi Singkat</label>
+        <textarea name="description" rows="3" placeholder="Jelaskan ringkasan tujuan materi ini..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"><%= course ? course.description : '' %></textarea>
+      </div>
+
+      <!-- Thumbnail Cover -->
+      <div class="space-y-2">
+        <label class="block text-xs font-bold text-slate-700">Cover Thumbnail</label>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Pilihan A: Upload File Gambar -->
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+            <span class="text-[10px] font-bold text-slate-500 block mb-1">Unggah Gambar (JPG/PNG)</span>
+            <input type="file" name="thumbnail_file" accept="image/*" class="text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-violet-100 file:text-violet-700 hover:file:bg-violet-200">
+          </div>
+
+          <!-- Pilihan B: URL Gambar Eksternal -->
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+            <span class="text-[10px] font-bold text-slate-500 block mb-1">Atau Gunakan URL Gambar</span>
+            <input type="url" name="custom_thumbnail" value="<%= (course && course.thumbnail && !course.thumbnail.startsWith('/uploads/')) ? course.thumbnail : '' %>" placeholder="https://..." class="w-full px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs">
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-4 flex items-center justify-end gap-3">
+        <a href="/admin" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50">Batal</a>
+        <button type="submit" class="px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-xs font-bold shadow-md shadow-violet-200 transition-all">
+          <%= course ? 'Simpan Perubahan' : 'Buat Kursus' %>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>

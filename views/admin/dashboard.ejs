@@ -1,0 +1,119 @@
+<!-- Admin Dashboard: Kelola Materi & Kursus CRUD -->
+
+<div class="space-y-6">
+
+  <!-- Alert Notifikasi -->
+  <% if (success) { %>
+    <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-2xl flex items-center gap-2">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+      <span class="font-bold"><%= success %></span>
+    </div>
+  <% } %>
+
+  <!-- Header & Tombol Tambah Kursus -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-[22px] border border-slate-100 p-6 shadow-sm">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Mode Admin</span>
+        <h2 class="text-xl font-bold text-slate-900">Pusat Pengelolaan Kursus & Materi</h2>
+      </div>
+      <p class="text-xs text-slate-400 mt-1">Buat modul baru, atur bab, dan unggah video panduan untuk pelanggan.</p>
+    </div>
+
+    <a href="/admin/courses/new" class="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-bold text-xs shadow-md shadow-violet-200 transition-all">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+      <span>Tambah Kursus Baru</span>
+    </a>
+  </div>
+
+  <!-- 4 Ringkasan Metrik Admin -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+      <div class="text-xs font-semibold text-slate-400">Total Kursus</div>
+      <div class="text-2xl font-black text-slate-900 mt-1"><%= stats.totalCourses %></div>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+      <div class="text-xs font-semibold text-slate-400">Total Bab / Chapter</div>
+      <div class="text-2xl font-black text-slate-900 mt-1"><%= stats.totalChapters %></div>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+      <div class="text-xs font-semibold text-slate-400">Total Video Tutorial</div>
+      <div class="text-2xl font-black text-slate-900 mt-1"><%= stats.totalLessons %></div>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+      <div class="text-xs font-semibold text-slate-400">Pelanggan Aktif</div>
+      <div class="text-2xl font-black text-slate-900 mt-1"><%= stats.totalUsers %></div>
+    </div>
+  </div>
+
+  <!-- Tabel CRUD Kursus -->
+  <div class="bg-white rounded-[22px] border border-slate-100 p-6 shadow-sm">
+    <h3 class="text-base font-bold text-slate-900 mb-4">Daftar Kursus & Video Tutorial Aktif</h3>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-3">
+            <th class="py-3 px-3">Kode</th>
+            <th class="py-3 px-3">Kursus</th>
+            <th class="py-3 px-3">Kategori</th>
+            <th class="py-3 px-3 text-center">Bab</th>
+            <th class="py-3 px-3 text-center">Video</th>
+            <th class="py-3 px-3 text-right">Aksi Kelola</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <% courses.forEach(course => { %>
+          <tr class="hover:bg-slate-50/70 transition-colors">
+            <td class="py-4 px-3 text-xs font-bold text-slate-500 font-mono"><%= course.code %></td>
+            
+            <td class="py-4 px-3">
+              <div class="flex items-center gap-3">
+                <img src="<%= course.thumbnail %>" alt="" class="w-10 h-10 rounded-xl object-cover border border-slate-100">
+                <div>
+                  <h4 class="text-xs sm:text-sm font-bold text-slate-800"><%= course.title %></h4>
+                  <span class="text-[10px] text-slate-400 font-mono">/<%= course.slug %></span>
+                </div>
+              </div>
+            </td>
+
+            <td class="py-4 px-3">
+              <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-violet-50 text-violet-700">
+                <%= course.category %>
+              </span>
+            </td>
+
+            <td class="py-4 px-3 text-center text-xs font-bold text-slate-700">
+              <%= course.chapters_count %>
+            </td>
+
+            <td class="py-4 px-3 text-center text-xs font-bold text-slate-700">
+              <%= course.lessons_count %>
+            </td>
+
+            <td class="py-4 px-3 text-right">
+              <div class="inline-flex items-center gap-1.5">
+                <!-- Tombol Kelola Kurikulum & Video -->
+                <a href="/admin/courses/<%= course.id %>/curriculum" class="px-3 py-1.5 bg-[#6c5dd3] hover:bg-violet-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm">
+                  Kelola Video
+                </a>
+                <!-- Edit Kursus -->
+                <a href="/admin/courses/<%= course.id %>/edit" class="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors" title="Edit Kursus">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                </a>
+                <!-- Hapus Kursus -->
+                <form action="/admin/courses/<%= course.id %>/delete" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kursus ini beserta semua bab dan materinya?');" class="inline">
+                  <button type="submit" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="Hapus Kursus">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

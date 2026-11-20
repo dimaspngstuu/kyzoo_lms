@@ -1,0 +1,210 @@
+<!-- Admin: Kelola Kurikulum (Bab & Materi Video CRUD) -->
+
+<div class="space-y-6">
+
+  <!-- Header Info Kursus -->
+  <div class="bg-white rounded-[22px] border border-slate-100 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <a href="/admin" class="text-xs font-bold text-violet-600 hover:underline">← Panel Admin</a>
+        <span class="text-slate-300">/</span>
+        <span class="text-xs font-bold text-slate-500"><%= course.code %></span>
+      </div>
+      <h2 class="text-xl font-bold text-slate-900 mt-1">Kelola Materi: <%= course.title %></h2>
+    </div>
+
+    <!-- Tombol Modal Tambah Bab -->
+    <button onclick="document.getElementById('modalAddChapter').classList.remove('hidden')" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+      <span>Tambah Bab Baru</span>
+    </button>
+  </div>
+
+  <!-- Notifikasi Pesan -->
+  <% if (success) { %>
+    <div class="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-xl"><%= success %></div>
+  <% } %>
+  <% if (error) { %>
+    <div class="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-xl"><%= error %></div>
+  <% } %>
+
+  <!-- Daftar Bab & Lessons -->
+  <div class="space-y-6">
+    <% if (chapters.length === 0) { %>
+      <div class="bg-white rounded-[22px] border border-slate-100 p-12 text-center shadow-sm">
+        <p class="text-sm font-semibold text-slate-500">Belum ada bab yang dibuat untuk kursus ini.</p>
+        <button onclick="document.getElementById('modalAddChapter').classList.remove('hidden')" class="mt-3 px-4 py-2 bg-violet-600 text-white font-bold text-xs rounded-xl">
+          Buat Bab Pertama
+        </button>
+      </div>
+    <% } %>
+
+    <% chapters.forEach((ch, idx) => { %>
+      <div class="bg-white rounded-[22px] border border-slate-100 p-6 shadow-sm space-y-4">
+        
+        <!-- Header Bab -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-lg bg-violet-100 text-violet-700 font-bold text-xs flex items-center justify-center">
+              <%= idx + 1 %>
+            </span>
+            <h3 class="text-sm font-bold text-slate-900"><%= ch.title %></h3>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <!-- Tombol Tambah Materi ke Bab ini -->
+            <button onclick="openAddLessonModal(<%= ch.id %>, '<%= ch.title %>')" class="px-3 py-1.5 bg-violet-50 hover:bg-[#6c5dd3] hover:text-white text-violet-700 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              <span>Tambah Video Materi</span>
+            </button>
+
+            <!-- Hapus Bab -->
+            <form action="/admin/chapters/<%= ch.id %>/delete" method="POST" onsubmit="return confirm('Hapus bab ini beserta seluruh materinya?');" class="inline">
+              <button type="submit" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="Hapus Bab">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Daftar Lesson dalam Bab -->
+        <div class="space-y-2">
+          <% if (ch.lessons.length === 0) { %>
+            <p class="text-xs text-slate-400 italic py-2">Belum ada video materi di bab ini.</p>
+          <% } %>
+
+          <% ch.lessons.forEach(l => { %>
+            <div class="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 bg-slate-50/60 hover:bg-white hover:border-violet-200 transition-all">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-600 shrink-0">
+                  <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
+                </div>
+                <div>
+                  <h4 class="text-xs font-bold text-slate-800"><%= l.title %></h4>
+                  <div class="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
+                    <span class="font-semibold text-violet-600 uppercase"><%= l.video_source %></span>
+                    <span>•</span>
+                    <span><%= l.duration_minutes %> Menit</span>
+                    <span>•</span>
+                    <span class="truncate max-w-xs"><%= l.video_url %></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Hapus Lesson -->
+              <form action="/admin/lessons/<%= l.id %>/delete" method="POST" onsubmit="return confirm('Hapus materi ini?');" class="inline">
+                <button type="submit" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+              </form>
+            </div>
+          <% }) %>
+        </div>
+
+      </div>
+    <% }) %>
+  </div>
+
+</div>
+
+<!-- MODAL TAMBAH BAB -->
+<div id="modalAddChapter" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl">
+    <h3 class="text-base font-bold text-slate-900 mb-4">Tambah Bab / Chapter Baru</h3>
+    <form action="/admin/courses/<%= course.id %>/chapters/new" method="POST" class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Nama Bab *</label>
+        <input type="text" name="title" required placeholder="Contoh: Bab 2: Pengaturan Lanjutan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800">
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" onclick="document.getElementById('modalAddChapter').classList.add('hidden')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Batal</button>
+        <button type="submit" class="px-5 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-xs font-bold">Simpan Bab</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL TAMBAH MATERI / VIDEO (CRUD) -->
+<div id="modalAddLesson" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+      <h3 class="text-base font-bold text-slate-900">Tambah Video Tutorial</h3>
+      <button type="button" onclick="document.getElementById('modalAddLesson').classList.add('hidden')" class="text-slate-400 hover:text-slate-700">✕</button>
+    </div>
+
+    <form id="formAddLesson" action="" method="POST" enctype="multipart/form-data" class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Judul Video / Materi *</label>
+        <input type="text" name="title" required placeholder="Contoh: Cara Menghubungkan Akun & Integrasi" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800">
+      </div>
+
+      <!-- Pilihan Sumber Video -->
+      <div class="space-y-2">
+        <label class="block text-xs font-bold text-slate-700">Pilih Sumber Video *</label>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <label class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
+            <input type="radio" name="video_source" value="youtube" checked onchange="toggleVideoInput('link')">
+            <span class="font-bold">Link YouTube / Vimeo / Drive</span>
+          </label>
+          <label class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
+            <input type="radio" name="video_source" value="upload" onchange="toggleVideoInput('upload')">
+            <span class="font-bold">Upload File MP4 Lokal</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Input Link Video -->
+      <div id="boxVideoLink">
+        <label class="block text-xs font-bold text-slate-700 mb-1">Link URL Video</label>
+        <input type="url" name="video_url" placeholder="https://www.youtube.com/watch?v=..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800">
+        <p class="text-[10px] text-slate-400 mt-1">Sistem otomatis mendeteksi format embed YouTube, Vimeo, maupun Google Drive.</p>
+      </div>
+
+      <!-- Input File Upload Video -->
+      <div id="boxVideoFile" class="hidden">
+        <label class="block text-xs font-bold text-slate-700 mb-1">Pilih File Video MP4</label>
+        <input type="file" name="video_file" accept="video/mp4,video/webm" class="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-violet-100 file:text-violet-700 hover:file:bg-violet-200">
+        <p class="text-[10px] text-slate-400 mt-1">Video akan disimpan ke server lokal folder public/uploads/videos.</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Durasi (Menit)</label>
+          <input type="number" name="duration_minutes" value="10" min="1" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800">
+        </div>
+      </div>
+
+      <!-- Teks Panduan & Rangkuman Materi -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Teks Panduan / Catatan Tambahan</label>
+        <textarea name="content_text" rows="4" placeholder="Tuliskan panduan langkah demi langkah, link dokumentasi, atau catatan penting untuk pelanggan..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800"></textarea>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" onclick="document.getElementById('modalAddLesson').classList.add('hidden')" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Batal</button>
+        <button type="submit" class="px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-xs font-bold shadow-md shadow-violet-200">Simpan Materi</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function openAddLessonModal(chapterId, chapterTitle) {
+    const modal = document.getElementById('modalAddLesson');
+    const form = document.getElementById('formAddLesson');
+    form.action = `/admin/chapters/${chapterId}/lessons/new`;
+    modal.classList.remove('hidden');
+  }
+
+  function toggleVideoInput(mode) {
+    const boxLink = document.getElementById('boxVideoLink');
+    const boxFile = document.getElementById('boxVideoFile');
+    if (mode === 'upload') {
+      boxLink.classList.add('hidden');
+      boxFile.classList.remove('hidden');
+    } else {
+      boxLink.classList.remove('hidden');
+      boxFile.classList.add('hidden');
+    }
+  }
+</script>

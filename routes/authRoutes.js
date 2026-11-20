@@ -17,9 +17,12 @@ router.get('/login', (req, res) => {
 // 1-Click Demo Login (Admin atau Pelanggan)
 router.get('/demo-login/:role', (req, res) => {
   const role = req.params.role === 'admin' ? 'admin' : 'pelanggan';
-  const email = role === 'admin' ? 'admin@kyzoo.com' : 'user@kyzoo.com';
-
-  const user = DB.get('SELECT * FROM users WHERE email = ? AND role = ?', email, role);
+  let user = null;
+  if (role === 'admin') {
+    user = DB.get('SELECT * FROM users WHERE role = ? AND email = ?', 'admin', 'admin@kyzoo.com');
+  } else {
+    user = DB.get('SELECT * FROM users WHERE role = ? ORDER BY id ASC LIMIT 1', 'pelanggan');
+  }
   if (user) {
     req.session.user = {
       id: user.id,

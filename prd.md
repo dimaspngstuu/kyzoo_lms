@@ -261,3 +261,5 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
     * Penguncian permanen field alamat email dengan status `readonly`, ikon gembok 🔒, dan styling `cursor-not-allowed` sehingga email tidak dapat diubah sembarangan.
     * Penambahan kotak informasi edukatif terkait email sebagai identitas tunggal akun untuk akses login, data progres, dan keamanan.
     * Implementasi formulir penggantian kata sandi (Password Saat Ini, Password Baru minimal 6 karakter, Konfirmasi Password Baru) lengkap dengan tombol intip/sembunyikan kata sandi (eye icon) dan validasi database instan.
+  - `2026-11-20`: Restorasi Halaman Login:
+    * Mengembalikan tampilan halaman login ke desain awal yang bersih, rapi, dan minimalis (kartu putih berlatar abu-abu terang dengan logo resmi Kyzoo, tombol 1-Click Demo Login, dan form login email/password langsung tanpa alur OTP).

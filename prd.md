@@ -271,3 +271,6 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
     * Transformasi daftar kursus ("My Courses") menjadi Bento Card Grid modern (2-3 kolom) dengan thumbnail 16:9, label kategori & kode kursus, bar progres belajar, accordion laci turunan bab & video, serta tombol "Lanjutkan Belajar ▶".
     * Penyediaan tombol switch tampilan ("Grid" vs "Tabel") lengkap dengan penyimpanan preferensi pengguna di `localStorage`.
     * Penambahan kartu info akun mini di atas tombol Logout pada sidebar untuk menjaga keseimbangan visual antarmuka.
+  - `2026-11-20`: Pembaruan Tipografi Sistem (Modern & Non-Kaku):
+    * Beralih dari font default `Inter` (yang cenderung formal & kaku) ke **`Plus Jakarta Sans`** (font geometris modern dengan kurva humanis yang luwes, standar emas SaaS/LMS modern dunia).
+    * Memberikan sentuhan ramah, tajam pada angka/persentase, dan sangat elegan di seluruh halaman aplikasi (`layout.ejs`, `login.ejs`, `register.ejs`).

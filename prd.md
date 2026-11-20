@@ -248,3 +248,6 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   - `2026-11-20`: Perbaikan Bug Potongan Dropdown Pencarian:
     * Mengatasi pemotongan visual dropdown hasil pencarian akibat `overflow-hidden` pada hero banner.
     * Memisahkan ambient glow ke layer independen sehingga dropdown mengambang bebas di atas kartu kursus tanpa terpotong.
+  - `2026-11-20`: Penyederhanaan Navigasi Sidebar & Bottom Bar:
+    * Penghapusan menu Chapter, Help, dan FAQ dari bilah navigasi samping (Sidebar) dan bottom bar mobile.
+    * Menu utama kini terfokus padat: Dashboard, Courses, Settings, Panel Admin (khusus role Admin), dan Logout.

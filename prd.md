@@ -252,3 +252,8 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
     * Penghapusan menu Chapter, Help, dan FAQ dari bilah navigasi samping (Sidebar) dan bottom bar mobile.
     * Menu utama kini terfokus padat: Dashboard, Courses, Settings, Panel Admin (khusus role Admin), dan Logout.
     * Perbaikan parameter binding SQL pada perhitungan total user dashboard admin.
+  - `2026-11-20`: Implementasi Pohon Struktur Hierarki Kursus ("Nama Kursus ➔ Turunan Bab ➔ Turunan Video"):
+    * Di Sidebar: Menu **Courses** dilengkapi expandable tree yang memperlihatkan nama kursus dan cabang turunannya (Bab & jumlah materi video).
+    * Di Dashboard: Tabel kursus dan kartu mobile kini memiliki tombol buka/tutup (toggle accordion) sehingga pengguna dapat langsung melihat daftar bab dan materi video di bawah kursus tersebut tanpa harus berpindah halaman.
+    * Di Halaman Detail Kursus (`/courses/:slug`): Visual silabus ditingkatkan dengan hierarki bertingkat (Nomor Bab, pohon konektor materi, durasi video, dan status penyelesaian).
+    * Di Pemutar Belajar (`/learn/:courseSlug/:lessonId`): Daftar modul di sidebar pemutar video menyertakan penanda nomor bab yang terstruktur rapi.

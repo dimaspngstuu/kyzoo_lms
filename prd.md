@@ -263,3 +263,11 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
     * Implementasi formulir penggantian kata sandi (Password Saat Ini, Password Baru minimal 6 karakter, Konfirmasi Password Baru) lengkap dengan tombol intip/sembunyikan kata sandi (eye icon) dan validasi database instan.
   - `2026-11-20`: Restorasi Halaman Login:
     * Mengembalikan tampilan halaman login ke desain awal yang bersih, rapi, dan minimalis (kartu putih berlatar abu-abu terang dengan logo resmi Kyzoo, tombol 1-Click Demo Login, dan form login email/password langsung tanpa alur OTP).
+  - `2026-11-20`: Implementasi Konsep 1 (Modern Clean Light) pada Dashboard:
+    * Transformasi Hero Greeting Banner dari warna hitam pekat menjadi gradasi terang modern nan elegan (`bg-gradient-to-br from-violet-50/70 via-white to-indigo-50/50`) berpadu dengan teks gelap kontras tinggi (`text-slate-900`) dan badge sapaan hangat.
+    * Integrasi kotak pencarian materi light modern terpadu dengan shortcut `Ctrl + K` dan dropdown live search light mode (`bg-white divide-slate-100`).
+    * Penghapusan duplikasi search bar di topbar saat pengguna membuka halaman `/dashboard`.
+    * Penambahan 3 Kartu Metrik Bento Minimalis (Modul Aktif, Materi Selesai/Ditonton, Capaian Belajar Akun) untuk mengisi ruang kosong dan memberi visual progres instan.
+    * Transformasi daftar kursus ("My Courses") menjadi Bento Card Grid modern (2-3 kolom) dengan thumbnail 16:9, label kategori & kode kursus, bar progres belajar, accordion laci turunan bab & video, serta tombol "Lanjutkan Belajar ▶".
+    * Penyediaan tombol switch tampilan ("Grid" vs "Tabel") lengkap dengan penyimpanan preferensi pengguna di `localStorage`.
+    * Penambahan kartu info akun mini di atas tombol Logout pada sidebar untuk menjaga keseimbangan visual antarmuka.

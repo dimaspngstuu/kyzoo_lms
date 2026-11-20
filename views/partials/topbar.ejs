@@ -17,7 +17,8 @@
     </h1>
   </div>
 
-  <!-- Search Bar Tengah (Persis Layout Gambar) -->
+  <!-- Search Bar Tengah (Hanya aktif di luar Dashboard agar tidak dobel dengan hero search) -->
+  <% if (typeof currentPath !== 'undefined' && currentPath !== '/dashboard') { %>
   <div class="flex-1 max-w-md mx-4 hidden sm:block">
     <form action="/courses" method="GET" class="relative">
       <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -28,12 +29,15 @@
       <input 
         type="text" 
         name="q" 
-        placeholder="Search here..." 
+        placeholder="Cari materi tutorial..." 
         value="<%= typeof search !== 'undefined' ? search : '' %>"
         class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all"
       />
     </form>
   </div>
+  <% } else { %>
+  <div class="flex-1 hidden md:block"></div>
+  <% } %>
 
   <!-- Profil Pengguna Kanan -->
   <div class="flex items-center gap-3">

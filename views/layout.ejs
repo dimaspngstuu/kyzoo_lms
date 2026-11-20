@@ -61,14 +61,9 @@
 
       <!-- Wadah Konten Dinamis -->
       <div class="flex-1 flex overflow-x-hidden">
-        <main class="flex-1 p-6 lg:p-8 max-w-7xl">
+        <main class="flex-1 p-6 lg:p-8 w-full max-w-7xl">
           <%- body %>
         </main>
-
-        <!-- Sidebar Kanan (Status & Upcoming) -->
-        <% if (typeof showRightbar === 'undefined' || showRightbar === true) { %>
-          <%- include('partials/rightbar') %>
-        <% } %>
       </div>
     </div>
   </div>

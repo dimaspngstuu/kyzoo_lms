@@ -78,15 +78,22 @@
         </thead>
         <tbody class="divide-y divide-slate-100/80">
           <% courses.forEach((course, index) => { %>
+          <!-- Baris Utama Kursus -->
           <tr class="course-row hover:bg-slate-50/70 transition-colors group cursor-pointer" 
-              data-type="<%= course.isFinished ? 'completed' : 'active' %>"
-              onclick="window.location.href='/courses/<%= course.slug %>'">
+              data-type="<%= course.isFinished ? 'completed' : 'active' %>">
             
             <td class="py-4 px-2 text-xs font-semibold text-slate-400">
-              <%= index + 1 %>
+              <button type="button" 
+                      onclick="toggleDashboardCourseTree(event, '<%= course.id %>')" 
+                      class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-violet-100 text-slate-400 hover:text-violet-700 transition-colors" 
+                      title="Buka / Tutup Turunan Bab & Materi">
+                <svg id="dashboardTreeArrow-<%= course.id %>" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
             </td>
 
-            <td class="py-4 px-4">
+            <td class="py-4 px-4" onclick="window.location.href='/courses/<%= course.slug %>'">
               <div class="flex items-center gap-3.5">
                 <div class="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-sm border border-slate-100">
                   <img src="<%= course.thumbnail %>" alt="<%= course.title %>" class="w-full h-full object-cover">
@@ -95,12 +102,17 @@
                   <h4 class="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-violet-600 transition-colors line-clamp-1">
                     <%= course.title %>
                   </h4>
-                  <span class="text-[10px] text-slate-400 font-medium"><%= course.category %></span>
+                  <div class="flex items-center gap-2 mt-0.5">
+                    <span class="text-[10px] text-slate-400 font-medium"><%= course.category %></span>
+                    <span class="text-[10px] text-violet-600 font-bold bg-violet-50 px-1.5 py-0.5 rounded border border-violet-100">
+                      📂 <%= (course.chapters ? course.chapters.length : 0) %> Bab Turunan
+                    </span>
+                  </div>
                 </div>
               </div>
             </td>
 
-            <td class="py-4 px-4">
+            <td class="py-4 px-4" onclick="window.location.href='/courses/<%= course.slug %>'">
               <div class="flex items-center gap-3">
                 <div class="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden">
                   <div class="h-full rounded-full transition-all duration-500" 
@@ -129,6 +141,68 @@
             </td>
 
           </tr>
+
+          <!-- Baris Expandable Turunan Kursus (Pohon Bab & Materi Video) -->
+          <tr id="dashboardTreeRow-<%= course.id %>" class="hidden bg-slate-50/80 border-b border-slate-100">
+            <td colspan="4" class="p-0">
+              <div class="px-6 py-4 pl-12 bg-gradient-to-b from-slate-50/90 to-white border-y border-slate-100/80 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-bold text-violet-600 uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-violet-600"></span>
+                    Turunan Modul: <span class="text-slate-800 normal-case font-extrabold"><%= course.title %></span>
+                  </span>
+                  <a href="/courses/<%= course.slug %>" class="text-xs font-bold text-violet-600 hover:text-violet-800 hover:underline flex items-center gap-1">
+                    <span>Lihat Halaman Kursus Lengkap</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                  </a>
+                </div>
+
+                <!-- Pohon Turunan Bab & Materi -->
+                <div class="space-y-3 pl-3 border-l-2 border-violet-200 ml-1">
+                  <% if (course.chapters && course.chapters.length > 0) { %>
+                    <% course.chapters.forEach((ch, chIdx) => { %>
+                      <div class="bg-white rounded-xl p-3.5 border border-slate-100 shadow-sm">
+                        <!-- Induk Turunan Tingkat 1: Bab / Chapter -->
+                        <div class="flex items-center justify-between text-xs font-bold text-slate-800 pb-2 border-b border-slate-100">
+                          <span class="flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-violet-100 text-violet-700 text-[10px] flex items-center justify-center font-bold">
+                              <%= chIdx + 1 %>
+                            </span>
+                            <span><%= ch.title %></span>
+                          </span>
+                          <span class="text-[10px] text-slate-400 font-semibold"><%= ch.lessons ? ch.lessons.length : 0 %> Video Pembelajaran</span>
+                        </div>
+
+                        <!-- Turunan Tingkat 2: Materi / Lesson Video -->
+                        <div class="mt-2 space-y-1 pl-4">
+                          <% if (ch.lessons && ch.lessons.length > 0) { %>
+                            <% ch.lessons.forEach(l => { %>
+                              <a href="/learn/<%= course.slug %>/<%= l.id %>" class="flex items-center justify-between py-1.5 px-2.5 rounded-lg hover:bg-violet-50 text-xs transition-colors group">
+                                <div class="flex items-center gap-2 min-w-0">
+                                  <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] shrink-0 <%= l.is_completed ? 'bg-emerald-500 text-white font-bold' : 'border border-slate-300 text-transparent' %>">
+                                    ✓
+                                  </span>
+                                  <span class="text-slate-700 group-hover:text-violet-700 font-medium truncate"><%= l.title %></span>
+                                </div>
+                                <div class="flex items-center gap-3 text-[10px] text-slate-400 shrink-0 ml-2">
+                                  <span><%= l.duration_minutes %> menit</span>
+                                  <span class="text-violet-600 font-bold group-hover:underline">Putar Video ▶</span>
+                                </div>
+                              </a>
+                            <% }) %>
+                          <% } else { %>
+                            <span class="text-[10px] text-slate-400 italic">Belum ada video materi di bab ini.</span>
+                          <% } %>
+                        </div>
+                      </div>
+                    <% }) %>
+                  <% } else { %>
+                    <span class="text-xs text-slate-400 italic">Belum ada bab turunan untuk kursus ini.</span>
+                  <% } %>
+                </div>
+              </div>
+            </td>
+          </tr>
           <% }) %>
         </tbody>
       </table>
@@ -137,11 +211,10 @@
     <!-- TAMPILAN 2: Kartu Kursus Responsif (Khusus Layar HP / Mobile - block md:hidden) -->
     <div class="block md:hidden space-y-3">
       <% courses.forEach((course, index) => { %>
-      <div class="course-card-mobile p-4 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-violet-200 transition-all cursor-pointer shadow-sm"
-           data-type="<%= course.isFinished ? 'completed' : 'active' %>"
-           onclick="window.location.href='/courses/<%= course.slug %>'">
+      <div class="course-card-mobile p-4 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-violet-200 transition-all shadow-sm"
+           data-type="<%= course.isFinished ? 'completed' : 'active' %>">
         
-        <div class="flex items-center gap-3 mb-3">
+        <div class="flex items-center gap-3 mb-3" onclick="window.location.href='/courses/<%= course.slug %>'">
           <div class="w-11 h-11 rounded-xl overflow-hidden shrink-0 shadow-sm border border-slate-100">
             <img src="<%= course.thumbnail %>" alt="<%= course.title %>" class="w-full h-full object-cover">
           </div>
@@ -153,7 +226,7 @@
         </div>
 
         <!-- Progress Bar HP -->
-        <div class="space-y-1.5 pt-2 border-t border-slate-100">
+        <div class="space-y-1.5 pt-2 border-t border-slate-100" onclick="window.location.href='/courses/<%= course.slug %>'">
           <div class="flex justify-between text-xs font-semibold text-slate-500">
             <span>Capaian Belajar</span>
             <span class="font-bold text-slate-800"><%= course.percent %>%</span>
@@ -165,12 +238,45 @@
           </div>
         </div>
 
-        <!-- Tombol Lanjut Belajar Full-Width Ramah Sentuhan Jempol -->
-        <div class="mt-3.5 flex items-center justify-between text-xs font-semibold text-slate-500">
-          <span class="text-[11px] text-slate-400"><%= course.total_lessons %> Video Tutorial</span>
-          <span class="text-xs font-bold text-violet-600 flex items-center gap-1">
-            Buka Modul →
-          </span>
+        <!-- Tombol Buka Turunan Modul Bab di HP -->
+        <div class="mt-3.5 pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+          <button type="button" 
+                  onclick="toggleMobileCourseTree(event, '<%= course.id %>')" 
+                  class="flex-1 py-2 px-3 rounded-xl bg-violet-50 hover:bg-violet-100 text-violet-700 text-xs font-bold flex items-center justify-between transition-colors">
+            <span>Lihat <%= (course.chapters ? course.chapters.length : 0) %> Bab Turunan</span>
+            <svg id="mobileTreeChevron-<%= course.id %>" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <a href="/courses/<%= course.slug %>" class="px-3 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold">
+            Buka →
+          </a>
+        </div>
+
+        <!-- Wadah Turunan Modul HP -->
+        <div id="mobileCourseTree-<%= course.id %>" class="hidden mt-3 pt-3 border-t border-slate-200/60 space-y-2">
+          <% if (course.chapters && course.chapters.length > 0) { %>
+            <% course.chapters.forEach((ch, chIdx) => { %>
+              <div class="p-2.5 rounded-xl bg-white border border-slate-100 space-y-1.5">
+                <div class="text-xs font-bold text-slate-800 flex items-center justify-between">
+                  <span><%= chIdx + 1 %>. <%= ch.title %></span>
+                  <span class="text-[10px] text-slate-400 font-semibold"><%= ch.lessons ? ch.lessons.length : 0 %> video</span>
+                </div>
+                <div class="space-y-1 pl-2 border-l border-slate-100">
+                  <% if (ch.lessons && ch.lessons.length > 0) { %>
+                    <% ch.lessons.forEach(l => { %>
+                      <a href="/learn/<%= course.slug %>/<%= l.id %>" class="flex items-center justify-between py-1 text-[11px] text-slate-600 hover:text-violet-600">
+                        <span class="truncate">↳ <%= l.title %></span>
+                        <span class="text-[10px] text-violet-600 font-bold shrink-0 ml-1">Putar</span>
+                      </a>
+                    <% }) %>
+                  <% } %>
+                </div>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <div class="text-[11px] text-slate-400 italic">Belum ada bab turunan.</div>
+          <% } %>
         </div>
 
       </div>
@@ -182,6 +288,38 @@
 </div>
 
 <script>
+  // Toggle Pohon Turunan Kursus di Desktop Table
+  function toggleDashboardCourseTree(e, courseId) {
+    if (e) e.stopPropagation();
+    const row = document.getElementById('dashboardTreeRow-' + courseId);
+    const arrow = document.getElementById('dashboardTreeArrow-' + courseId);
+    if (!row) return;
+
+    if (row.classList.contains('hidden')) {
+      row.classList.remove('hidden');
+      if (arrow) arrow.classList.add('rotate-90', 'text-violet-600');
+    } else {
+      row.classList.add('hidden');
+      if (arrow) arrow.classList.remove('rotate-90', 'text-violet-600');
+    }
+  }
+
+  // Toggle Pohon Turunan Kursus di Mobile Card
+  function toggleMobileCourseTree(e, courseId) {
+    if (e) e.stopPropagation();
+    const container = document.getElementById('mobileCourseTree-' + courseId);
+    const chevron = document.getElementById('mobileTreeChevron-' + courseId);
+    if (!container) return;
+
+    if (container.classList.contains('hidden')) {
+      container.classList.remove('hidden');
+      if (chevron) chevron.classList.add('rotate-180');
+    } else {
+      container.classList.add('hidden');
+      if (chevron) chevron.classList.remove('rotate-180');
+    }
+  }
+
   function switchCourseTab(type) {
     const activeBtn = document.getElementById('tabActiveBtn');
     const compBtn = document.getElementById('tabCompletedBtn');

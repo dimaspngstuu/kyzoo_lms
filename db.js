@@ -193,8 +193,11 @@ function seedDatabase() {
         (?, 'Membaca Berkas CSV & Pembersihan Data', 'youtube', 'https://www.youtube.com/watch?v=vmEHCJofslg', 'Langkah awal membaca data eksternal, membersihkan nilai kosong (null), dan mengubah tipe data kolom.', 18, 1)
     `, ch3_1.lastInsertRowid);
 
-    // Seed progress for Dipu Paul (user_id = 2) on Course 1 Lesson 1 & Lesson 2
-    DB.run(`INSERT OR IGNORE INTO user_progress (user_id, lesson_id, is_completed) VALUES (2, 1, 1), (2, 2, 1)`);
+    // Seed progress for pelanggan on Course 1 first lessons
+    const firstTwoLessons = DB.all('SELECT id FROM lessons ORDER BY id ASC LIMIT 2');
+    for (const fl of firstTwoLessons) {
+      DB.run('INSERT OR IGNORE INTO user_progress (user_id, lesson_id, is_completed) VALUES (2, ?, 1)', fl.id);
+    }
   }
 }
 

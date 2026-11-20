@@ -71,11 +71,31 @@ router.get('/dashboard', (req, res) => {
     const colorThemes = ['#6c5dd3', '#ff754c', '#ffa2c0', '#3f8cff'];
     const barColor = colorThemes[index % colorThemes.length];
 
+    // Ambil Bab & Lessons turunan untuk kursus ini
+    const chapters = DB.all(`
+      SELECT ch.*,
+        (SELECT COUNT(1) FROM lessons l WHERE l.chapter_id = ch.id) as lesson_count
+      FROM chapters ch
+      WHERE ch.course_id = ?
+      ORDER BY ch.sort_order ASC, ch.id ASC
+    `, c.id);
+
+    for (const ch of chapters) {
+      ch.lessons = DB.all(`
+        SELECT l.*,
+          COALESCE((SELECT is_completed FROM user_progress WHERE user_id = ? AND lesson_id = l.id), 0) as is_completed
+        FROM lessons l
+        WHERE l.chapter_id = ?
+        ORDER BY l.sort_order ASC, l.id ASC
+      `, userId, ch.id);
+    }
+
     return {
       ...c,
       percent,
       barColor,
-      isFinished: total > 0 && completed >= total
+      isFinished: total > 0 && completed >= total,
+      chapters
     };
   });
 

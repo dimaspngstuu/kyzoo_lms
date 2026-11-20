@@ -252,8 +252,8 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
     * Penghapusan menu Chapter, Help, dan FAQ dari bilah navigasi samping (Sidebar) dan bottom bar mobile.
     * Menu utama kini terfokus padat: Dashboard, Courses, Settings, Panel Admin (khusus role Admin), dan Logout.
     * Perbaikan parameter binding SQL pada perhitungan total user dashboard admin.
-  - `2026-11-20`: Implementasi Pohon Struktur Hierarki Kursus:
-    * Di Sidebar: Tetap bersih dan minimalis sesuai permintaan pengguna — hanya tombol **Courses** tunggal tanpa pohon turunan agar tidak terlalu padat.
-    * Di Dashboard: Tabel kursus dan kartu mobile memiliki toggle expandable (📂 [X] Bab Turunan ▾) untuk melihat bab dan materi video langsung di tempat.
-    * Di Halaman Detail Kursus (`/courses/:slug`): Visual silabus menyajikan hierarki lengkap (Nomor Bab, pohon konektor materi, durasi video, dan status penyelesaian).
-    * Di Pemutar Belajar (`/learn/:courseSlug/:lessonId`): Daftar modul di sidebar pemutar video menyertakan penanda nomor bab yang terstruktur rapi.
+  - `2026-11-20`: Pembaruan Branding Logo Resmi Kyzoo:
+    * Ekstraksi dan pemotongan presisi (tight crop + transparent background) dari logo resmi baru dengan ikon K bulat warna-warni dan tipografi "kyzoo" bertabur percikan.
+    * Penerapan pada halaman Login (`/login`) & Register (`/register`) dengan proporsi ideal (lebar 112px, elegan dan terpusat).
+    * Penerapan pada bilah atas / sidebar header (`views/partials/sidebar.ejs` dan `views/partials/topbar.ejs`) dengan format horizontal yang pas (tinggi 40px) menggantikan logo lama.
+    * Penambahan ikon favicon browser (`logo-icon.png`) pada tab peramban.

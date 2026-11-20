@@ -238,3 +238,6 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
     * Sapaan hangat personal & dinamis berdasarkan waktu ("Selamat Pagi / Siang / Sore / Malam, Dimas Pangestu!").
     * Subjudul motivasi belajar: "Mau belajar atau praktik membuat web app AI apa hari ini?".
     * Kotak pencarian materi interaktif bergaya gelap modern dilengkapi shortcut shortcut keyboard `Ctrl + K`.
+  - `2026-11-20`: Penyederhanaan Layout Dashboard Utama:
+    * Penghapusan kartu 'Lanjutkan Belajar' (Resume Banner) dan 3 kartu status pastel (Lessons, Assignments, Tests).
+    * Alur dashboard menjadi sangat bersih & langsung: Hero Greeting ("Selamat Pagi, Dimas Pangestu!") langsung tersambung ke daftar modul pembelajaran ("My Courses").

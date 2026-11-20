@@ -187,11 +187,48 @@ router.get('/help', (req, res) => {
 
 // Halaman Pengaturan / Settings
 router.get('/settings', (req, res) => {
+  const userId = req.session.user.id;
+  const freshUser = DB.get('SELECT * FROM users WHERE id = ?', userId);
+  const user = freshUser || req.session.user;
+
   res.render('settings', {
     title: 'Pengaturan Akun - Kyzoo LMS',
-    user: req.session.user,
-    message: null
+    user,
+    success: req.query.success || null,
+    error: req.query.error || null
   });
+});
+
+// Update Password Akun Pengguna
+router.post('/settings/password', (req, res) => {
+  const userId = req.session.user.id;
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return res.redirect('/settings?error=' + encodeURIComponent('Semua kolom kata sandi wajib diisi.'));
+  }
+
+  if (newPassword.length < 6) {
+    return res.redirect('/settings?error=' + encodeURIComponent('Kata sandi baru minimal harus 6 karakter.'));
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res.redirect('/settings?error=' + encodeURIComponent('Konfirmasi kata sandi baru tidak cocok.'));
+  }
+
+  const user = DB.get('SELECT * FROM users WHERE id = ?', userId);
+  if (!user || user.password !== currentPassword.trim()) {
+    return res.redirect('/settings?error=' + encodeURIComponent('Kata sandi saat ini tidak tepat.'));
+  }
+
+  if (currentPassword.trim() === newPassword.trim()) {
+    return res.redirect('/settings?error=' + encodeURIComponent('Kata sandi baru tidak boleh sama dengan kata sandi lama.'));
+  }
+
+  // Update password baru di database
+  DB.run('UPDATE users SET password = ? WHERE id = ?', newPassword.trim(), userId);
+
+  return res.redirect('/settings?success=' + encodeURIComponent('Kata sandi berhasil diperbarui! Silakan gunakan kata sandi baru Anda.'));
 });
 
 module.exports = router;

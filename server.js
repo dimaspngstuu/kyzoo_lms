@@ -48,7 +48,7 @@ app.use((req, res, next) => {
       }
 
       // Halaman tanpa layout utama
-      const noLayoutViews = ['login', 'register', 'error'];
+      const noLayoutViews = ['login', 'register', 'verify_otp', 'error'];
       if (options.layout === false || noLayoutViews.includes(view)) {
         if (callback) return callback(null, html);
         return res.send(html);

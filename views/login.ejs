@@ -84,8 +84,26 @@
               </a>
             </div>
 
-    <!-- BAGIAN 2: FORM LOGIN STANDAR -->
-    <form action="/login" method="POST" class="space-y-4 mt-2">
+    <!-- TAB SWITCHER: KATA SANDI VS KODE OTP -->
+    <div class="flex items-center p-1 bg-slate-100 rounded-2xl mb-4 border border-slate-200/60 text-xs font-bold">
+      <button 
+        type="button" 
+        id="tabPasswordBtn" 
+        onclick="switchLoginMode('password')" 
+        class="flex-1 py-2.5 rounded-xl transition-all text-center <%= (typeof tab === 'undefined' || tab === 'password') ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800' %>">
+        🔑 Kata Sandi
+      </button>
+      <button 
+        type="button" 
+        id="tabOtpBtn" 
+        onclick="switchLoginMode('otp')" 
+        class="flex-1 py-2.5 rounded-xl transition-all text-center <%= (typeof tab !== 'undefined' && tab === 'otp') ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800' %>">
+        📬 Kode OTP Email
+      </button>
+    </div>
+
+    <!-- FORM 1: MASUK DENGAN KATA SANDI -->
+    <form id="formPasswordLogin" action="/login" method="POST" class="space-y-4 <%= (typeof tab !== 'undefined' && tab === 'otp') ? 'hidden' : '' %>">
       <div>
         <label class="block text-xs font-bold text-slate-700 mb-1.5">Alamat Email Terdaftar</label>
         <input 
@@ -98,7 +116,12 @@
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-slate-700 mb-1.5">Password</label>
+        <div class="flex items-center justify-between mb-1.5">
+          <label class="block text-xs font-bold text-slate-700">Password</label>
+          <button type="button" onclick="switchLoginMode('otp')" class="text-[11px] font-semibold text-violet-600 hover:underline">
+            Lupa sandi? Kirim OTP
+          </button>
+        </div>
         <input 
           type="password" 
           name="password" 
@@ -111,15 +134,61 @@
       <button 
         type="submit"
         class="w-full py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm">
-        Masuk ke Sistem
+        Masuk dengan Kata Sandi
+      </button>
+    </form>
+
+    <!-- FORM 2: MASUK DENGAN KODE OTP EMAIL -->
+    <form id="formOtpLogin" action="/send-otp" method="POST" class="space-y-4 <%= (typeof tab !== 'undefined' && tab === 'otp') ? '' : 'hidden' %>">
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1.5">Alamat Email Terdaftar</label>
+        <input 
+          type="email" 
+          name="email" 
+          required 
+          placeholder="email terdaftar Anda (misal: user@kyzoo.com)" 
+          class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all"
+        />
+      </div>
+
+      <div class="p-3 bg-violet-50/70 border border-violet-100 rounded-xl text-[11px] text-violet-700 flex items-start gap-2">
+        <span class="text-sm">💡</span>
+        <span>Kode OTP 6 digit akan dikirimkan ke email yang Anda daftarkan untuk masuk tanpa perlu mengingat kata sandi.</span>
+      </div>
+
+      <button 
+        type="submit"
+        class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md shadow-indigo-200 flex items-center justify-center gap-2">
+        <span>Kirim Kode OTP ke Email</span>
+        <span>▶</span>
       </button>
     </form>
 
             <div class="mt-6 text-center text-xs text-slate-400">
-              Belum punya akun? <a href="/register" class="text-violet-600 font-bold hover:underline">Daftar Akun
-                Pelanggan</a>
+              Belum punya akun? <a href="/register" class="text-violet-600 font-bold hover:underline">Daftar Akun Pelanggan</a>
             </div>
   </div>
+
+  <script>
+    function switchLoginMode(mode) {
+      const formPass = document.getElementById('formPasswordLogin');
+      const formOtp = document.getElementById('formOtpLogin');
+      const tabPass = document.getElementById('tabPasswordBtn');
+      const tabOtp = document.getElementById('tabOtpBtn');
+
+      if (mode === 'otp') {
+        formPass.classList.add('hidden');
+        formOtp.classList.remove('hidden');
+        tabOtp.className = "flex-1 py-2.5 rounded-xl transition-all text-center bg-white text-slate-900 shadow-xs";
+        tabPass.className = "flex-1 py-2.5 rounded-xl transition-all text-center text-slate-500 hover:text-slate-800";
+      } else {
+        formOtp.classList.add('hidden');
+        formPass.classList.remove('hidden');
+        tabPass.className = "flex-1 py-2.5 rounded-xl transition-all text-center bg-white text-slate-900 shadow-xs";
+        tabOtp.className = "flex-1 py-2.5 rounded-xl transition-all text-center text-slate-500 hover:text-slate-800";
+      }
+    }
+  </script>
 
 </body>
 

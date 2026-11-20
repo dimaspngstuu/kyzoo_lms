@@ -283,3 +283,9 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
     * Konsol eksekusi query SQL interaktif untuk menjalankan perintah query langsung dari browser.
     * Tombol 1-klik unduh berkas cadangan database (`kyzoo-backup-*.db`).
     * Menambahkan tautan menu cepat "Database Explorer" pada sidebar Panel Admin.
+  - `2026-11-21`: Implementasi Sistem Masuk dengan Kode OTP Email (Email OTP Login):
+    * Instalasi dan integrasi modul `nodemailer` pada `services/mailer.js`.
+    * Pembuatan tabel SQLite `email_otps` untuk menyimpan kode OTP 6 digit, status kedaluwarsa 10 menit, dan flag `is_used`.
+    * Dukungan ganda: Jika kredensial SMTP (`SMTP_USER`, `SMTP_PASS`) diisi di `.env`, email HTML resmi Kyzoo langsung terkirim ke inbox pengguna; jika belum, sistem berjalan dalam mode simulasi instan (kode tampil di notifikasi layar untuk kemudahan pengujian).
+    * Halaman login (`/login`) kini memiliki tab switcher interaktif: `🔑 Kata Sandi` vs `📬 Kode OTP Email`.
+    * Halaman verifikasi OTP (`/verify_otp.ejs`) dengan input kode 6 digit berukuran besar, timer masa berlaku, tombol kirim ulang kode, dan validasi sesi otomatis.

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-50">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="icon" type="image/png" href="/images/logo-icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Urbanist', sans-serif;
+    }
+  </style>
+</head>
+
+<body class="h-full flex items-center justify-center p-4">
+
+  <div class="w-full max-w-md bg-white rounded-3xl border border-slate-100 p-8 shadow-xl shadow-slate-200/50">
+    <!-- Brand Logo Kyzoo -->
+    <div class="text-center mb-6">
+      <div class="flex justify-center mb-3">
+        <a href="/login">
+          <img src="/images/logo.png" alt="Kyzoo" class="w-28 h-auto object-contain mx-auto transition-transform hover:scale-105" />
+        </a>
+      </div>
+      <h2 class="text-xl font-black text-slate-900 tracking-tight">Verifikasi Kode OTP</h2>
+      <p class="text-xs text-slate-500 font-medium mt-1">
+        Masukkan 6 digit kode yang dikirim ke:<br>
+        <strong class="text-slate-800 font-bold"><%= email %></strong>
+      </p>
+    </div>
+
+    <!-- Notifikasi Error -->
+    <% if (error) { %>
+      <div class="mb-5 p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-center gap-2">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span><%= error %></span>
+      </div>
+    <% } %>
+
+    <!-- Notifikasi Email Terkirim Asli -->
+    <% if (sent) { %>
+      <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-xl flex items-center gap-2">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span>Kode OTP baru saja dikirim ke inbox/spam email Anda. Silakan cek email Anda.</span>
+      </div>
+    <% } %>
+
+    <!-- Notifikasi Mode Simulasi (Saat Pengujian Tanpa SMTP) -->
+    <% if (simulated) { %>
+      <div class="mb-5 p-4 bg-violet-50 border border-violet-200 rounded-2xl text-xs text-violet-800 space-y-1 shadow-xs">
+        <div class="font-bold flex items-center gap-1.5 text-violet-900">
+          <span>📬 Mode Simulasi Cepat:</span>
+        </div>
+        <p class="text-[11px] text-violet-700">
+          Kode OTP Anda adalah: <strong class="text-base font-black font-mono tracking-widest text-violet-900 bg-white px-2.5 py-0.5 rounded-lg border border-violet-200 inline-block ml-1"><%= simulated %></strong>
+        </p>
+        <p class="text-[10px] text-slate-500 pt-1">
+          *(Kode ini otomatis dihasilkan untuk pengujian lokal. Jika SMTP sudah aktif di .env, email akan terkirim nyata ke inbox).*
+        </p>
+      </div>
+    <% } %>
+
+    <!-- Form Input Kode OTP -->
+    <form action="/verify-otp" method="POST" class="space-y-4">
+      <input type="hidden" name="email" value="<%= email %>">
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-2 text-center">Masukkan 6 Digit Kode OTP</label>
+        <div class="relative">
+          <input 
+            type="text" 
+            name="otp_code" 
+            id="otpInput"
+            maxlength="6" 
+            required 
+            autofocus 
+            value="<%= simulated || '' %>"
+            placeholder="······"
+            class="w-full py-3.5 text-center text-2xl sm:text-3xl font-mono font-black tracking-[12px] bg-slate-50 border-2 border-slate-200 hover:border-violet-400 focus:border-violet-600 focus:bg-white rounded-2xl text-slate-900 focus:outline-none focus:ring-4 focus:ring-violet-500/15 transition-all shadow-inner"
+          />
+        </div>
+        <p class="text-[11px] text-slate-400 text-center mt-2">
+          ⏱️ Berlaku selama 10 menit
+        </p>
+      </div>
+
+      <button 
+        type="submit"
+        class="w-full py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md shadow-violet-200 flex items-center justify-center gap-2">
+        <span>Verifikasi & Masuk</span>
+        <span>▶</span>
+      </button>
+    </form>
+
+    <!-- Tombol Kirim Ulang OTP -->
+    <div class="mt-6 pt-5 border-t border-slate-100 flex flex-col items-center gap-3">
+      <form action="/send-otp" method="POST" class="w-full text-center">
+        <input type="hidden" name="email" value="<%= email %>">
+        <button type="submit" class="text-xs font-bold text-violet-600 hover:text-violet-800 hover:underline">
+          Belum terima kode? Kirim Ulang OTP
+        </button>
+      </form>
+
+      <a href="/login" class="text-xs text-slate-400 hover:text-slate-600 font-medium">
+        ← Kembali ke Halaman Login
+      </a>
+    </div>
+
+  </div>
+
+</body>
+</html>

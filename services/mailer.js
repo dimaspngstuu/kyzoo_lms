@@ -9,10 +9,22 @@ function isSmtpConfigured() {
 function getTransporter() {
   if (!isSmtpConfigured()) return null;
 
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  // Optimasi otomatis untuk Gmail
+  if (host.includes('gmail.com')) {
+    return nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
+  }
+
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT, 10) || 465,
-    secure: process.env.SMTP_SECURE ? process.env.SMTP_SECURE === 'true' : true,
+    host: host,
+    port: parseInt(process.env.SMTP_PORT, 10) || 587,
+    secure: process.env.SMTP_SECURE === 'true',
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS

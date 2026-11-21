@@ -1,4 +1,6 @@
 const nodemailer = require('nodemailer');
+const path = require('path');
+const fs = require('fs');
 
 // Deteksi apakah kredensial SMTP telah dikonfigurasi di Environment
 function isSmtpConfigured() {
@@ -57,8 +59,8 @@ async function sendOtpEmail(toEmail, otpCode) {
     <body>
       <div class="card">
         <div class="logo">
-          <h2 style="margin: 0; color: #6c5dd3; font-size: 26px; font-weight: 900; letter-spacing: -0.5px;">kyzoo<span style="color: #ff754c;">.</span></h2>
-          <p style="margin: 2px 0 0 0; font-size: 11px; color: #94a3b8; font-weight: 600;">Learning Management System</p>
+          <img src="cid:kyzoo-logo" alt="Kyzoo" style="height: 60px; width: auto; max-width: 150px; margin: 0 auto 8px auto; display: block; border: 0;" />
+          <p style="margin: 0; font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Learning Management System</p>
         </div>
         <div class="title">Kode Verifikasi Masuk</div>
         <div class="subtitle">Gunakan kode verifikasi berikut untuk masuk ke akun Kyzoo LMS Anda:</div>
@@ -84,12 +86,24 @@ async function sendOtpEmail(toEmail, otpCode) {
   if (isConfigured) {
     try {
       const transporter = getTransporter();
+
+      const logoPath = path.join(__dirname, '../public/images/logo.png');
+      const attachments = [];
+      if (fs.existsSync(logoPath)) {
+        attachments.push({
+          filename: 'logo.png',
+          path: logoPath,
+          cid: 'kyzoo-logo'
+        });
+      }
+
       const info = await transporter.sendMail({
         from: process.env.SMTP_FROM || `"Kyzoo LMS" <${process.env.SMTP_USER}>`,
         to: toEmail,
         subject: `[Kyzoo LMS] Kode Verifikasi Masuk Anda: ${otpCode}`,
         text: `Kode verifikasi masuk Kyzoo LMS Anda adalah: ${otpCode}. Kode ini berlaku selama 10 menit.`,
-        html: htmlContent
+        html: htmlContent,
+        attachments: attachments
       });
 
       console.log(`[SMTP] Email OTP berhasil terkirim ke ${toEmail} (MessageId: ${info.messageId})`);

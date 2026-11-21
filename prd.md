@@ -289,3 +289,6 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
     * Dukungan ganda: Jika kredensial SMTP (`SMTP_USER`, `SMTP_PASS`) diisi di `.env`, email HTML resmi Kyzoo langsung terkirim ke inbox pengguna; jika belum, sistem berjalan dalam mode simulasi instan (kode tampil di notifikasi layar untuk kemudahan pengujian).
     * Halaman login (`/login`) kini memiliki tab switcher interaktif: `🔑 Kata Sandi` vs `📬 Kode OTP Email`.
     * Halaman verifikasi OTP (`/verify_otp.ejs`) dengan input kode 6 digit berukuran besar, timer masa berlaku, tombol kirim ulang kode, dan validasi sesi otomatis.
+  - `2026-11-21`: Branding Logo Resmi Kyzoo pada Template Email OTP:
+    * Mengganti tulisan teks biasa header email `kyzoo.` dengan gambar logo resmi Kyzoo (`public/images/logo.png`) menggunakan metode *inline MIME attachment Content-ID* (`cid:kyzoo-logo`).
+    * Memastikan logo tampil tajam, proporsional, dan 100% selalu muncul langsung di semua aplikasi pembaca email (Gmail, Outlook, Apple Mail) tanpa terblokir proteksi gambar eksternal.

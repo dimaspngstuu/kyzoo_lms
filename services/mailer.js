@@ -59,7 +59,7 @@ async function sendOtpEmail(toEmail, otpCode) {
     <body>
       <div class="card">
         <div class="logo">
-          <img src="cid:kyzoo-logo" alt="Kyzoo" style="height: 60px; width: auto; max-width: 150px; margin: 0 auto 8px auto; display: block; border: 0;" />
+          <img src="https://iili.io/oFt9Q44.png" alt="Kyzoo" style="height: 64px; width: auto; max-width: 140px; margin: 0 auto 8px auto; display: block; border: 0;" />
           <p style="margin: 0; font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Learning Management System</p>
         </div>
         <div class="title">Kode Verifikasi Masuk</div>
@@ -87,23 +87,12 @@ async function sendOtpEmail(toEmail, otpCode) {
     try {
       const transporter = getTransporter();
 
-      const logoPath = path.join(__dirname, '../public/images/logo.png');
-      const attachments = [];
-      if (fs.existsSync(logoPath)) {
-        attachments.push({
-          filename: 'logo.png',
-          path: logoPath,
-          cid: 'kyzoo-logo'
-        });
-      }
-
       const info = await transporter.sendMail({
         from: process.env.SMTP_FROM || `"Kyzoo LMS" <${process.env.SMTP_USER}>`,
         to: toEmail,
         subject: `[Kyzoo LMS] Kode Verifikasi Masuk Anda: ${otpCode}`,
         text: `Kode verifikasi masuk Kyzoo LMS Anda adalah: ${otpCode}. Kode ini berlaku selama 10 menit.`,
-        html: htmlContent,
-        attachments: attachments
+        html: htmlContent
       });
 
       console.log(`[SMTP] Email OTP berhasil terkirim ke ${toEmail} (MessageId: ${info.messageId})`);

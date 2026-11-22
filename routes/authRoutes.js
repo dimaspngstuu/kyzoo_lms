@@ -189,38 +189,13 @@ router.post('/verify-otp', (req, res) => {
   }
 });
 
-// Register Pelanggan Baru
+// Register Akun Baru (Ditutup untuk Umum - Pendaftaran Eksklusif Member oleh Admin)
 router.get('/register', (req, res) => {
-  res.render('register', {
-    title: 'Daftar Akun Pelanggan - Kyzoo LMS',
-    error: null
-  });
+  res.redirect('/login?error=' + encodeURIComponent('Pendaftaran publik ditutup. Akun member didaftarkan langsung secara eksklusif oleh Admin.'));
 });
 
 router.post('/register', (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
-    return res.render('register', {
-      title: 'Daftar Akun Pelanggan - Kyzoo LMS',
-      error: 'Semua kolom wajib diisi!'
-    });
-  }
-
-  const existing = DB.get('SELECT id FROM users WHERE email = ?', email.trim().toLowerCase());
-  if (existing) {
-    return res.render('register', {
-      title: 'Daftar Akun Pelanggan - Kyzoo LMS',
-      error: 'Email sudah terdaftar, silakan gunakan email lain atau langsung login.'
-    });
-  }
-
-  const defaultAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(name)}`;
-  DB.run(
-    'INSERT INTO users (name, email, password, role, avatar) VALUES (?, ?, ?, ?, ?)',
-    name.trim(), email.trim().toLowerCase(), password.trim(), 'pelanggan', defaultAvatar
-  );
-
-  res.redirect('/login?success=Pendaftaran+berhasil!+Silakan+masuk+menggunakan+akun+baru+Anda.');
+  res.redirect('/login?error=' + encodeURIComponent('Pendaftaran publik ditutup. Akun member didaftarkan langsung secara eksklusif oleh Admin.'));
 });
 
 module.exports = router;

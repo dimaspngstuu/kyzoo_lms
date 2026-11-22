@@ -1,12 +1,12 @@
-<!-- Sidebar Kiri ala Quyl / Kyzoo -->
-<aside id="sidebarMenu" class="w-64 bg-white border-r border-slate-100 flex flex-col justify-between p-6 shrink-0 transition-all duration-300 md:static fixed inset-y-0 left-0 z-50 transform -translate-x-full md:translate-x-0 shadow-sm md:shadow-none">
+<!-- Sidebar Kiri ala Quyl / Kyzoo (Mendukung Dark Mode & Warna Aksen Dinamis) -->
+<aside id="sidebarMenu" class="w-64 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 flex flex-col justify-between p-6 shrink-0 transition-all duration-300 md:static fixed inset-y-0 left-0 z-50 transform -translate-x-full md:translate-x-0 shadow-sm md:shadow-none">
   <div>
     <!-- Logo Kyzoo Resmi -->
     <div class="flex items-center justify-between mb-8">
       <a href="/dashboard" class="flex items-center group py-1">
         <img src="/images/logo-horizontal.png" alt="Kyzoo" class="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
       </a>
-      <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-slate-700">
+      <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
     </div>
@@ -14,7 +14,7 @@
     <!-- Navigasi Menu Utama -->
     <nav class="space-y-1.5">
       <!-- Dashboard -->
-      <a href="/dashboard" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all <%= (typeof currentPath !== 'undefined' && currentPath === '/dashboard') ? 'bg-[#6c5dd3] text-white shadow-md shadow-violet-200' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' %>">
+      <a href="/dashboard" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all <%= (typeof currentPath !== 'undefined' && currentPath === '/dashboard') ? 'bg-brand-500 text-white shadow-md shadow-dynamic-glow' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60' %>">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <rect x="3" y="3" width="7" height="7" rx="1.5" stroke-width="2"></rect>
           <rect x="14" y="3" width="7" height="7" rx="1.5" stroke-width="2"></rect>
@@ -25,7 +25,7 @@
       </a>
 
       <!-- Courses -->
-      <a href="/courses" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all <%= (typeof currentPath !== 'undefined' && (currentPath.startsWith('/courses') || currentPath.startsWith('/learn'))) ? 'bg-[#6c5dd3] text-white shadow-md shadow-violet-200' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' %>">
+      <a href="/courses" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all <%= (typeof currentPath !== 'undefined' && (currentPath.startsWith('/courses') || currentPath.startsWith('/learn'))) ? 'bg-brand-500 text-white shadow-md shadow-dynamic-glow' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60' %>">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
         </svg>
@@ -33,7 +33,7 @@
       </a>
 
       <!-- Settings -->
-      <a href="/settings" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all <%= (typeof currentPath !== 'undefined' && currentPath === '/settings') ? 'bg-[#6c5dd3] text-white shadow-md shadow-violet-200' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' %>">
+      <a href="/settings" class="flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm transition-all <%= (typeof currentPath !== 'undefined' && currentPath === '/settings') ? 'bg-brand-500 text-white shadow-md shadow-dynamic-glow' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60' %>">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -43,19 +43,27 @@
 
       <!-- Khusus Role Admin: Kelola Materi CMS & Database Explorer -->
       <% if (currentUser && currentUser.role === 'admin') { %>
-      <div class="pt-3 border-t border-slate-100 my-2 space-y-1">
-        <span class="px-4 text-[10px] font-bold uppercase tracking-wider text-violet-500">Panel Admin</span>
+      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 my-2 space-y-1">
+        <span class="px-4 text-[10px] font-bold uppercase tracking-wider text-brand-500">Panel Admin</span>
         
         <!-- Kelola Materi -->
-        <a href="/admin" class="flex items-center gap-3.5 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/admin') && !currentPath.startsWith('/admin/database')) ? 'bg-amber-500 text-white shadow-md shadow-amber-200' : 'text-amber-700 bg-amber-50/70 hover:bg-amber-100' %>">
+        <a href="/admin" class="flex items-center gap-3.5 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all <%= (typeof currentPath !== 'undefined' && currentPath === '/admin') ? 'bg-amber-500 text-white shadow-md shadow-amber-200 dark:shadow-none' : 'text-amber-700 dark:text-amber-400 bg-amber-50/70 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50' %>">
           <svg class="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
           </svg>
           <span>Kelola Materi (CRUD)</span>
         </a>
 
+        <!-- Kelola Anggota -->
+        <a href="/admin/users" class="flex items-center gap-3.5 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/admin/users')) ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200 dark:shadow-none' : 'text-emerald-700 dark:text-emerald-400 bg-emerald-50/70 dark:bg-emerald-950/30 hover:bg-emerald-100 dark:hover:bg-emerald-950/50' %>">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          <span>Kelola Anggota</span>
+        </a>
+
         <!-- Database Explorer -->
-        <a href="/admin/database" class="flex items-center gap-3.5 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/admin/database')) ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100' %>">
+        <a href="/admin/database" class="flex items-center gap-3.5 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/admin/database')) ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none' : 'text-indigo-700 dark:text-indigo-400 bg-indigo-50/70 dark:bg-indigo-950/30 hover:bg-indigo-100 dark:hover:bg-indigo-950/50' %>">
           <svg class="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
           </svg>
@@ -67,19 +75,19 @@
   </div>
 
   <!-- Menu Bawah: Info Akun Mini & Logout -->
-  <div class="pt-4 border-t border-slate-100 space-y-3">
+  <div class="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
     <!-- Status Akun Pelanggan -->
-    <a href="/settings" class="p-3 rounded-2xl bg-slate-50 hover:bg-violet-50/60 border border-slate-100/90 flex items-center gap-3 transition-colors group">
+    <a href="/settings" class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 hover:bg-brand-50/60 dark:hover:bg-slate-800 border border-slate-100/90 dark:border-slate-700/60 flex items-center gap-3 transition-colors group">
       <img 
         src="<%= (currentUser && currentUser.avatar) ? currentUser.avatar : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80' %>" 
         alt="Avatar" 
-        class="w-9 h-9 rounded-xl object-cover ring-2 ring-white shrink-0 shadow-xs"
+        class="w-9 h-9 rounded-xl object-cover ring-2 ring-white dark:ring-slate-700 shrink-0 shadow-xs"
       />
       <div class="min-w-0 flex-1">
-        <h4 class="text-xs font-bold text-slate-800 group-hover:text-violet-700 truncate leading-tight">
+        <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-500 truncate leading-tight transition-colors">
           <%= currentUser ? currentUser.name : 'Dimas Pangestu' %>
         </h4>
-        <span class="text-[10px] text-emerald-600 font-bold flex items-center gap-1 mt-0.5">
+        <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 mt-0.5">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
           <%= currentUser ? (currentUser.role === 'admin' ? 'Administrator' : 'Pelanggan Aktif') : 'Pelanggan Aktif' %>
         </span>
@@ -87,7 +95,7 @@
     </a>
 
     <!-- Tombol Logout -->
-    <a href="/logout" class="flex items-center gap-3.5 px-4 py-2.5 rounded-xl font-semibold text-sm text-rose-500 hover:bg-rose-50 transition-colors">
+    <a href="/logout" class="flex items-center gap-3.5 px-4 py-2.5 rounded-xl font-semibold text-sm text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
       </svg>

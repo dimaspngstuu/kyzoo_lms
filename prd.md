@@ -289,6 +289,46 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
     * Dukungan ganda: Jika kredensial SMTP (`SMTP_USER`, `SMTP_PASS`) diisi di `.env`, email HTML resmi Kyzoo langsung terkirim ke inbox pengguna; jika belum, sistem berjalan dalam mode simulasi instan (kode tampil di notifikasi layar untuk kemudahan pengujian).
     * Halaman login (`/login`) kini memiliki tab switcher interaktif: `🔑 Kata Sandi` vs `📬 Kode OTP Email`.
     * Halaman verifikasi OTP (`/verify_otp.ejs`) dengan input kode 6 digit berukuran besar, timer masa berlaku, tombol kirim ulang kode, dan validasi sesi otomatis.
-  - `2026-11-21`: Branding Logo Resmi Kyzoo pada Template Email OTP (Direct CDN Host):
-    * Mengganti tulisan teks biasa header email `kyzoo.` dengan gambar logo resmi Kyzoo menggunakan CDN URL permanen (`https://iili.io/oFt9Q44.png`).
-    * Menghilangkan attachment berkas fisik pada email sehingga di Gmail tidak lagi muncul kartu lampiran file ("One attachment - Scanned by Gmail") di bagian bawah email, dan logo langsung tampil utuh di header kartu verifikasi.
+  - `2026-11-21`: Branding Logo Resmi Kyzoo pada Template Email OTP (Pure HTML/CSS Email-Safe):
+    * Menerapkan badge brand resmi Kyzoo berbasis HTML & CSS murni (warna khas cyan, mint, orange, pink pada emblem K dan tipografi `kyzoo✦`).
+    * Menghilangkan seluruh ketergantungan pada hosting gambar eksternal maupun file lampiran MIME, menjamin 100% tampilan selalu tajam, indah, dan tidak pernah pecah/silang di seluruh aplikasi email (Gmail, Outlook, iOS, Android).
+  - `2026-11-21`: Sistem Tema Interaktif & Dinamis (Dark/Light Mode + 4 Aksen Warna):
+    * **Toggle Mode Terang (Light ☀️) & Gelap (Dark 🌙)**: Transisi mulus di seluruh elemen (Sidebar, Topbar, Hero Greeting, Bento Metric Cards, My Courses Grid/Table, dan Bottom Nav).
+    * **4 Palet Warna Aksen Kyzoo**: Pengguna dapat memilih langsung warna aksen favorit: *Kyzoo Violet* 🟣, *Ocean Blue* 🔵, *Mint Emerald* 🟢, dan *Sunset Coral* 🟠.
+    * **Komponen Theme Customizer di Topbar**: Tombol interaktif `🎨 Tema` dengan dropdown visual dan indikator warna aktif.
+    * **Penyimpanan Preferensi di LocalStorage**: Pengaturan mode dan aksen tersimpan otomatis di browser dengan skrip inisialisasi instan tanpa kedipan (Zero FOUC).
+    * **Animasi & Interaktivitas UI**: Efek hover micro-lift 3D pada Bento Card, animasi ambient glow dinamis, dan notifikasi toast saat tema berganti.
+  - `2026-11-22`: Fitur Kelola Anggota & Pengguna (User Management CRUD) di Panel Admin:
+    * **Halaman `/admin/users`**: Antarmuka lengkap untuk melihat seluruh anggota, filter pencarian nama/email, serta filter tab role (Semua / Pelanggan / Administrator).
+    * **3 Kartu Metrik Anggota**: Ringkasan jumlah Total Anggota Terdaftar, Pelanggan Siswa, dan Administrator.
+    * **Tambah Anggota Baru**: Modal formulir input nama, email unik, password awal (dengan tombol intip mata 👁️), dan penetapan hak akses (Pelanggan / Admin).
+    * **Edit Data Anggota**: Modal pengubahan nama, email, role, serta opsional penggantian password baru (jika dikosongkan, password lama tetap dipertahankan).
+    * **Hapus Anggota dengan Proteksi Diri**: Modal konfirmasi penghapusan permanen akun beserta pembersihan kaskade data progres belajar dan OTP, dilengkapi proteksi sistem agar admin tidak dapat menghapus akunnya sendiri yang sedang aktif login.
+    * **Navigasi Sidebar Terintegrasi**: Penambahan menu "Kelola Anggota" dengan ikon 👥 di bawah Panel Admin dan tautan langsung dari kartu metrik dashboard admin.
+  - `2026-11-22`: Penutupan Halaman Registrasi Publik (Model Akses Eksklusif Member):
+    * **Penutupan Route `/register`**: Pendaftaran publik dinonaktifkan dan dialihkan otomatis ke `/login` dengan notifikasi bahwa akun member disediakan langsung secara eksklusif oleh Admin.
+    * **Pembaruan Tampilan Halaman Login**: Tautan "Daftar Akun" di bagian bawah kartu login diganti dengan catatan eksklusif: *"🔒 Akses Khusus Member Resmi Kyzoo. Pendaftaran akun dilakukan langsung oleh Admin. Belum terdaftar sebagai member? Silakan hubungi Admin untuk aktivasi membership Anda."*
+    * **Pencegahan Akses Ilegal**: Menjamin konten video dan materi tutorial hanya dapat diakses oleh member sah yang telah didaftarkan melalui Panel Admin.
+  - `2026-11-22`: Pembersihan Teks Hero Dashboard & Fitur Intip Password Login:
+    * **Pembaruan Teks Hero Greeting**: Kalimat *"Mau lanjut belajar modul apa hari ini?"* telah dihapus dan disempurnakan menjadi *"Portal pembelajaran video tutorial Kyzoo Agent."*
+    * **Fitur Unhide / Intip Password**: Menambahkan tombol interaktif ikon mata (show/hide password) pada kolom input password halaman login (`/login`) untuk memudahkan pengguna melihat kata sandi yang diketik.
+  - `2026-11-22`: Penyeimbangan Proporsi Logo Horizontal Kyzoo (`/images/logo-horizontal.png`):
+    * **Penyelarasan Rasio Lambang & Tipografi**: Skala teks nama merek `kyzoo` ditingkatkan proporsinya sebesar ~25% agar seimbang dan tidak lagi terintimidasi oleh bobot visual lambang huruf "K".
+    * **Optical Vertical Alignment**: Penyelarasan titik sumbu vertikal antara lambang dan teks tipografi untuk estetika layout navigasi sidebar dan topbar mobile yang lebih presisi dan premium.
+    * **Transparansi Alpha Bersih**: Pembersihan latar belakang piksel putih menjadi transparan murni sehingga menyatu sempurna di mode terang (Light) maupun mode gelap (Dark).
+  - `2026-11-22`: Penataan Ulang Tata Letak Ruang Belajar (Materi Teori di Atas & Video Opsional di Bawah):
+    * **Materi Teori di Posisi Utama (Atas)**: Teks penjelasan, konsep dasar, dan langkah panduan kini ditampilkan di atas pemutar video sehingga alur kognitif siswa dimulai dari pemahaman konsep.
+    * **Video Tutorial Bersifat Opsional di Bawah**: Pemutar video ditempatkan di bawah materi teori dengan label pengantar *"Langsung aja ditonton videonya (Opsional)"*. Jika materi tidak memiliki URL video, sistem tidak menampilkan frame kosong / pesan unavailable.
+    * **Parser Pemformat Teks Cerdas (`helpers/contentFormatter.js`)**: Mendukung rendering otomatis judul subtopik, poin bullet list dengan dot aksen dinamis, highlight teks tebal (`**bold**`), teks miring, dan kode inline.
+    * **Bar Aksi & Navigasi Terpadu**: Tombol "Tandai Materi Selesai" dan navigasi "Sebelumnya / Materi Lanjut" diletakkan di bawah konten agar siswa dapat menyelesaikan materi secara natural setelah selesai membaca dan menyimak.
+    * **Kepatuhan Desain & Tema Kyzoo**: Tetap sepenuhnya mendukung Light ☀️ & Dark 🌙 Mode serta 4 warna aksen dinamis (Violet, Ocean, Mint, Coral) dengan identitas visual Kyzoo yang bersih dan modern.
+  - `2026-11-22`: Restrukturisasi Kurikulum Linear Berbasis Episode & Akses Langsung 1-Klik:
+    * **Penyederhanaan Hierarki (Tanpa Bab & Tanpa Turunan)**: Menghapus pengelompokan bersarang (*nested chapters*) "Bab 1, Bab 2, Bab 3" dan konsep "materi turunan". Seluruh materi kini disajikan sebagai rangkaian linear **Episode** (`EP 01`, `EP 02`, `EP 03`, dst.) yang bersih dan mudah ditelusuri.
+    * **Akses Masuk Materi Langsung (Tanpa Tombol Sempit 'Putar Video')**: Menghapus tombol sempit *"Putar Video ▶"*. Seluruh kartu/baris episode pada halaman silabus ([course_detail.ejs](file:///c:/Users/dimas/.gemini/antigravity-ide/project/lms/views/course_detail.ejs)) kini menjadi tautan interaktif utuh yang dapat diklik di area mana saja untuk langsung membuka materi.
+    * **Pembaruan Navigasi Ruang Belajar ([course_view.ejs](file:///c:/Users/dimas/.gemini/antigravity-ide/project/lms/views/course_view.ejs))**: Sidebar kanan kini menampilkan daftar episode linear dengan badge penomoran `EP 01`, `EP 02`, durasi, serta indikator checkmark selesai yang tersinkronisasi realtime. Header materi juga menampilkan badge `EPISODE XX`.
+  - `2026-11-22`: Penyesuaian Panel Kelola Materi Admin Berbasis Episode ([curriculum.ejs](file:///c:/Users/dimas/.gemini/antigravity-ide/project/lms/views/admin/curriculum.ejs)):
+    * **Penyelarasan Panel Admin**: Menghapus konsep "Tambah Bab" dan "Turunan Bab". Admin kini langsung mengelola daftar **Episode** materi secara linear dan terpadu.
+    * **Tambah Episode Langsung**: Admin dapat langsung mengklik tombol `+ Tambah Episode Baru` tanpa perlu repot membuat bab terlebih dahulu.
+    * **Dukungan Penuh Materi Teori & Video Opsional**: Modal Tambah dan Edit Episode kini memprioritaskan penulisan materi teori (textarea kaya untuk penjelasan konsep) serta dilengkapi opsi video tutorial opsional (bisa diaktifkan dengan link YouTube/Drive atau file MP4 lokal, atau dinonaktifkan untuk materi murni bacaan).
+    * **Fitur CRUD Episode Lengkap**: Menambahkan modal Edit Episode (update judul, isi teori, sumber video, dan durasi) serta aksi Hapus Episode.
+    * **Pembaruan Dashboard Admin ([admin/dashboard.ejs](file:///c:/Users/dimas/.gemini/antigravity-ide/project/lms/views/admin/dashboard.ejs))**: Mengubah metrik kolom menjadi "Total Episode" dan tombol tindakan menjadi "Kelola Materi".

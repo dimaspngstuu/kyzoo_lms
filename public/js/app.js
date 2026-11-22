@@ -44,7 +44,117 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
+
+  // 3. Sistem Tema Interaktif & Dinamis (Dark/Light Mode + Aksen Warna Kyzoo)
+  initInteractiveThemeSystem();
 });
+
+// Implementasi Sistem Tema Dinamis
+function initInteractiveThemeSystem() {
+  const dropdownBtn = document.getElementById('themeDropdownBtn');
+  const dropdownMenu = document.getElementById('themeDropdownMenu');
+  const activeModeIcon = document.getElementById('activeModeIcon');
+  const activeAccentDot = document.getElementById('activeAccentDot');
+  const lightModeBtn = document.getElementById('setLightModeBtn');
+  const darkModeBtn = document.getElementById('setDarkModeBtn');
+  const accentBtns = document.querySelectorAll('.accent-btn');
+
+  const accentColors = {
+    violet: '#6c5dd3',
+    ocean: '#0284c7',
+    emerald: '#10b981',
+    coral: '#f97316'
+  };
+
+  const accentNames = {
+    violet: 'Kyzoo Violet 🟣',
+    ocean: 'Ocean Blue 🔵',
+    emerald: 'Mint Emerald 🟢',
+    coral: 'Sunset Coral 🟠'
+  };
+
+  // Toggle Dropdown
+  if (dropdownBtn && dropdownMenu) {
+    dropdownBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!dropdownMenu.contains(e.target) && !dropdownBtn.contains(e.target)) {
+        dropdownMenu.classList.add('hidden');
+      }
+    });
+  }
+
+  // Fungsi Penerapan Mode (Light vs Dark)
+  function applyThemeMode(mode, notify = false) {
+    if (mode === 'dark') {
+      document.documentElement.classList.add('dark');
+      if (activeModeIcon) activeModeIcon.textContent = '🌙';
+      if (lightModeBtn) lightModeBtn.className = 'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white';
+      if (darkModeBtn) darkModeBtn.className = 'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-bold transition-all bg-white/10 text-white shadow-xs';
+    } else {
+      document.documentElement.classList.remove('dark');
+      if (activeModeIcon) activeModeIcon.textContent = '☀️';
+      if (lightModeBtn) lightModeBtn.className = 'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-bold transition-all bg-white text-slate-900 shadow-xs';
+      if (darkModeBtn) darkModeBtn.className = 'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-slate-800';
+    }
+    localStorage.setItem('kyzoo_theme_mode', mode);
+    if (notify) {
+      showToast(`Mode tema diubah ke ${mode === 'dark' ? 'Gelap 🌙' : 'Terang ☀️'}`);
+    }
+  }
+
+  // Fungsi Penerapan Warna Aksen
+  function applyAccentColor(accent, notify = false) {
+    document.documentElement.setAttribute('data-accent', accent);
+    localStorage.setItem('kyzoo_theme_accent', accent);
+
+    if (activeAccentDot && accentColors[accent]) {
+      activeAccentDot.style.backgroundColor = accentColors[accent];
+    }
+
+    accentBtns.forEach(btn => {
+      const btnAccent = btn.getAttribute('data-accent');
+      const checkIcon = btn.querySelector('span:first-child');
+      if (btnAccent === accent) {
+        btn.classList.add('bg-brand-50', 'dark:bg-slate-700', 'border-brand-300', 'dark:border-brand-500');
+        if (checkIcon) checkIcon.textContent = '✓';
+      } else {
+        btn.classList.remove('bg-brand-50', 'dark:bg-slate-700', 'border-brand-300', 'dark:border-brand-500');
+        if (checkIcon) checkIcon.textContent = '';
+      }
+    });
+
+    if (notify) {
+      showToast(`Warna aksen diubah ke ${accentNames[accent] || accent}`);
+    }
+  }
+
+  // Event Listener Tombol Mode
+  if (lightModeBtn) {
+    lightModeBtn.addEventListener('click', () => applyThemeMode('light', true));
+  }
+  if (darkModeBtn) {
+    darkModeBtn.addEventListener('click', () => applyThemeMode('dark', true));
+  }
+
+  // Event Listener Tombol Aksen
+  accentBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const accent = btn.getAttribute('data-accent');
+      applyAccentColor(accent, true);
+    });
+  });
+
+  // Sinkronisasi Status Awal dari LocalStorage
+  const currentMode = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  applyThemeMode(currentMode, false);
+
+  const currentAccent = document.documentElement.getAttribute('data-accent') || 'violet';
+  applyAccentColor(currentAccent, false);
+}
 
 // 3. Toast Notification Function
 function showToast(message, type = 'success') {

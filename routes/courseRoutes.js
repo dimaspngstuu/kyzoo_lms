@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const DB = require('../db');
 const { requireAuth } = require('../middleware/auth');
+const { formatLessonContent } = require('../helpers/contentFormatter');
 
 router.use(requireAuth);
 
@@ -164,7 +165,7 @@ router.get('/courses', (req, res) => {
   });
 });
 
-// Halaman Silabus Kursus
+// Halaman Silabus Kursus (Berbasis Daftar Episode Tunggal / Linear)
 router.get('/courses/:slug', (req, res) => {
   const userId = req.session.user.id;
   const course = DB.get('SELECT * FROM courses WHERE slug = ? AND is_active = 1', req.params.slug);
@@ -176,30 +177,29 @@ router.get('/courses/:slug', (req, res) => {
     });
   }
 
-  // Ambil Bab & Lessons
-  const chapters = DB.all('SELECT * FROM chapters WHERE course_id = ? ORDER BY sort_order ASC, id ASC', course.id);
-  for (const ch of chapters) {
-    ch.lessons = DB.all(`
-      SELECT l.*, 
-        COALESCE((SELECT is_completed FROM user_progress WHERE user_id = ? AND lesson_id = l.id), 0) as is_completed
-      FROM lessons l
-      WHERE l.chapter_id = ?
-      ORDER BY l.sort_order ASC, l.id ASC
-    `, userId, ch.id);
-  }
+  // Ambil semua lessons langsung secara linear urut per episode
+  const allLessons = DB.all(`
+    SELECT l.*, ch.title as chapter_title,
+      COALESCE((SELECT is_completed FROM user_progress WHERE user_id = ? AND lesson_id = l.id), 0) as is_completed
+    FROM lessons l
+    JOIN chapters ch ON l.chapter_id = ch.id
+    WHERE ch.course_id = ?
+    ORDER BY ch.sort_order ASC, l.sort_order ASC, l.id ASC
+  `, userId, course.id);
 
-  // Ambil lesson pertama untuk tombol mulai belajar
-  const firstLesson = DB.get(`
-    SELECT l.id FROM chapters ch JOIN lessons l ON l.chapter_id = ch.id
-    WHERE ch.course_id = ? ORDER BY ch.sort_order ASC, l.sort_order ASC LIMIT 1
-  `, course.id);
+  // Ambil lesson pertama yang belum selesai (atau yang pertama)
+  const nextLesson = allLessons.find(l => !l.is_completed) || allLessons[0];
+  const completedCount = allLessons.filter(l => l.is_completed).length;
+  const courseProgressPercent = allLessons.length > 0 ? Math.round((completedCount / allLessons.length) * 100) : 0;
 
   res.render('course_detail', {
     title: `${course.title} - Kyzoo LMS`,
     user: req.session.user,
     course,
-    chapters,
-    firstLessonId: firstLesson ? firstLesson.id : null
+    lessons: allLessons,
+    firstLessonId: nextLesson ? nextLesson.id : null,
+    completedCount,
+    courseProgressPercent
   });
 });
 
@@ -217,7 +217,7 @@ function handleLearnView(req, res) {
     });
   }
 
-  // Ambil semua bab dan lessons untuk sidebar materi
+  // Ambil semua bab dan lessons untuk daftar episode
   const chapters = DB.all('SELECT * FROM chapters WHERE course_id = ? ORDER BY sort_order ASC, id ASC', course.id);
   let allLessons = [];
 
@@ -249,8 +249,9 @@ function handleLearnView(req, res) {
     activeLesson = allLessons.find(l => !l.is_completed) || allLessons[0];
   }
 
-  // Tentukan previous dan next lesson
+  // Tentukan previous dan next lesson serta indeks episode
   const currentIndex = allLessons.findIndex(l => l.id === activeLesson.id);
+  const currentEpisodeIndex = currentIndex >= 0 ? currentIndex : 0;
   const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
   const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
 
@@ -262,17 +263,19 @@ function handleLearnView(req, res) {
   const courseProgressPercent = Math.round((completedCount / allLessons.length) * 100);
 
   res.render('course_view', {
-    title: `${activeLesson.title} - ${course.title} - Kyzoo`,
+    title: `EP ${currentEpisodeIndex + 1}: ${activeLesson.title} - ${course.title} - Kyzoo`,
     user: req.session.user,
     course,
-    chapters,
+    lessons: allLessons,
+    currentEpisodeIndex,
     activeLesson,
     videoPlayerInfo,
     prevLesson,
     nextLesson,
     totalLessons: allLessons.length,
     completedCount,
-    courseProgressPercent
+    courseProgressPercent,
+    renderedContent: formatLessonContent(activeLesson.content_text)
   });
 }
 

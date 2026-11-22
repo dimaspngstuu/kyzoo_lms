@@ -1,28 +1,28 @@
-<!-- Halaman Dashboard (Konsep 1: Modern Clean Light - Bento Grid & Metric Strip) -->
+<!-- Halaman Dashboard (Konsep 1: Modern Clean Light & Dark Mode Interaktif) -->
 
 <div class="space-y-6">
 
-  <!-- 1. HERO GREETING BANNER (Modern Clean Light & Elegant) -->
-  <div class="bg-gradient-to-br from-violet-50/70 via-white to-indigo-50/50 rounded-[28px] p-7 sm:p-10 text-center shadow-xs border border-slate-200/90 relative z-20">
-    <!-- Ambient Soft Glow Efek Elegan -->
+  <!-- 1. HERO GREETING BANNER (Modern Clean & Adaptif Tema) -->
+  <div class="bg-gradient-to-br from-brand-50/70 via-white to-indigo-50/50 dark:from-slate-900/95 dark:via-slate-900/70 dark:to-slate-900/95 rounded-[28px] p-7 sm:p-10 text-center shadow-xs border border-slate-200/90 dark:border-slate-800 relative z-20 transition-all duration-300">
+    <!-- Ambient Soft Glow Efek Dinamis -->
     <div class="absolute inset-0 rounded-[28px] overflow-hidden pointer-events-none">
-      <div class="absolute -top-24 -right-24 w-80 h-80 bg-violet-200/30 rounded-full blur-3xl"></div>
-      <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-fuchsia-200/25 rounded-full blur-3xl"></div>
+      <div class="absolute -top-24 -right-24 w-80 h-80 bg-brand-200/30 dark:bg-brand-500/10 rounded-full blur-3xl animate-pulse"></div>
+      <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-fuchsia-200/25 dark:bg-indigo-500/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 1.5s;"></div>
     </div>
 
     <div class="relative z-10 max-w-3xl mx-auto space-y-3">
       <!-- Badge Sapaan Hangat -->
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-100/80 border border-violet-200/60 text-xs font-semibold text-violet-700 shadow-2xs">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-100/80 dark:bg-slate-800 border border-brand-200/60 dark:border-slate-700 text-xs font-semibold text-brand-600 dark:text-brand-300 shadow-2xs">
         <span>👋</span>
         <span><%= greeting %>, Selamat Datang Kembali!</span>
       </div>
 
       <!-- Judul Sapaan Dinamis & Nama Pengguna -->
-      <h1 class="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+      <h1 class="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight transition-colors">
         <%= (user && user.name) ? user.name : 'Dimas Pangestu' %>
       </h1>
-      <p class="text-xs sm:text-base text-slate-500 font-medium max-w-xl mx-auto">
-        Portal pembelajaran video tutorial Kyzoo. Mau lanjut belajar modul apa hari ini?
+      <p class="text-xs sm:text-base text-slate-500 dark:text-slate-400 font-medium max-w-xl mx-auto">
+        Portal pembelajaran video tutorial Kyzoo Agent.
       </p>
 
       <!-- Input Pencarian Tunggal Terintegrasi (Live Search & Shortcut Ctrl K) -->
@@ -39,43 +39,43 @@
               name="q" 
               id="heroSearchInput"
               placeholder="Cari materi video, modul, atau catatan panduan..." 
-              class="w-full pl-11 sm:pl-13 pr-20 sm:pr-24 py-3 sm:py-3.5 bg-white hover:border-slate-300 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all shadow-xs"
+              class="w-full pl-11 sm:pl-13 pr-20 sm:pr-24 py-3 sm:py-3.5 bg-white dark:bg-slate-800/90 hover:border-slate-300 dark:hover:border-slate-600 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all shadow-xs"
             />
             <div class="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center pointer-events-none">
-              <kbd class="px-2 sm:px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-slate-500 bg-slate-100 border border-slate-200 rounded-lg shadow-2xs">Ctrl K</kbd>
+              <kbd class="px-2 sm:px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg shadow-2xs">Ctrl K</kbd>
             </div>
           </div>
         </form>
 
-        <!-- Dropdown Live Search Hasil Cepat (Clean Light) -->
-        <div id="heroSearchResults" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200/90 rounded-2xl shadow-xl z-50 overflow-hidden text-left max-h-96 overflow-y-auto divide-y divide-slate-100">
+        <!-- Dropdown Live Search Hasil Cepat -->
+        <div id="heroSearchResults" class="hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 rounded-2xl shadow-xl z-50 overflow-hidden text-left max-h-96 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700">
           <!-- Diisi secara dinamis melalui JavaScript -->
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 2. BENTO METRIC STRIP (3 Ringkasan Metrik Cepat & Bersih) -->
+  <!-- 2. BENTO METRIC STRIP (3 Ringkasan Metrik Interaktif & Halus) -->
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
     <!-- Card 1: Total Modul Aktif -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex items-center gap-4 hover:border-violet-300 transition-colors">
-      <div class="w-12 h-12 rounded-2xl bg-violet-50 border border-violet-100 flex items-center justify-center text-violet-600 shrink-0">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex items-center gap-4 hover:border-brand-300 dark:hover:border-brand-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
+      <div class="w-12 h-12 rounded-2xl bg-brand-50 dark:bg-brand-950/40 border border-brand-100 dark:border-brand-900/50 flex items-center justify-center text-brand-500 shrink-0 group-hover:scale-110 transition-transform">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
         </svg>
       </div>
       <div class="min-w-0 flex-1">
         <div class="text-xs font-semibold text-slate-400">Modul Kursus</div>
-        <div class="text-xl sm:text-2xl font-black text-slate-800 leading-tight">
-          <%= stats.totalCourses %> <span class="text-xs font-bold text-slate-500">Kelas Aktif</span>
+        <div class="text-xl sm:text-2xl font-black text-slate-800 dark:text-white leading-tight">
+          <%= stats.totalCourses %> <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Kelas Aktif</span>
         </div>
         <div class="text-[11px] text-slate-400 mt-0.5 truncate">Tersedia untuk dipelajari</div>
       </div>
     </div>
 
     <!-- Card 2: Video Selesai / Ditonton -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex items-center gap-4 hover:border-emerald-300 transition-colors">
-      <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex items-center gap-4 hover:border-emerald-300 dark:hover:border-emerald-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
+      <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/50 flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-110 transition-transform">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -83,18 +83,18 @@
       </div>
       <div class="min-w-0 flex-1">
         <div class="text-xs font-semibold text-slate-400">Materi Ditonton</div>
-        <div class="text-xl sm:text-2xl font-black text-slate-800 leading-tight">
+        <div class="text-xl sm:text-2xl font-black text-slate-800 dark:text-white leading-tight">
           <%= stats.completedLessons %> <span class="text-xs font-bold text-slate-400">/ <%= stats.totalLessons %> Video</span>
         </div>
-        <div class="text-[11px] text-emerald-600 font-semibold mt-0.5">
+        <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
           <%= stats.totalLessons - stats.completedLessons %> materi siap ditonton
         </div>
       </div>
     </div>
 
     <!-- Card 3: Capaian Belajar Akun -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex items-center gap-4 hover:border-blue-300 transition-colors">
-      <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex items-center gap-4 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
+      <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-110 transition-transform">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
         </svg>
@@ -102,9 +102,9 @@
       <div class="min-w-0 flex-1">
         <div class="flex items-center justify-between">
           <span class="text-xs font-semibold text-slate-400">Capaian Belajar</span>
-          <span class="text-sm font-extrabold text-blue-600"><%= stats.overallPercentage %>%</span>
+          <span class="text-sm font-extrabold text-blue-600 dark:text-blue-400"><%= stats.overallPercentage %>%</span>
         </div>
-        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-1.5">
+        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
           <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-full rounded-full transition-all duration-700" style="width: <%= stats.overallPercentage %>%"></div>
         </div>
         <div class="text-[11px] text-slate-400 mt-1 truncate">Rata-rata progres pembelajaran</div>
@@ -113,21 +113,21 @@
   </div>
 
   <!-- 3. SECTION MY COURSES (Bento Card Grid & Opsi Switch Tabel) -->
-  <div class="bg-white rounded-[24px] border border-slate-200/80 p-5 sm:p-7 shadow-xs relative z-10">
+  <div class="bg-white dark:bg-slate-900 rounded-[24px] border border-slate-200/80 dark:border-slate-800 p-5 sm:p-7 shadow-xs relative z-10 transition-colors duration-300">
     <!-- Header Section My Courses -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
       <div>
-        <h3 class="text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+        <h3 class="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
           <span>My Courses</span>
-          <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold"><%= courses.length %></span>
+          <span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold"><%= courses.length %></span>
         </h3>
         <p class="text-xs text-slate-400 font-medium mt-0.5">Daftar modul pembelajaran dan video tutorial yang Anda ikuti</p>
       </div>
       
       <div class="flex items-center justify-between sm:justify-end gap-3">
         <!-- Switch View: Grid / Tabel -->
-        <div class="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200/60 text-xs font-bold">
-          <button id="viewGridBtn" onclick="switchCourseView('grid')" class="px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-white text-slate-900 shadow-xs" title="Tampilan Kartu Bento">
+        <div class="inline-flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200/60 dark:border-slate-700 text-xs font-bold">
+          <button id="viewGridBtn" onclick="switchCourseView('grid')" class="px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs" title="Tampilan Kartu Bento">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <rect x="3" y="3" width="7" height="7" rx="1.5" stroke-width="2"></rect>
               <rect x="14" y="3" width="7" height="7" rx="1.5" stroke-width="2"></rect>
@@ -136,7 +136,7 @@
             </svg>
             <span class="hidden sm:inline">Grid</span>
           </button>
-          <button id="viewTableBtn" onclick="switchCourseView('table')" class="px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-slate-500 hover:text-slate-800" title="Tampilan Tabel Rapi">
+          <button id="viewTableBtn" onclick="switchCourseView('table')" class="px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white" title="Tampilan Tabel Rapi">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
@@ -145,11 +145,11 @@
         </div>
 
         <!-- Filter Tabs: Active | Completed -->
-        <div class="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200/60 text-xs font-bold">
-          <button id="tabActiveBtn" onclick="switchCourseTab('active')" class="px-3 py-1.5 rounded-lg transition-all bg-white text-violet-700 shadow-xs">
+        <div class="inline-flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200/60 dark:border-slate-700 text-xs font-bold">
+          <button id="tabActiveBtn" onclick="switchCourseTab('active')" class="px-3 py-1.5 rounded-lg transition-all bg-white dark:bg-slate-700 text-brand-500 dark:text-brand-400 shadow-xs">
             Active
           </button>
-          <button id="tabCompletedBtn" onclick="switchCourseTab('completed')" class="px-3 py-1.5 rounded-lg transition-all text-slate-500 hover:text-slate-800">
+          <button id="tabCompletedBtn" onclick="switchCourseTab('completed')" class="px-3 py-1.5 rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white">
             Completed
           </button>
         </div>
@@ -159,12 +159,12 @@
     <!-- TAMPILAN 1: BENTO CARD GRID (Default & Paling Rapi, Mengisi Ruang Layar) -->
     <div id="courseGridView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <% courses.forEach((course, index) => { %>
-      <div class="course-bento-card bg-slate-50/50 hover:bg-white rounded-2xl border border-slate-200/80 hover:border-violet-300 p-5 transition-all duration-200 shadow-2xs hover:shadow-md flex flex-col justify-between group"
+      <div class="course-bento-card bg-slate-50/50 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-750 hover:border-brand-300 dark:hover:border-brand-500 p-5 transition-all duration-300 shadow-2xs hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between group"
            data-type="<%= course.isFinished ? 'completed' : 'active' %>">
         
         <div>
           <!-- Thumbnail & Badges -->
-          <div class="relative w-full aspect-video rounded-xl overflow-hidden mb-4 bg-slate-200 border border-slate-100 shadow-xs">
+          <div class="relative w-full aspect-video rounded-xl overflow-hidden mb-4 bg-slate-200 dark:bg-slate-700 border border-slate-100 dark:border-slate-700 shadow-xs">
             <img src="<%= course.thumbnail %>" alt="<%= course.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
             <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5">
               <span class="px-2.5 py-1 rounded-lg bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider">
@@ -172,7 +172,7 @@
               </span>
             </div>
             <div class="absolute top-2.5 right-2.5">
-              <span class="px-2.5 py-1 rounded-lg bg-violet-600/90 backdrop-blur-md text-white text-[10px] font-bold">
+              <span class="px-2.5 py-1 rounded-lg bg-brand-500/90 backdrop-blur-md text-white text-[10px] font-bold">
                 <%= course.category %>
               </span>
             </div>
@@ -180,18 +180,18 @@
 
           <!-- Info Kursus -->
           <div class="space-y-1.5 mb-4">
-            <h4 class="text-base font-extrabold text-slate-900 group-hover:text-violet-600 transition-colors line-clamp-2 leading-snug">
+            <h4 class="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-brand-500 transition-colors line-clamp-2 leading-snug">
               <a href="/courses/<%= course.slug %>"><%= course.title %></a>
             </h4>
-            <p class="text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed">
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-2 leading-relaxed">
               <%= course.description || 'Pelajari materi video terstruktur dan praktik langsung langkah demi langkah.' %>
             </p>
           </div>
 
           <!-- Indikator Metrik Bab & Materi -->
-          <div class="flex items-center gap-3 text-xs text-slate-500 font-medium py-2 border-y border-slate-100">
+          <div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium py-2 border-y border-slate-100 dark:border-slate-800">
             <div class="flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+              <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
               <span><%= course.chapters ? course.chapters.length : 0 %> Bab Turunan</span>
             </div>
             <span>•</span>
@@ -203,11 +203,11 @@
 
           <!-- Progress Bar Modul -->
           <div class="mt-3.5 space-y-1.5">
-            <div class="flex items-center justify-between text-xs font-semibold text-slate-600">
+            <div class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-400">
               <span>Progres Belajar</span>
-              <span class="font-extrabold text-slate-800"><%= course.percent %>%</span>
+              <span class="font-extrabold text-slate-800 dark:text-white"><%= course.percent %>%</span>
             </div>
-            <div class="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden">
+            <div class="w-full bg-slate-200/70 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
               <div class="h-full rounded-full transition-all duration-500" style="width: <%= course.percent %>%; background-color: <%= course.barColor %>;"></div>
             </div>
             <div class="text-[11px] text-slate-400 font-medium">
@@ -217,11 +217,11 @@
         </div>
 
         <!-- Tombol Aksi & Accordion Turunan -->
-        <div class="mt-5 pt-3.5 border-t border-slate-100 space-y-2">
+        <div class="mt-5 pt-3.5 border-t border-slate-100 dark:border-slate-800 space-y-2">
           <!-- Accordion Toggle Bab Turunan -->
           <button type="button" 
                   onclick="toggleBentoChapterDrawer(event, '<%= course.id %>')" 
-                  class="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-violet-50 text-slate-600 hover:text-violet-700 text-xs font-bold flex items-center justify-between transition-colors">
+                  class="w-full py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-brand-500 dark:hover:text-brand-400 text-xs font-bold flex items-center justify-between transition-colors">
             <span class="flex items-center gap-1.5">
               <span>📂</span>
               <span>Daftar Bab & Video</span>
@@ -232,23 +232,23 @@
           </button>
 
           <!-- Drawer Turunan Bab Bento (Expandable) -->
-          <div id="bentoChapterDrawer-<%= course.id %>" class="hidden space-y-2 pt-2 border-t border-slate-100 max-h-60 overflow-y-auto">
+          <div id="bentoChapterDrawer-<%= course.id %>" class="hidden space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800 max-h-60 overflow-y-auto">
             <% if (course.chapters && course.chapters.length > 0) { %>
               <% course.chapters.forEach((ch, chIdx) => { %>
-                <div class="p-2.5 rounded-xl bg-white border border-slate-100 space-y-1.5 shadow-2xs">
-                  <div class="text-xs font-bold text-slate-800 flex items-center justify-between">
+                <div class="p-2.5 rounded-xl bg-white dark:bg-slate-850 border border-slate-100 dark:border-slate-700/80 space-y-1.5 shadow-2xs">
+                  <div class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
                     <span class="truncate">Bab <%= chIdx + 1 %>: <%= ch.title %></span>
                     <span class="text-[10px] text-slate-400 font-semibold shrink-0 ml-1"><%= ch.lessons ? ch.lessons.length : 0 %> v</span>
                   </div>
-                  <div class="space-y-1 pl-2 border-l border-violet-200">
+                  <div class="space-y-1 pl-2 border-l border-brand-200 dark:border-brand-800">
                     <% if (ch.lessons && ch.lessons.length > 0) { %>
                       <% ch.lessons.forEach(l => { %>
-                        <a href="/learn/<%= course.slug %>/<%= l.id %>" class="flex items-center justify-between py-1 text-[11px] text-slate-600 hover:text-violet-600 group/l">
+                        <a href="/learn/<%= course.slug %>/<%= l.id %>" class="flex items-center justify-between py-1 text-[11px] text-slate-600 dark:text-slate-300 hover:text-brand-500 group/l">
                           <span class="truncate flex items-center gap-1.5">
-                            <span class="w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] <%= l.is_completed ? 'bg-emerald-500 text-white font-bold' : 'border border-slate-300 text-transparent' %>">✓</span>
+                            <span class="w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] <%= l.is_completed ? 'bg-emerald-500 text-white font-bold' : 'border border-slate-300 dark:border-slate-600 text-transparent' %>">✓</span>
                             <span><%= l.title %></span>
                           </span>
-                          <span class="text-[10px] text-violet-600 font-bold shrink-0 ml-1 group-hover/l:underline">Tonton ▶</span>
+                          <span class="text-[10px] text-brand-500 font-bold shrink-0 ml-1 group-hover/l:underline">Tonton ▶</span>
                         </a>
                       <% }) %>
                     <% } %>
@@ -261,7 +261,7 @@
           </div>
 
           <!-- Tombol Lanjut Belajar -->
-          <a href="/courses/<%= course.slug %>" class="w-full py-2.5 px-4 rounded-xl bg-[#6c5dd3] hover:bg-violet-700 text-white text-xs font-bold text-center block transition-all shadow-sm shadow-violet-200">
+          <a href="/courses/<%= course.slug %>" class="w-full py-2.5 px-4 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold text-center block transition-all shadow-sm shadow-dynamic-glow">
             Lanjutkan Belajar ▶
           </a>
         </div>
@@ -274,7 +274,7 @@
     <div id="courseTableView" class="hidden overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-3">
+          <tr class="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-3">
             <th class="py-3 px-2 w-10">#</th>
             <th class="py-3 px-4">Course Name</th>
             <th class="py-3 px-4 w-64">Completed</th>
@@ -282,16 +282,16 @@
             <th class="py-3 px-4 text-right">Aksi</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-100/80">
+        <tbody class="divide-y divide-slate-100/80 dark:divide-slate-800">
           <% courses.forEach((course, index) => { %>
           <!-- Baris Utama Kursus -->
-          <tr class="course-row hover:bg-slate-50/70 transition-colors group cursor-pointer" 
+          <tr class="course-row hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer" 
               data-type="<%= course.isFinished ? 'completed' : 'active' %>">
             
             <td class="py-4 px-2 text-xs font-semibold text-slate-400">
               <button type="button" 
                       onclick="toggleDashboardCourseTree(event, '<%= course.id %>')" 
-                      class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-violet-100 text-slate-400 hover:text-violet-700 transition-colors" 
+                      class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-brand-100 dark:hover:bg-slate-700 text-slate-400 hover:text-brand-600 transition-colors" 
                       title="Buka / Tutup Turunan Bab & Materi">
                 <svg id="dashboardTreeArrow-<%= course.id %>" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
@@ -301,16 +301,16 @@
 
             <td class="py-4 px-4" onclick="window.location.href='/courses/<%= course.slug %>'">
               <div class="flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-xl overflow-hidden shrink-0 shadow-xs border border-slate-100">
+                <div class="w-10 h-10 rounded-xl overflow-hidden shrink-0 shadow-xs border border-slate-100 dark:border-slate-700">
                   <img src="<%= course.thumbnail %>" alt="<%= course.title %>" class="w-full h-full object-cover">
                 </div>
                 <div>
-                  <h4 class="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-violet-600 transition-colors line-clamp-1">
+                  <h4 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-brand-500 transition-colors line-clamp-1">
                     <%= course.title %>
                   </h4>
                   <div class="flex items-center gap-2 mt-0.5">
                     <span class="text-[10px] text-slate-400 font-medium"><%= course.category %></span>
-                    <span class="text-[10px] text-violet-600 font-bold bg-violet-50 px-1.5 py-0.5 rounded border border-violet-100">
+                    <span class="text-[10px] text-brand-500 font-bold bg-brand-50 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-brand-100 dark:border-slate-700">
                       📂 <%= (course.chapters ? course.chapters.length : 0) %> Bab Turunan
                     </span>
                   </div>
@@ -320,23 +320,23 @@
 
             <td class="py-4 px-4" onclick="window.location.href='/courses/<%= course.slug %>'">
               <div class="flex items-center gap-3">
-                <div class="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div class="flex-1 bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                   <div class="h-full rounded-full transition-all duration-500" 
                        style="width: <%= course.percent %>%; background-color: <%= course.barColor %>;">
                   </div>
                 </div>
-                <span class="text-xs font-bold text-slate-600 w-9 text-right"><%= course.percent %>%</span>
+                <span class="text-xs font-bold text-slate-600 dark:text-slate-300 w-9 text-right"><%= course.percent %>%</span>
               </div>
             </td>
 
             <td class="py-4 px-4 text-right">
-              <span class="text-xs font-semibold text-slate-500">
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">
                 <%= course.completed_lessons || 0 %> / <%= course.total_lessons || 0 %> video
               </span>
             </td>
 
             <td class="py-4 px-4 text-right">
-              <a href="/courses/<%= course.slug %>" class="px-3 py-1.5 rounded-xl bg-violet-50 hover:bg-violet-100 text-violet-700 text-xs font-bold inline-block transition-colors">
+              <a href="/courses/<%= course.slug %>" class="px-3 py-1.5 rounded-xl bg-brand-50 dark:bg-slate-800 hover:bg-brand-100 dark:hover:bg-slate-700 text-brand-500 dark:text-brand-400 text-xs font-bold inline-block transition-colors">
                 Buka →
               </a>
             </td>
@@ -344,28 +344,28 @@
           </tr>
 
           <!-- Baris Expandable Turunan Kursus Tabel -->
-          <tr id="dashboardTreeRow-<%= course.id %>" class="hidden bg-slate-50/80 border-b border-slate-100">
+          <tr id="dashboardTreeRow-<%= course.id %>" class="hidden bg-slate-50/80 dark:bg-slate-850/80 border-b border-slate-100 dark:border-slate-800">
             <td colspan="5" class="p-0">
-              <div class="px-6 py-4 pl-12 bg-gradient-to-b from-slate-50/90 to-white border-y border-slate-100/80 space-y-3">
+              <div class="px-6 py-4 pl-12 bg-gradient-to-b from-slate-50/90 to-white dark:from-slate-900/90 dark:to-slate-900 border-y border-slate-100/80 dark:border-slate-800 space-y-3">
                 <div class="flex items-center justify-between">
-                  <span class="text-[11px] font-bold text-violet-600 uppercase tracking-wider flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-violet-600"></span>
-                    Turunan Modul: <span class="text-slate-800 normal-case font-extrabold"><%= course.title %></span>
+                  <span class="text-[11px] font-bold text-brand-500 uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                    Turunan Modul: <span class="text-slate-800 dark:text-slate-100 normal-case font-extrabold"><%= course.title %></span>
                   </span>
-                  <a href="/courses/<%= course.slug %>" class="text-xs font-bold text-violet-600 hover:text-violet-800 hover:underline flex items-center gap-1">
+                  <a href="/courses/<%= course.slug %>" class="text-xs font-bold text-brand-500 hover:underline flex items-center gap-1">
                     <span>Lihat Halaman Kursus Lengkap</span>
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                   </a>
                 </div>
 
                 <!-- Pohon Turunan Bab & Materi -->
-                <div class="space-y-3 pl-3 border-l-2 border-violet-200 ml-1">
+                <div class="space-y-3 pl-3 border-l-2 border-brand-200 dark:border-brand-800 ml-1">
                   <% if (course.chapters && course.chapters.length > 0) { %>
                     <% course.chapters.forEach((ch, chIdx) => { %>
-                      <div class="bg-white rounded-xl p-3.5 border border-slate-100 shadow-xs">
-                        <div class="flex items-center justify-between text-xs font-bold text-slate-800 pb-2 border-b border-slate-100">
+                      <div class="bg-white dark:bg-slate-800/90 rounded-xl p-3.5 border border-slate-100 dark:border-slate-700 shadow-xs">
+                        <div class="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-100 pb-2 border-b border-slate-100 dark:border-slate-700">
                           <span class="flex items-center gap-2">
-                            <span class="w-5 h-5 rounded-md bg-violet-100 text-violet-700 text-[10px] flex items-center justify-center font-bold">
+                            <span class="w-5 h-5 rounded-md bg-brand-50 dark:bg-slate-700 text-brand-600 dark:text-brand-300 text-[10px] flex items-center justify-center font-bold">
                               <%= chIdx + 1 %>
                             </span>
                             <span><%= ch.title %></span>
@@ -376,7 +376,7 @@
                         <div class="mt-2 space-y-1 pl-4">
                           <% if (ch.lessons && ch.lessons.length > 0) { %>
                             <% ch.lessons.forEach(l => { %>
-                              <a href="/learn/<%= course.slug %>/<%= l.id %>" class="flex items-center justify-between py-1.5 px-2.5 rounded-lg hover:bg-violet-50 text-xs transition-colors group">
+                              <a href="/learn/<%= course.slug %>/<%= l.id %>" class="flex items-center justify-between py-1.5 px-2.5 rounded-lg hover:bg-brand-50/60 dark:hover:bg-slate-700/60 text-xs transition-colors group">
                                 <div class="flex items-center gap-2 min-w-0">
                                   <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] shrink-0 <%= l.is_completed ? 'bg-emerald-500 text-white font-bold' : 'border border-slate-300 text-transparent' %>">
                                     ✓

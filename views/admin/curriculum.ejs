@@ -1,216 +1,344 @@
-<!-- Admin: Kelola Kurikulum (Bab & Materi Video CRUD) -->
+<!-- Admin: Kelola Materi Berbasis Linear Episode (Tanpa Bab & Tanpa Turunan) -->
 
 <div class="space-y-6">
 
-  <!-- Header Info Kursus -->
+  <!-- Header Info Kursus & Tombol Tambah Episode -->
   <div class="bg-white rounded-[22px] border border-slate-100 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div>
       <div class="flex items-center gap-2">
-        <a href="/admin" class="text-xs font-bold text-violet-600 hover:underline">← Panel Admin</a>
+        <a href="/admin" class="text-xs font-bold text-brand-600 hover:underline">← Panel Admin</a>
         <span class="text-slate-300">/</span>
-        <span class="text-xs font-bold text-slate-500"><%= course.code %></span>
+        <span class="text-xs font-bold text-slate-500 font-mono"><%= course.code %></span>
       </div>
-      <h2 class="text-xl font-bold text-slate-900 mt-1">Kelola Materi: <%= course.title %></h2>
+      <div class="flex items-center gap-3 mt-1.5 flex-wrap">
+        <h2 class="text-xl font-black text-slate-900 tracking-tight">Kelola Materi: <%= course.title %></h2>
+        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-50 text-brand-600 border border-brand-200/60">
+          <%= lessons.length %> Episode Terdaftar
+        </span>
+      </div>
+      <p class="text-xs text-slate-400 mt-1">Susun materi secara linear per episode. Siswa dapat membaca teori dan menonton video tutorial opsional.</p>
     </div>
 
-    <!-- Tombol Modal Tambah Bab -->
-    <button onclick="document.getElementById('modalAddChapter').classList.remove('hidden')" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs flex items-center gap-2">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-      <span>Tambah Bab Baru</span>
+    <!-- Tombol Tambah Episode Baru -->
+    <button onclick="openAddLessonModal()" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-xs flex items-center gap-2 shadow-md shadow-dynamic-glow transition-all self-start sm:self-auto">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+      <span>Tambah Episode Baru</span>
     </button>
   </div>
 
   <!-- Notifikasi Pesan -->
   <% if (success) { %>
-    <div class="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-xl"><%= success %></div>
+    <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-2xl flex items-center gap-2 shadow-xs">
+      <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+      <span><%= success %></span>
+    </div>
   <% } %>
   <% if (error) { %>
-    <div class="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-xl"><%= error %></div>
+    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold rounded-2xl flex items-center gap-2 shadow-xs">
+      <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span><%= error %></span>
+    </div>
   <% } %>
 
-  <!-- Daftar Bab & Lessons -->
-  <div class="space-y-6">
-    <% if (chapters.length === 0) { %>
-      <div class="bg-white rounded-[22px] border border-slate-100 p-12 text-center shadow-sm">
-        <p class="text-sm font-semibold text-slate-500">Belum ada bab yang dibuat untuk kursus ini.</p>
-        <button onclick="document.getElementById('modalAddChapter').classList.remove('hidden')" class="mt-3 px-4 py-2 bg-violet-600 text-white font-bold text-xs rounded-xl">
-          Buat Bab Pertama
+  <!-- Daftar Episode Pembelajaran (Tabel / Card Linear) -->
+  <div class="bg-white rounded-[22px] border border-slate-100 p-6 shadow-sm space-y-4">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+      <div>
+        <h3 class="text-base font-bold text-slate-900">Urutan Episode Materi</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Episode ditampilkan sesuai urutan pembelajaran yang dilihat oleh pelanggan.</p>
+      </div>
+      <a href="/courses/<%= course.slug %>" target="_blank" class="text-xs font-semibold text-brand-600 hover:underline flex items-center gap-1">
+        <span>Lihat Tampilan Siswa</span>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+      </a>
+    </div>
+
+    <% if (lessons.length === 0) { %>
+      <div class="py-16 text-center space-y-3">
+        <div class="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center text-slate-400 mx-auto text-2xl">
+          📚
+        </div>
+        <p class="text-sm font-semibold text-slate-600">Belum ada episode materi yang dibuat untuk kursus ini.</p>
+        <p class="text-xs text-slate-400 max-w-sm mx-auto">Klik tombol di bawah untuk menambahkan materi pertama berupa teks panduan dan video tutorial opsional.</p>
+        <button onclick="openAddLessonModal()" class="mt-2 px-5 py-2.5 bg-brand-500 text-white font-bold text-xs rounded-xl shadow-md shadow-dynamic-glow">
+          + Buat Episode Pertama
         </button>
       </div>
-    <% } %>
+    <% } else { %>
+      <div class="divide-y divide-slate-100">
+        <% lessons.forEach((l, idx) => { %>
+          <div class="py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/60 p-3 rounded-2xl transition-all">
+            
+            <!-- Info Episode -->
+            <div class="flex items-start sm:items-center gap-3.5 min-w-0">
+              <span class="w-10 h-10 rounded-xl bg-brand-50 text-brand-700 font-extrabold text-xs flex items-center justify-center shrink-0 border border-brand-100">
+                EP <%= String(idx + 1).padStart(2, '0') %>
+              </span>
 
-    <% chapters.forEach((ch, idx) => { %>
-      <div class="bg-white rounded-[22px] border border-slate-100 p-6 shadow-sm space-y-4">
-        
-        <!-- Header Bab -->
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-          <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-lg bg-violet-100 text-violet-700 font-bold text-xs flex items-center justify-center">
-              <%= idx + 1 %>
-            </span>
-            <h3 class="text-sm font-bold text-slate-900"><%= ch.title %></h3>
-          </div>
+              <div class="min-w-0 space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="text-sm font-bold text-slate-900 truncate"><%= l.title %></h4>
+                  
+                  <% if (l.video_url) { %>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-violet-50 text-violet-700 border border-violet-100 flex items-center gap-1">
+                      <span>🎥 Video Tutorial</span>
+                      <span class="uppercase text-[9px] opacity-75">(<%= l.video_source %>)</span>
+                    </span>
+                  <% } else { %>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
+                      📄 Teks Panduan Saja
+                    </span>
+                  <% } %>
 
-          <div class="flex items-center gap-2">
-            <!-- Tombol Tambah Materi ke Bab ini -->
-            <button onclick="openAddLessonModal(<%= ch.id %>, '<%= ch.title %>')" class="px-3 py-1.5 bg-violet-50 hover:bg-[#6c5dd3] hover:text-white text-violet-700 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-              <span>Tambah Video Materi</span>
-            </button>
-
-            <!-- Hapus Bab -->
-            <form action="/admin/chapters/<%= ch.id %>/delete" method="POST" onsubmit="return confirm('Hapus bab ini beserta seluruh materinya?');" class="inline">
-              <button type="submit" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="Hapus Bab">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <!-- Daftar Lesson dalam Bab -->
-        <div class="space-y-2">
-          <% if (ch.lessons.length === 0) { %>
-            <p class="text-xs text-slate-400 italic py-2">Belum ada video materi di bab ini.</p>
-          <% } %>
-
-          <% ch.lessons.forEach(l => { %>
-            <div class="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 bg-slate-50/60 hover:bg-white hover:border-violet-200 transition-all">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-600 shrink-0">
-                  <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
+                  <span class="text-[11px] font-medium text-slate-400">⏱️ <%= l.duration_minutes %> Menit</span>
                 </div>
-                <div>
-                  <h4 class="text-xs font-bold text-slate-800"><%= l.title %></h4>
-                  <div class="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
-                    <span class="font-semibold text-violet-600 uppercase"><%= l.video_source %></span>
-                    <span>•</span>
-                    <span><%= l.duration_minutes %> Menit</span>
-                    <span>•</span>
-                    <span class="truncate max-w-xs"><%= l.video_url %></span>
-                  </div>
-                </div>
+
+                <% if (l.content_text) { %>
+                  <p class="text-xs text-slate-500 line-clamp-1 max-w-xl">
+                    <%= l.content_text.substring(0, 120) %>...
+                  </p>
+                <% } else { %>
+                  <p class="text-xs text-slate-400 italic">Tidak ada catatan teks teori.</p>
+                <% } %>
               </div>
+            </div>
 
-              <!-- Hapus Lesson -->
-              <form action="/admin/lessons/<%= l.id %>/delete" method="POST" onsubmit="return confirm('Hapus materi ini?');" class="inline">
-                <button type="submit" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            <!-- Tombol Aksi -->
+            <div class="flex items-center gap-2 self-end md:self-auto shrink-0">
+              <!-- Preview Halaman Belajar -->
+              <a href="/learn/<%= course.slug %>/<%= l.id %>" target="_blank" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1" title="Lihat di Peramban">
+                <span>Buka</span>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              </a>
+
+              <!-- Edit Episode -->
+              <button onclick='openEditLessonModal(<%- JSON.stringify(l) %>)' class="px-3 py-1.5 bg-brand-50 hover:bg-brand-500 hover:text-white text-brand-700 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                <span>Edit</span>
+              </button>
+
+              <!-- Hapus Episode -->
+              <form action="/admin/lessons/<%= l.id %>/delete" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus Episode ini?');" class="inline">
+                <button type="submit" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="Hapus Episode">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
               </form>
             </div>
-          <% }) %>
-        </div>
 
+          </div>
+        <% }) %>
       </div>
-    <% }) %>
+    <% } %>
   </div>
 
 </div>
 
-<!-- MODAL TAMBAH BAB -->
-<div id="modalAddChapter" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4 hidden">
-  <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl">
-    <h3 class="text-base font-bold text-slate-900 mb-4">Tambah Bab / Chapter Baru</h3>
-    <form action="/admin/courses/<%= course.id %>/chapters/new" method="POST" class="space-y-4">
+<!-- ========================================== -->
+<!-- MODAL TAMBAH EPISODE BARU                  -->
+<!-- ========================================== -->
+<div id="modalAddLesson" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl max-h-[92vh] overflow-y-auto space-y-5">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
       <div>
-        <label class="block text-xs font-bold text-slate-700 mb-1">Nama Bab *</label>
-        <input type="text" name="title" required placeholder="Contoh: Bab 2: Pengaturan Lanjutan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800">
+        <h3 class="text-base font-bold text-slate-900">Tambah Episode Baru</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Isi materi teori dan sertakan video tutorial (opsional).</p>
       </div>
-      <div class="flex justify-end gap-2 pt-2">
-        <button type="button" onclick="document.getElementById('modalAddChapter').classList.add('hidden')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Batal</button>
-        <button type="submit" class="px-5 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-xs font-bold">Simpan Bab</button>
+      <button type="button" onclick="closeModal('modalAddLesson')" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 flex items-center justify-center">✕</button>
+    </div>
+
+    <form action="/admin/courses/<%= course.id %>/episodes/new" method="POST" enctype="multipart/form-data" class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Judul Episode *</label>
+        <input type="text" name="title" required placeholder="Contoh: Cara Download & Install Antigravity IDE" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 font-medium">
+      </div>
+
+      <!-- Teks Panduan & Rangkuman Materi Teori -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Teks Panduan / Teori Pembelajaran</label>
+        <textarea name="content_text" rows="5" placeholder="Tuliskan rangkuman konsep, penjelasan teori, atau poin-poin langkah... (Mendukung judul subtopik, bullet points, dan **teks tebal**)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 leading-relaxed"></textarea>
+      </div>
+
+      <!-- Seksi Opsi Video (Opsional) -->
+      <div class="p-4 bg-slate-50/80 border border-slate-200 rounded-2xl space-y-3">
+        <div class="flex items-center justify-between">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="addHasVideoCheck" name="has_video" value="yes" checked onchange="toggleAddVideoFields(this.checked)" class="w-4 h-4 text-brand-600 rounded">
+            <span class="text-xs font-bold text-slate-800">Sertakan Video Tutorial (Opsional)</span>
+          </label>
+          <span class="text-[10px] text-slate-400 font-semibold bg-white px-2 py-0.5 rounded border border-slate-200">Bisa dikosongkan</span>
+        </div>
+
+        <div id="addVideoFieldsBox" class="space-y-3 pt-2 border-t border-slate-200">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">Sumber Video</label>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <label class="flex items-center gap-2 p-2 bg-white border border-slate-200 rounded-xl cursor-pointer">
+                <input type="radio" name="video_source" value="youtube" checked onchange="toggleVideoInputType('add', 'link')">
+                <span class="font-semibold text-[11px]">Link YouTube / Drive</span>
+              </label>
+              <label class="flex items-center gap-2 p-2 bg-white border border-slate-200 rounded-xl cursor-pointer">
+                <input type="radio" name="video_source" value="upload" onchange="toggleVideoInputType('add', 'upload')">
+                <span class="font-semibold text-[11px]">Upload File MP4</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="boxAddVideoLink">
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">URL Video</label>
+            <input type="url" id="addVideoUrl" name="video_url" placeholder="https://www.youtube.com/watch?v=..." class="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800">
+          </div>
+
+          <div id="boxAddVideoFile" class="hidden">
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">Pilih File Video MP4</label>
+            <input type="file" id="addVideoFile" name="video_file" accept="video/mp4,video/webm" class="text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-violet-100 file:text-violet-700">
+          </div>
+        </div>
+      </div>
+
+      <!-- Estimasi Durasi Belajar -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Estimasi Durasi Belajar (Menit) *</label>
+        <div class="relative flex items-center">
+          <input type="number" id="addDurationInput" name="duration_minutes" value="10" min="1" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 font-bold pr-14">
+          <span class="absolute right-3 text-xs font-bold text-slate-400 pointer-events-none">Menit</span>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+        <button type="button" onclick="closeModal('modalAddLesson')" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Batal</button>
+        <button type="submit" class="px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold shadow-md shadow-dynamic-glow">Simpan Episode</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- MODAL TAMBAH MATERI / VIDEO (CRUD) -->
-<div id="modalAddLesson" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4 hidden">
-  <div class="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-    <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-      <h3 class="text-base font-bold text-slate-900">Tambah Video Tutorial</h3>
-      <button type="button" onclick="document.getElementById('modalAddLesson').classList.add('hidden')" class="text-slate-400 hover:text-slate-700">✕</button>
+<!-- ========================================== -->
+<!-- MODAL EDIT EPISODE                         -->
+<!-- ========================================== -->
+<div id="modalEditLesson" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl max-h-[92vh] overflow-y-auto space-y-5">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+      <div>
+        <h3 class="text-base font-bold text-slate-900">Edit Data Episode</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Perbarui isi materi teori atau link video.</p>
+      </div>
+      <button type="button" onclick="closeModal('modalEditLesson')" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 flex items-center justify-center">✕</button>
     </div>
 
-    <form id="formAddLesson" action="" method="POST" enctype="multipart/form-data" class="space-y-4">
+    <form id="formEditLesson" action="" method="POST" enctype="multipart/form-data" class="space-y-4">
       <div>
-        <label class="block text-xs font-bold text-slate-700 mb-1">Judul Video / Materi *</label>
-        <input type="text" name="title" required placeholder="Contoh: Cara Menghubungkan Akun & Integrasi" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800">
+        <label class="block text-xs font-bold text-slate-700 mb-1">Judul Episode *</label>
+        <input type="text" id="editTitle" name="title" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 font-medium">
       </div>
 
-      <!-- Pilihan Sumber Video -->
-      <div class="space-y-2">
-        <label class="block text-xs font-bold text-slate-700">Pilih Sumber Video *</label>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <label class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
-            <input type="radio" name="video_source" value="youtube" checked onchange="toggleVideoInput('link')">
-            <span class="font-bold">Link YouTube / Vimeo / Drive</span>
-          </label>
-          <label class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
-            <input type="radio" name="video_source" value="upload" onchange="toggleVideoInput('upload')">
-            <span class="font-bold">Upload File MP4 Lokal</span>
+      <!-- Teks Panduan & Rangkuman Materi Teori -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Teks Panduan / Teori Pembelajaran</label>
+        <textarea id="editContentText" name="content_text" rows="5" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 leading-relaxed"></textarea>
+      </div>
+
+      <!-- Seksi Opsi Video (Opsional) -->
+      <div class="p-4 bg-slate-50/80 border border-slate-200 rounded-2xl space-y-3">
+        <div class="flex items-center justify-between">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="editHasVideoCheck" name="has_video" value="yes" onchange="toggleEditVideoFields(this.checked)" class="w-4 h-4 text-brand-600 rounded">
+            <span class="text-xs font-bold text-slate-800">Sertakan Video Tutorial (Opsional)</span>
           </label>
         </div>
-      </div>
 
-      <!-- Input Link Video -->
-      <div id="boxVideoLink">
-        <label class="block text-xs font-bold text-slate-700 mb-1">Link URL Video</label>
-        <input type="url" id="adminVideoUrl" name="video_url" placeholder="https://www.youtube.com/watch?v=..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800">
-        <p class="text-[10px] text-slate-400 mt-1">Sistem otomatis mendeteksi durasi & format embed YouTube, Vimeo, maupun Google Drive.</p>
-      </div>
-
-      <!-- Input File Upload Video -->
-      <div id="boxVideoFile" class="hidden">
-        <label class="block text-xs font-bold text-slate-700 mb-1">Pilih File Video MP4</label>
-        <input type="file" id="adminVideoFile" name="video_file" accept="video/mp4,video/webm" class="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-violet-100 file:text-violet-700 hover:file:bg-violet-200">
-        <p class="text-[10px] text-slate-400 mt-1">Video akan disimpan ke server lokal folder public/uploads/videos.</p>
-      </div>
-
-      <!-- Status Deteksi Durasi Otomatis -->
-      <div id="adminDetectNotice" class="hidden p-3 rounded-xl bg-violet-50 border border-violet-100 text-violet-700 text-xs font-medium flex items-center gap-2">
-        <span id="adminDetectSpinner">✨</span>
-        <span id="adminDetectText">Mendeteksi durasi video...</span>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Durasi Video (Menit)</label>
-          <div class="relative flex items-center">
-            <input type="number" id="adminDurationInput" name="duration_minutes" value="10" min="1" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 font-bold pr-14">
-            <span class="absolute right-3 text-xs font-bold text-slate-400 pointer-events-none">Menit</span>
+        <div id="editVideoFieldsBox" class="space-y-3 pt-2 border-t border-slate-200">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">Sumber Video</label>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <label class="flex items-center gap-2 p-2 bg-white border border-slate-200 rounded-xl cursor-pointer">
+                <input type="radio" id="editRadioLink" name="video_source" value="youtube" onchange="toggleVideoInputType('edit', 'link')">
+                <span class="font-semibold text-[11px]">Link YouTube / Drive</span>
+              </label>
+              <label class="flex items-center gap-2 p-2 bg-white border border-slate-200 rounded-xl cursor-pointer">
+                <input type="radio" id="editRadioUpload" name="video_source" value="upload" onchange="toggleVideoInputType('edit', 'upload')">
+                <span class="font-semibold text-[11px]">Upload File MP4</span>
+              </label>
+            </div>
           </div>
-          <span class="text-[10px] text-emerald-600 font-semibold mt-1 block">✓ Auto-detect aktif dari video</span>
+
+          <div id="boxEditVideoLink">
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">URL Video</label>
+            <input type="text" id="editVideoUrl" name="video_url" placeholder="https://www.youtube.com/watch?v=..." class="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800">
+          </div>
+
+          <div id="boxEditVideoFile" class="hidden">
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">Ganti File Video MP4 (Opsional)</label>
+            <input type="file" id="editVideoFile" name="video_file" accept="video/mp4,video/webm" class="text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-violet-100 file:text-violet-700">
+          </div>
         </div>
       </div>
 
-      <!-- Teks Panduan & Rangkuman Materi -->
+      <!-- Estimasi Durasi Belajar -->
       <div>
-        <label class="block text-xs font-bold text-slate-700 mb-1">Teks Panduan / Catatan Tambahan</label>
-        <textarea name="content_text" rows="4" placeholder="Tuliskan panduan langkah demi langkah, link dokumentasi, atau catatan penting untuk pelanggan..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800"></textarea>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Estimasi Durasi Belajar (Menit) *</label>
+        <div class="relative flex items-center">
+          <input type="number" id="editDurationInput" name="duration_minutes" value="10" min="1" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 font-bold pr-14">
+          <span class="absolute right-3 text-xs font-bold text-slate-400 pointer-events-none">Menit</span>
+        </div>
       </div>
 
-      <div class="flex justify-end gap-2 pt-2">
-        <button type="button" onclick="document.getElementById('modalAddLesson').classList.add('hidden')" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Batal</button>
-        <button type="submit" class="px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-xs font-bold shadow-md shadow-violet-200">Simpan Materi</button>
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+        <button type="button" onclick="closeModal('modalEditLesson')" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Batal</button>
+        <button type="submit" class="px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold shadow-md shadow-dynamic-glow">Simpan Perubahan</button>
       </div>
     </form>
   </div>
 </div>
 
 <script>
-  function openAddLessonModal(chapterId, chapterTitle) {
-    const modal = document.getElementById('modalAddLesson');
-    const form = document.getElementById('formAddLesson');
-    form.action = `/admin/chapters/${chapterId}/lessons/new`;
-    modal.classList.remove('hidden');
+  function openAddLessonModal() {
+    document.getElementById('modalAddLesson').classList.remove('hidden');
   }
 
-  function toggleVideoInput(mode) {
-    const boxLink = document.getElementById('boxVideoLink');
-    const boxFile = document.getElementById('boxVideoFile');
-    const notice = document.getElementById('adminDetectNotice');
-    if (notice) notice.classList.add('hidden');
+  function openEditLessonModal(lesson) {
+    const form = document.getElementById('formEditLesson');
+    form.action = `/admin/lessons/${lesson.id}/edit`;
+
+    document.getElementById('editTitle').value = lesson.title || '';
+    document.getElementById('editContentText').value = lesson.content_text || '';
+    document.getElementById('editDurationInput').value = lesson.duration_minutes || 10;
+
+    const hasVideo = !!(lesson.video_url && lesson.video_url.trim());
+    const hasVideoCheck = document.getElementById('editHasVideoCheck');
+    hasVideoCheck.checked = hasVideo;
+    toggleEditVideoFields(hasVideo);
+
+    if (lesson.video_source === 'upload') {
+      document.getElementById('editRadioUpload').checked = true;
+      toggleVideoInputType('edit', 'upload');
+    } else {
+      document.getElementById('editRadioLink').checked = true;
+      toggleVideoInputType('edit', 'link');
+    }
+    document.getElementById('editVideoUrl').value = lesson.video_url || '';
+
+    document.getElementById('modalEditLesson').classList.remove('hidden');
+  }
+
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+  }
+
+  function toggleAddVideoFields(show) {
+    const box = document.getElementById('addVideoFieldsBox');
+    if (show) box.classList.remove('hidden');
+    else box.classList.add('hidden');
+  }
+
+  function toggleEditVideoFields(show) {
+    const box = document.getElementById('editVideoFieldsBox');
+    if (show) box.classList.remove('hidden');
+    else box.classList.add('hidden');
+  }
+
+  function toggleVideoInputType(prefix, mode) {
+    const boxLink = document.getElementById(prefix === 'add' ? 'boxAddVideoLink' : 'boxEditVideoLink');
+    const boxFile = document.getElementById(prefix === 'add' ? 'boxAddVideoFile' : 'boxEditVideoFile');
 
     if (mode === 'upload') {
       boxLink.classList.add('hidden');
@@ -220,94 +348,4 @@
       boxFile.classList.add('hidden');
     }
   }
-
-  // Auto-Detect Durasi untuk File Video Lokal (MP4)
-  const adminVideoFileEl = document.getElementById('adminVideoFile');
-  if (adminVideoFileEl) {
-    adminVideoFileEl.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const notice = document.getElementById('adminDetectNotice');
-      const text = document.getElementById('adminDetectText');
-      notice.classList.remove('hidden');
-      notice.className = "p-3 rounded-xl bg-violet-50 border border-violet-100 text-violet-700 text-xs font-medium flex items-center gap-2";
-      text.textContent = 'Membaca metadata file video lokal...';
-
-      const tempVideo = document.createElement('video');
-      tempVideo.preload = 'metadata';
-      tempVideo.src = URL.createObjectURL(file);
-      tempVideo.onloadedmetadata = function() {
-        window.URL.revokeObjectURL(tempVideo.src);
-        const durSec = Math.round(tempVideo.duration);
-        const mins = Math.max(1, Math.round(durSec / 60));
-        const mm = Math.floor(durSec / 60);
-        const ss = durSec % 60;
-        document.getElementById('adminDurationInput').value = mins;
-
-        notice.className = "p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium flex items-center gap-2";
-        text.innerHTML = `✓ Durasi video lokal terdeteksi: <b>${mins} Menit</b> (${mm}m ${ss < 10 ? '0' : ''}${ss}s)`;
-      };
-    });
-  }
-
-  // Auto-Detect Durasi untuk URL YouTube
-  const adminVideoUrlEl = document.getElementById('adminVideoUrl');
-  let adminYtTimer = null;
-  if (adminVideoUrlEl) {
-    adminVideoUrlEl.addEventListener('input', function(e) {
-      const url = e.target.value.trim();
-      clearTimeout(adminYtTimer);
-      if (!url) return;
-
-      const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-      if (ytMatch && ytMatch[1]) {
-        const vidId = ytMatch[1];
-        const notice = document.getElementById('adminDetectNotice');
-        const text = document.getElementById('adminDetectText');
-        notice.classList.remove('hidden');
-        notice.className = "p-3 rounded-xl bg-violet-50 border border-violet-100 text-violet-700 text-xs font-medium flex items-center gap-2";
-        text.textContent = 'Menghubungkan ke YouTube untuk mendeteksi durasi asli...';
-
-        adminYtTimer = setTimeout(() => {
-          let detector = document.getElementById('adminYtDetectorIframe');
-          if (!detector) {
-            detector = document.createElement('iframe');
-            detector.id = 'adminYtDetectorIframe';
-            detector.style.width = '1px';
-            detector.style.height = '1px';
-            detector.style.opacity = '0';
-            detector.style.position = 'absolute';
-            detector.style.pointerEvents = 'none';
-            document.body.appendChild(detector);
-          }
-          detector.src = `https://www.youtube-nocookie.com/embed/${vidId}?enablejsapi=1&autoplay=0`;
-        }, 400);
-      }
-    });
-  }
-
-  // Listener pesan durasi YouTube untuk Admin
-  window.addEventListener('message', function(event) {
-    try {
-      const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-      if (data && data.info && typeof data.info.duration === 'number' && data.info.duration > 0) {
-        const durSec = Math.round(data.info.duration);
-        const mins = Math.max(1, Math.round(durSec / 60));
-        const mm = Math.floor(durSec / 60);
-        const ss = durSec % 60;
-        
-        const durInput = document.getElementById('adminDurationInput');
-        if (durInput) durInput.value = mins;
-
-        const notice = document.getElementById('adminDetectNotice');
-        const text = document.getElementById('adminDetectText');
-        if (notice && text) {
-          notice.classList.remove('hidden');
-          notice.className = "p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium flex items-center gap-2";
-          text.innerHTML = `✓ Durasi YouTube terdeteksi otomatis: <b>${mins} Menit</b> (${mm}:${ss < 10 ? '0' : ''}${ss})`;
-        }
-      }
-    } catch (e) {}
-  });
 </script>

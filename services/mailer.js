@@ -58,9 +58,39 @@ async function sendOtpEmail(toEmail, otpCode) {
     </head>
     <body>
       <div class="card">
-        <div class="logo">
-          <img src="https://iili.io/oFt9Q44.png" alt="Kyzoo" style="height: 64px; width: auto; max-width: 140px; margin: 0 auto 8px auto; display: block; border: 0;" />
-          <p style="margin: 0; font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Learning Management System</p>
+        <div class="logo" style="text-align: center; margin-bottom: 24px;">
+          <!-- Modern Pure HTML/CSS Kyzoo Brand Badge (100% Anti-Pecah & Email-Safe) -->
+          <table align="center" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 10px auto;">
+            <tr>
+              <td align="center" style="background: #f8fafc; border-radius: 20px; padding: 10px 24px; border: 1px solid #e2e8f0;">
+                <table cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <!-- Colorful Kyzoo K-Emblem (Pure CSS) -->
+                    <td style="vertical-align: middle; padding-right: 12px;">
+                      <table cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td style="width: 9px; height: 13px; background: #38bdf8; border-radius: 5px; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                          <td style="width: 4px; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                          <td style="width: 12px; height: 12px; background: #fb923c; border-radius: 6px; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                        </tr>
+                        <tr style="height: 3px;"><td colspan="3" style="font-size: 1px; line-height: 1px;">&nbsp;</td></tr>
+                        <tr>
+                          <td style="width: 9px; height: 13px; background: #2dd4bf; border-radius: 5px; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                          <td style="width: 4px; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                          <td style="width: 12px; height: 12px; background: #f43f5e; border-radius: 6px; font-size: 1px; line-height: 1px;">&nbsp;</td>
+                        </tr>
+                      </table>
+                    </td>
+                    <!-- Kyzoo Brand Typography -->
+                    <td style="vertical-align: middle; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; line-height: 1;">
+                      <span style="color: #334155;">kyz</span><span style="color: #334155;">o</span><span style="color: #38bdf8;">o</span><span style="color: #fbbf24; font-size: 18px; margin-left: 2px;">✦</span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+          <p style="margin: 0; font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;">Learning Management System</p>
         </div>
         <div class="title">Kode Verifikasi Masuk</div>
         <div class="subtitle">Gunakan kode verifikasi berikut untuk masuk ke akun Kyzoo LMS Anda:</div>

@@ -188,71 +188,62 @@ router.post('/admin/courses/:id/delete', (req, res) => {
   res.redirect('/admin?success=Kursus+dan+semua+materinya+berhasil+dihapus!');
 });
 
-// 7. Kelola Bab & Pelajaran (Kurikulum Kursus)
+// 7. Kelola Episode & Materi Kursus (Linear Tanpa Bab)
 router.get('/admin/courses/:id/curriculum', (req, res) => {
   const course = DB.get('SELECT * FROM courses WHERE id = ?', req.params.id);
   if (!course) return res.redirect('/admin?error=Kursus+tidak+ditemukan');
 
-  const chapters = DB.all('SELECT * FROM chapters WHERE course_id = ? ORDER BY sort_order ASC, id ASC', course.id);
-  for (const ch of chapters) {
-    ch.lessons = DB.all('SELECT * FROM lessons WHERE chapter_id = ? ORDER BY sort_order ASC, id ASC', ch.id);
-  }
+  // Ambil seluruh episode materi secara linear
+  const lessons = DB.all(`
+    SELECT l.*, ch.title as chapter_title 
+    FROM lessons l 
+    JOIN chapters ch ON l.chapter_id = ch.id 
+    WHERE ch.course_id = ? 
+    ORDER BY ch.sort_order ASC, l.sort_order ASC, l.id ASC
+  `, course.id);
 
   res.render('admin/curriculum', {
-    title: `Kurikulum: ${course.title} - Kyzoo Admin`,
+    title: `Kelola Materi: ${course.title} - Kyzoo Admin`,
     user: req.session.user,
     course,
-    chapters,
+    lessons,
     success: req.query.success || null,
     error: req.query.error || null
   });
 });
 
-// 8. Tambah Bab Baru
-router.post('/admin/courses/:id/chapters/new', (req, res) => {
-  const { title } = req.body;
-  if (!title) return res.redirect(`/admin/courses/${req.params.id}/curriculum?error=Judul+bab+wajib+diisi`);
+// 8. Tambah Episode Baru ke Kursus
+router.post('/admin/courses/:id/episodes/new', upload.single('video_file'), (req, res) => {
+  const courseId = req.params.id;
+  const course = DB.get('SELECT * FROM courses WHERE id = ?', courseId);
+  if (!course) return res.redirect('/admin?error=Kursus+tidak+ditemukan');
 
-  const lastOrder = DB.get('SELECT MAX(sort_order) as max_order FROM chapters WHERE course_id = ?', req.params.id);
-  const nextOrder = (lastOrder && lastOrder.max_order) ? lastOrder.max_order + 1 : 1;
-
-  DB.run(
-    'INSERT INTO chapters (course_id, title, sort_order) VALUES (?, ?, ?)',
-    req.params.id, title.trim(), nextOrder
-  );
-
-  res.redirect(`/admin/courses/${req.params.id}/curriculum?success=Bab+berhasil+ditambahkan!`);
-});
-
-// 9. Hapus Bab
-router.post('/admin/chapters/:id/delete', (req, res) => {
-  const chapter = DB.get('SELECT course_id FROM chapters WHERE id = ?', req.params.id);
-  if (chapter) {
-    DB.run('DELETE FROM chapters WHERE id = ?', req.params.id);
-    return res.redirect(`/admin/courses/${chapter.course_id}/curriculum?success=Bab+berhasil+dihapus`);
-  }
-  res.redirect('/admin');
-});
-
-// 10. Tambah Lesson / Materi Video & Teks Baru
-router.post('/admin/chapters/:chapterId/lessons/new', upload.single('video_file'), (req, res) => {
-  const chapter = DB.get('SELECT * FROM chapters WHERE id = ?', req.params.chapterId);
-  if (!chapter) return res.redirect('/admin?error=Bab+tidak+ditemukan');
-
-  const { title, video_source, video_url, content_text, duration_minutes } = req.body;
-  if (!title) {
-    return res.redirect(`/admin/courses/${chapter.course_id}/curriculum?error=Judul+materi+wajib+diisi`);
+  const { title, has_video, video_source, video_url, content_text, duration_minutes } = req.body;
+  if (!title || !title.trim()) {
+    return res.redirect(`/admin/courses/${courseId}/curriculum?error=Judul+episode+wajib+diisi`);
   }
 
-  let finalVideoUrl = video_url ? video_url.trim() : '';
-  let finalSource = video_source || 'youtube';
-
-  if (req.file) {
-    finalSource = 'upload';
-    finalVideoUrl = `/uploads/videos/${req.file.filename}`;
+  // Pastikan ada chapter penampung episode di database
+  let chapter = DB.get('SELECT id FROM chapters WHERE course_id = ? ORDER BY id ASC LIMIT 1', courseId);
+  if (!chapter) {
+    const result = DB.run('INSERT INTO chapters (course_id, title, sort_order) VALUES (?, ?, ?)', courseId, 'Episode Silabus', 1);
+    chapter = { id: result.lastInsertRowid };
   }
 
-  const lastOrder = DB.get('SELECT MAX(sort_order) as max_order FROM lessons WHERE chapter_id = ?', chapter.id);
+  let finalVideoUrl = '';
+  let finalSource = 'youtube';
+
+  if (has_video === 'yes' || has_video === '1') {
+    if (req.file) {
+      finalSource = 'upload';
+      finalVideoUrl = `/uploads/videos/${req.file.filename}`;
+    } else if (video_url && video_url.trim()) {
+      finalSource = video_source || 'youtube';
+      finalVideoUrl = video_url.trim();
+    }
+  }
+
+  const lastOrder = DB.get('SELECT MAX(l.sort_order) as max_order FROM lessons l JOIN chapters ch ON l.chapter_id = ch.id WHERE ch.course_id = ?', courseId);
   const nextOrder = (lastOrder && lastOrder.max_order) ? lastOrder.max_order + 1 : 1;
 
   DB.run(`
@@ -260,17 +251,62 @@ router.post('/admin/chapters/:chapterId/lessons/new', upload.single('video_file'
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `, chapter.id, title.trim(), finalSource, finalVideoUrl, content_text ? content_text.trim() : '', parseInt(duration_minutes, 10) || 10, nextOrder);
 
-  res.redirect(`/admin/courses/${chapter.course_id}/curriculum?success=Materi+video+berhasil+ditambahkan!`);
+  res.redirect(`/admin/courses/${courseId}/curriculum?success=Episode+baru+berhasil+ditambahkan!`);
 });
 
-// 11. Hapus Lesson
+// 9. Edit Data Episode (Judul, Teori, Video Opsional, Durasi)
+router.post('/admin/lessons/:id/edit', upload.single('video_file'), (req, res) => {
+  const lesson = DB.get('SELECT l.*, ch.course_id FROM lessons l JOIN chapters ch ON l.chapter_id = ch.id WHERE l.id = ?', req.params.id);
+  if (!lesson) return res.redirect('/admin?error=Episode+tidak+ditemukan');
+
+  const { title, has_video, video_source, video_url, content_text, duration_minutes } = req.body;
+  if (!title || !title.trim()) {
+    return res.redirect(`/admin/courses/${lesson.course_id}/curriculum?error=Judul+episode+wajib+diisi`);
+  }
+
+  let finalVideoUrl = '';
+  let finalSource = 'youtube';
+
+  if (has_video === 'yes' || has_video === '1') {
+    if (req.file) {
+      finalSource = 'upload';
+      finalVideoUrl = `/uploads/videos/${req.file.filename}`;
+    } else if (video_url && video_url.trim()) {
+      finalSource = video_source || 'youtube';
+      finalVideoUrl = video_url.trim();
+    } else if (lesson.video_url) {
+      finalSource = lesson.video_source || 'youtube';
+      finalVideoUrl = lesson.video_url;
+    }
+  }
+
+  DB.run(`
+    UPDATE lessons 
+    SET title = ?, video_source = ?, video_url = ?, content_text = ?, duration_minutes = ?
+    WHERE id = ?
+  `, title.trim(), finalSource, finalVideoUrl, content_text ? content_text.trim() : '', parseInt(duration_minutes, 10) || 10, lesson.id);
+
+  res.redirect(`/admin/courses/${lesson.course_id}/curriculum?success=Episode+berhasil+diperbarui!`);
+});
+
+// 10. Hapus Episode
 router.post('/admin/lessons/:id/delete', (req, res) => {
   const lesson = DB.get('SELECT l.*, ch.course_id FROM lessons l JOIN chapters ch ON l.chapter_id = ch.id WHERE l.id = ?', req.params.id);
   if (lesson) {
     DB.run('DELETE FROM lessons WHERE id = ?', req.params.id);
-    return res.redirect(`/admin/courses/${lesson.course_id}/curriculum?success=Materi+berhasil+dihapus`);
+    return res.redirect(`/admin/courses/${lesson.course_id}/curriculum?success=Episode+berhasil+dihapus`);
   }
   res.redirect('/admin');
+});
+
+// Legacy Alias Support
+router.post('/admin/courses/:id/chapters/new', (req, res) => res.redirect(`/admin/courses/${req.params.id}/curriculum`));
+router.post('/admin/chapters/:id/delete', (req, res) => res.redirect('/admin'));
+router.post('/admin/chapters/:chapterId/lessons/new', upload.single('video_file'), (req, res) => {
+  const chapter = DB.get('SELECT * FROM chapters WHERE id = ?', req.params.chapterId);
+  if (!chapter) return res.redirect('/admin?error=Bab+tidak+ditemukan');
+  req.params.id = chapter.course_id;
+  return router.handle(req, res);
 });
 
 // 12. Database Explorer: Tampilkan Data Tabel & Skema
@@ -387,6 +423,172 @@ router.get('/admin/database/download', (req, res) => {
     return res.download(dbFile, `kyzoo-backup-${timestamp}.db`);
   }
   res.redirect('/admin/database?error=File+database+tidak+ditemukan');
+});
+
+// ==============================================================
+// FITUR KELOLA ANGGOTA / PENGGUNA (CRUD) OLEH ADMIN
+// ==============================================================
+
+// 15. Tampilkan Halaman Daftar Anggota
+router.get('/admin/users', (req, res) => {
+  const q = req.query.q ? req.query.q.trim().toLowerCase() : '';
+  const filterRole = req.query.role ? req.query.role.trim().toLowerCase() : 'all';
+  const success = req.query.success || null;
+  const error = req.query.error || null;
+
+  let sql = `
+    SELECT u.id, u.name, u.email, u.password, u.role, u.avatar, u.created_at,
+           (SELECT COUNT(*) FROM user_progress up WHERE up.user_id = u.id AND up.is_completed = 1) AS completed_lessons
+    FROM users u
+    WHERE 1=1
+  `;
+  const params = [];
+
+  if (q) {
+    sql += ` AND (LOWER(u.name) LIKE ? OR LOWER(u.email) LIKE ?)`;
+    params.push(`%${q}%`, `%${q}%`);
+  }
+
+  if (filterRole === 'pelanggan' || filterRole === 'admin') {
+    sql += ` AND u.role = ?`;
+    params.push(filterRole);
+  }
+
+  sql += ` ORDER BY u.id DESC`;
+
+  const users = DB.all(sql, ...params);
+
+  // Hitung Statistik
+  const totalUsers = DB.get('SELECT COUNT(*) as count FROM users').count;
+  const totalPelanggan = DB.get("SELECT COUNT(*) as count FROM users WHERE role = 'pelanggan'").count;
+  const totalAdmins = DB.get("SELECT COUNT(*) as count FROM users WHERE role = 'admin'").count;
+
+  res.render('admin/users', {
+    title: 'Kelola Anggota - Kyzoo Admin',
+    pageTitle: 'Kelola Anggota',
+    currentPath: '/admin/users',
+    currentUser: req.session.user,
+    users,
+    stats: {
+      totalUsers,
+      totalPelanggan,
+      totalAdmins
+    },
+    q,
+    filterRole,
+    success,
+    error
+  });
+});
+
+// 16. Tambah Anggota Baru
+router.post('/admin/users', (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+    if (!name || !name.trim() || !email || !email.trim() || !password || !password.trim()) {
+      return res.redirect('/admin/users?error=' + encodeURIComponent('Nama, email, dan password wajib diisi!'));
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const existing = DB.get('SELECT id FROM users WHERE email = ?', cleanEmail);
+    if (existing) {
+      return res.redirect('/admin/users?error=' + encodeURIComponent('Email sudah digunakan oleh anggota lain!'));
+    }
+
+    const cleanRole = (role === 'admin') ? 'admin' : 'pelanggan';
+    const cleanName = name.trim();
+    const defaultAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanName)}`;
+
+    DB.run(
+      'INSERT INTO users (name, email, password, role, avatar) VALUES (?, ?, ?, ?, ?)',
+      cleanName, cleanEmail, password.trim(), cleanRole, defaultAvatar
+    );
+
+    res.redirect('/admin/users?success=' + encodeURIComponent(`Anggota "${cleanName}" berhasil ditambahkan.`));
+  } catch (err) {
+    console.error('Error tambah anggota:', err);
+    res.redirect('/admin/users?error=' + encodeURIComponent('Gagal menambah anggota: ' + err.message));
+  }
+});
+
+// 17. Edit Data Anggota
+router.post('/admin/users/:id/edit', (req, res) => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    const { name, email, password, role } = req.body;
+
+    const user = DB.get('SELECT * FROM users WHERE id = ?', userId);
+    if (!user) {
+      return res.redirect('/admin/users?error=' + encodeURIComponent('Anggota tidak ditemukan.'));
+    }
+
+    if (!name || !name.trim() || !email || !email.trim()) {
+      return res.redirect('/admin/users?error=' + encodeURIComponent('Nama dan email tidak boleh kosong!'));
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    if (cleanEmail !== user.email) {
+      const existing = DB.get('SELECT id FROM users WHERE email = ? AND id != ?', cleanEmail, userId);
+      if (existing) {
+        return res.redirect('/admin/users?error=' + encodeURIComponent('Email tersebut sudah dipakai akun lain!'));
+      }
+    }
+
+    const cleanRole = (role === 'admin') ? 'admin' : 'pelanggan';
+    const cleanName = name.trim();
+
+    // Jika password diisi, perbarui password. Jika kosong, pertahankan password lama
+    if (password && password.trim().length > 0) {
+      DB.run(
+        'UPDATE users SET name = ?, email = ?, password = ?, role = ? WHERE id = ?',
+        cleanName, cleanEmail, password.trim(), cleanRole, userId
+      );
+    } else {
+      DB.run(
+        'UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?',
+        cleanName, cleanEmail, cleanRole, userId
+      );
+    }
+
+    // Jika user yang diedit adalah akun admin yang sedang login, update sesi aktif
+    if (req.session.user && req.session.user.id === userId) {
+      req.session.user.name = cleanName;
+      req.session.user.email = cleanEmail;
+      req.session.user.role = cleanRole;
+    }
+
+    res.redirect('/admin/users?success=' + encodeURIComponent(`Data anggota "${cleanName}" berhasil diperbarui.`));
+  } catch (err) {
+    console.error('Error edit anggota:', err);
+    res.redirect('/admin/users?error=' + encodeURIComponent('Gagal memperbarui anggota: ' + err.message));
+  }
+});
+
+// 18. Hapus Anggota
+router.post('/admin/users/:id/delete', (req, res) => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    const user = DB.get('SELECT * FROM users WHERE id = ?', userId);
+
+    if (!user) {
+      return res.redirect('/admin/users?error=' + encodeURIComponent('Anggota tidak ditemukan.'));
+    }
+
+    // Proteksi: Admin tidak boleh menghapus akunnya sendiri
+    if (req.session.user && req.session.user.id === userId) {
+      return res.redirect('/admin/users?error=' + encodeURIComponent('Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif!'));
+    }
+
+    // Hapus data progres pengguna dan kode OTP pengguna terlebih dahulu
+    DB.run('DELETE FROM user_progress WHERE user_id = ?', userId);
+    DB.run('DELETE FROM email_otps WHERE email = ?', user.email);
+    DB.run('DELETE FROM users WHERE id = ?', userId);
+
+    res.redirect('/admin/users?success=' + encodeURIComponent(`Akun anggota "${user.name}" (${user.email}) berhasil dihapus.`));
+  } catch (err) {
+    console.error('Error hapus anggota:', err);
+    res.redirect('/admin/users?error=' + encodeURIComponent('Gagal menghapus anggota: ' + err.message));
+  }
 });
 
 module.exports = router;

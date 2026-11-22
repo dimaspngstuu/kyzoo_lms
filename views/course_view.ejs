@@ -1,67 +1,149 @@
-<!-- Halaman Ruang Belajar Video & Checklist Materi (Course View) -->
+<!-- Halaman Ruang Belajar: Materi Teori Terstruktur di Atas, Video Opsional di Bawah (Course View) -->
 
 <div class="space-y-6">
 
-  <!-- Breadcrumbs & Navigasi Cepat -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-    <div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
-      <a href="/courses" class="hover:text-violet-600">Courses</a>
-      <span>/</span>
-      <a href="/courses/<%= course.slug %>" class="hover:text-violet-600 line-clamp-1"><%= course.title %></a>
-      <span>/</span>
-      <span class="text-slate-900 font-bold line-clamp-1"><%= activeLesson.title %></span>
+  <!-- Breadcrumbs & Navigasi Cepat (Mendukung Dark Mode & Tema Dinamis) -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm transition-colors">
+    <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 flex-wrap">
+      <a href="/courses" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Courses</a>
+      <span class="text-slate-300 dark:text-slate-700">/</span>
+      <a href="/courses/<%= course.slug %>" class="hover:text-brand-600 dark:hover:text-brand-400 line-clamp-1 transition-colors"><%= course.title %></a>
+      <span class="text-slate-300 dark:text-slate-700">/</span>
+      <span class="text-slate-900 dark:text-white font-bold line-clamp-1"><% if (typeof currentEpisodeIndex !== 'undefined') { %>EP <%= String(currentEpisodeIndex + 1).padStart(2, '0') %>: <% } %><%= activeLesson.title %></span>
     </div>
 
     <!-- Progress Kursus Mini -->
-    <div class="flex items-center gap-3">
-      <div class="text-xs font-bold text-slate-600">
-        Progress: <span id="courseProgressText" class="text-violet-600"><%= courseProgressPercent %>%</span>
+    <div class="flex items-center gap-3 shrink-0">
+      <div class="text-xs font-bold text-slate-600 dark:text-slate-300">
+        Progress: <span id="courseProgressText" class="text-brand-600 dark:text-brand-400 font-extrabold"><%= courseProgressPercent %>%</span>
       </div>
-      <div class="w-24 sm:w-32 bg-slate-100 h-2 rounded-full overflow-hidden">
-        <div id="courseProgressBar" class="bg-[#6c5dd3] h-full rounded-full transition-all duration-500" style="width: <%= courseProgressPercent %>%"></div>
+      <div class="w-24 sm:w-32 bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden p-0.5">
+        <div id="courseProgressBar" class="bg-brand-500 h-full rounded-full transition-all duration-500 shadow-dynamic-glow" style="width: <%= courseProgressPercent %>%"></div>
       </div>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-    <!-- KOLOM KIRI (2 Kolom): Pemutar Video & Teks Panduan -->
+    <!-- KOLOM KIRI (2 Kolom): Materi Teori Utama di Atas, Video Opsional di Bawah -->
     <div class="lg:col-span-2 space-y-5">
       
-      <!-- Wadah Pemutar Video (Responsive Aspect Ratio 16:9) -->
-      <div class="bg-slate-900 rounded-[22px] overflow-hidden shadow-lg border border-slate-800 relative aspect-video flex items-center justify-center">
-        <% if (videoPlayerInfo.type === 'video') { %>
-          <!-- HTML5 Video Player untuk File yang Diunggah Langsung -->
-          <video id="localLessonVideo" controls autoplay class="w-full h-full object-cover rounded-[22px]">
-            <source src="<%= videoPlayerInfo.embedUrl %>" type="video/mp4">
-            Peramban Anda tidak mendukung pemutar video HTML5.
-          </video>
-        <% } else if (videoPlayerInfo.type === 'iframe') { %>
-          <!-- Responsive Iframe Player untuk YouTube / Vimeo / Drive -->
-          <iframe 
-            id="lessonIframePlayer"
-            src="<%= videoPlayerInfo.embedUrl %>" 
-            title="<%= activeLesson.title %>" 
-            class="w-full h-full border-0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            allowfullscreen>
-          </iframe>
-        <% } else { %>
-          <!-- Fallback jika video belum diunggah -->
-          <div class="text-center p-6 text-slate-400">
-            <svg class="w-12 h-12 mx-auto mb-2 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-            <p class="text-sm font-semibold">Video tutorial untuk materi ini sedang disiapkan.</p>
+      <!-- CARD UTAMA: MATERI TULISAN / TEORI -->
+      <div class="bg-white dark:bg-slate-900 rounded-[24px] border border-slate-100 dark:border-slate-800 p-6 sm:p-8 shadow-sm space-y-6 transition-colors">
+        
+        <!-- Header Materi: Kategori, Status Video, Estimasi Durasi, & Judul Utama -->
+        <div class="border-b border-slate-100 dark:border-slate-800 pb-5">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <span class="text-xs font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/50 px-3 py-1 rounded-full border border-brand-200/60 dark:border-brand-800/60 flex items-center gap-1.5">
+              <span>📖</span>
+              <span>EPISODE <%= typeof currentEpisodeIndex !== 'undefined' ? String(currentEpisodeIndex + 1).padStart(2, '0') : '' %></span>
+            </span>
+            
+            <div class="flex items-center gap-2 flex-wrap">
+              <% if (videoPlayerInfo && videoPlayerInfo.type !== 'none') { %>
+                <span class="text-[11px] font-bold px-2.5 py-1 bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 rounded-lg border border-violet-100 dark:border-violet-900/60 flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                  <span>Video Tutorial Tersedia</span>
+                </span>
+              <% } else { %>
+                <span class="text-[11px] font-bold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg flex items-center gap-1">
+                  <span>📄</span>
+                  <span>Materi Bacaan Teks</span>
+                </span>
+              <% } %>
+              
+              <span id="lessonHeaderDuration" class="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                ⏱️ <%= activeLesson.duration_minutes %> menit
+              </span>
+            </div>
+          </div>
+
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
+            <%= activeLesson.title %>
+          </h1>
+        </div>
+
+        <!-- ISI KONTEN TEORI TULISAN UTAMA (Terformat Rapi & Enak Dibaca) -->
+        <div class="prose-container space-y-4 pt-1">
+          <% if (typeof renderedContent !== 'undefined' && renderedContent) { %>
+            <%- renderedContent %>
+          <% } else if (activeLesson.content_text) { %>
+            <p class="text-sm sm:text-base leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-line">
+              <%= activeLesson.content_text %>
+            </p>
+          <% } else { %>
+            <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center text-slate-400 dark:text-slate-500 italic text-sm">
+              Belum ada rangkuman teori tertulis untuk materi ini.
+            </div>
+          <% } %>
+        </div>
+
+        <!-- SEKSI VIDEO TUTORIAL (OPSIONAL: Hanya tampil jika ada video pada materi ini) -->
+        <% if (videoPlayerInfo && videoPlayerInfo.type !== 'none') { %>
+          <div class="pt-8 border-t border-slate-100 dark:border-slate-800 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 border border-brand-100 dark:border-brand-900/60">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
+                </div>
+                <div>
+                  <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <span>Langsung aja ditonton videonya:</span>
+                    <span class="text-[10px] font-bold text-slate-400 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full uppercase tracking-wider">Opsional</span>
+                  </h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Saksikan video di bawah ini untuk melihat demonstrasi dan implementasi praktiknya:
+                  </p>
+                </div>
+              </div>
+
+              <span class="self-start sm:self-auto text-[11px] font-semibold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg">
+                <%= activeLesson.video_source === 'upload' ? 'Video Lokal MP4' : 'Streaming Online' %>
+              </span>
+            </div>
+
+            <!-- Wadah Pemutar Video (Responsive Aspect Ratio 16:9) -->
+            <div class="bg-slate-900 rounded-[22px] overflow-hidden shadow-lg border border-slate-800 relative aspect-video flex items-center justify-center">
+              <% if (videoPlayerInfo.type === 'video') { %>
+                <!-- HTML5 Video Player untuk File yang Diunggah Langsung -->
+                <video id="localLessonVideo" controls class="w-full h-full object-cover rounded-[22px]">
+                  <source src="<%= videoPlayerInfo.embedUrl %>" type="video/mp4">
+                  Peramban Anda tidak mendukung pemutar video HTML5.
+                </video>
+              <% } else if (videoPlayerInfo.type === 'iframe') { %>
+                <!-- Responsive Iframe Player untuk YouTube / Vimeo / Drive -->
+                <iframe 
+                  id="lessonIframePlayer"
+                  src="<%= videoPlayerInfo.embedUrl %>" 
+                  title="<%= activeLesson.title %>" 
+                  class="w-full h-full border-0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                  allowfullscreen>
+                </iframe>
+              <% } %>
+            </div>
           </div>
         <% } %>
+
+        <!-- Tips Penggunaan / Catatan Belajar -->
+        <div class="bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60 rounded-2xl p-4 sm:p-5 flex items-start gap-3 mt-6">
+          <div class="w-7 h-7 rounded-lg bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            <strong class="text-slate-800 dark:text-slate-100 font-bold">Tips Pembelajaran:</strong> Baca materi teori di atas terlebih dahulu untuk memahami konsep dasarnya. Anda dapat menonton video penjelasan praktiknya berulang kali, lalu klik tombol <em>Tandai Selesai</em> di bawah agar progres Anda tercatat di dashboard.
+          </div>
+        </div>
+
       </div>
 
-      <!-- Bar Aksi Materi (Tandai Selesai & Navigasi Sebelumnya/Selanjutnya) -->
-      <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <!-- BAR AKSI MATERI: TANDAI SELESAI & NAVIGASI SEBELUMNYA / SELANJUTNYA -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 transition-colors">
         <!-- Tombol Tandai Selesai (Checklist Interaktif) -->
         <button 
           id="btnToggleComplete" 
           onclick="toggleLessonCompletion(<%= activeLesson.id %>)" 
-          class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm <%= activeLesson.is_completed ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' %>">
+          class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm <%= activeLesson.is_completed ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700' %>">
           <svg id="completeCheckIcon" class="w-4 h-4 <%= activeLesson.is_completed ? 'block' : 'hidden' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
           </svg>
@@ -73,14 +155,14 @@
         <!-- Navigasi Next & Prev -->
         <div class="flex items-center justify-between sm:justify-end gap-2">
           <% if (prevLesson) { %>
-            <a href="/learn/<%= course.slug %>/<%= prevLesson.id %>" class="flex-1 sm:flex-initial text-center justify-center px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold text-xs transition-colors flex items-center gap-1.5">
+            <a href="/learn/<%= course.slug %>/<%= prevLesson.id %>" class="flex-1 sm:flex-initial text-center justify-center px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs transition-colors flex items-center gap-1.5">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
               <span>Sebelumnya</span>
             </a>
           <% } %>
 
           <% if (nextLesson) { %>
-            <a href="/learn/<%= course.slug %>/<%= nextLesson.id %>" class="flex-1 sm:flex-initial text-center justify-center px-4 py-2.5 rounded-xl bg-[#6c5dd3] text-white hover:bg-violet-700 font-bold text-xs transition-colors flex items-center gap-1.5 shadow-sm shadow-violet-200">
+            <a href="/learn/<%= course.slug %>/<%= nextLesson.id %>" class="flex-1 sm:flex-initial text-center justify-center px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs transition-colors flex items-center gap-1.5 shadow-md shadow-dynamic-glow">
               <span>Materi Lanjut</span>
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
@@ -88,80 +170,44 @@
         </div>
       </div>
 
-      <!-- Teks Panduan & Rangkuman Materi -->
-      <div class="bg-white rounded-[22px] border border-slate-100 p-6 shadow-sm space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-          <div>
-            <h1 class="text-xl font-bold text-slate-900"><%= activeLesson.title %></h1>
-            <p id="lessonHeaderDuration" class="text-xs text-slate-400 font-medium mt-0.5">Estimasi Durasi: <%= activeLesson.duration_minutes %> menit</p>
-          </div>
-          <span class="text-xs font-bold px-3 py-1 bg-violet-50 text-violet-700 rounded-full border border-violet-100">
-            <%= activeLesson.video_source === 'upload' ? 'Video Lokal MP4' : 'Streaming Online' %>
-          </span>
-        </div>
-
-        <div class="prose prose-slate max-w-none text-sm leading-relaxed text-slate-600 space-y-3">
-          <% if (activeLesson.content_text) { %>
-            <p class="whitespace-pre-line"><%= activeLesson.content_text %></p>
-          <% } else { %>
-            <p class="text-slate-400 italic">Tidak ada catatan teks tambahan untuk video tutorial ini.</p>
-          <% } %>
-        </div>
-
-        <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4 flex items-start gap-3 mt-4">
-          <div class="w-7 h-7 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          </div>
-          <div class="text-xs text-slate-600 leading-relaxed">
-            <strong class="text-slate-800">Tips Penggunaan:</strong> Anda dapat menonton video berulang kali, mempercepat kecepatan playback, atau menandai selesai agar riwayat pembelajaran Anda tercatat di dashboard.
-          </div>
-        </div>
-      </div>
-
     </div>
 
-    <!-- KOLOM KANAN (1 Kolom): Daftar Silabus Bab & Materi Pelajaran -->
+    <!-- KOLOM KANAN (1 Kolom): Daftar Episode Pembelajaran (Linear Tanpa Bab) -->
     <div class="space-y-4">
-      <div class="bg-white rounded-[22px] border border-slate-100 p-5 shadow-sm sticky top-20">
-        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-          <h3 class="text-sm font-bold text-slate-900">Daftar Modul & Materi</h3>
-          <span class="text-xs font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-md">
+      <div class="bg-white dark:bg-slate-900 rounded-[24px] border border-slate-100 dark:border-slate-800 p-5 shadow-sm sticky top-20 transition-colors">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span>📚</span>
+            <span>Daftar Episode</span>
+          </h3>
+          <span class="text-xs font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/50 px-2.5 py-0.5 rounded-md border border-brand-200/50 dark:border-brand-800/50">
             <%= completedCount %> / <%= totalLessons %> Selesai
           </span>
         </div>
 
-        <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-          <% chapters.forEach((ch, chIdx) => { %>
-            <div class="space-y-2">
-              <div class="text-xs font-bold text-slate-800 flex items-center justify-between pb-1 border-b border-slate-100">
-                <span class="flex items-center gap-1.5 truncate">
-                  <span class="text-[10px] font-bold text-violet-700 bg-violet-100 px-1.5 py-0.5 rounded">Bab <%= chIdx + 1 %></span>
-                  <span class="truncate"><%= ch.title %></span>
+        <div class="space-y-1.5 max-h-[72vh] overflow-y-auto pr-1">
+          <% (typeof lessons !== 'undefined' ? lessons : []).forEach((l, idx) => { %>
+            <a href="/learn/<%= course.slug %>/<%= l.id %>" 
+               id="lessonItem-<%= l.id %>"
+               class="flex items-center justify-between p-3 rounded-xl text-xs transition-all <%= l.id === activeLesson.id ? 'bg-brand-500 text-white font-bold shadow-md shadow-dynamic-glow' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white font-medium' %>">
+              
+              <div class="flex items-center gap-2.5 min-w-0">
+                <!-- Indikator Checkmark / Nomor EP -->
+                <span id="badgeCheck-<%= l.id %>" data-ep-num="<%= idx + 1 %>" class="w-5 h-5 rounded-md flex items-center justify-center shrink-0 text-[10px] font-bold <%= l.is_completed ? (l.id === activeLesson.id ? 'bg-white text-brand-600' : 'bg-emerald-500 text-white') : (l.id === activeLesson.id ? 'bg-white/25 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400') %>">
+                  <% if (l.is_completed) { %>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                  <% } else { %>
+                    <%= idx + 1 %>
+                  <% } %>
                 </span>
-                <span class="text-[10px] text-slate-400 font-semibold shrink-0 ml-1">(<%= ch.lessons.length %> video)</span>
+                <span class="truncate">
+                  <span class="opacity-75 font-extrabold mr-1">EP <%= String(idx + 1).padStart(2, '0') %>:</span>
+                  <span><%= l.title %></span>
+                </span>
               </div>
 
-              <div class="space-y-1">
-                <% ch.lessons.forEach((l) => { %>
-                  <a href="/learn/<%= course.slug %>/<%= l.id %>" 
-                     id="lessonItem-<%= l.id %>"
-                     class="flex items-center justify-between p-2.5 rounded-xl text-xs transition-all <%= l.id === activeLesson.id ? 'bg-[#6c5dd3] text-white font-bold shadow-sm' : 'text-slate-600 hover:bg-slate-50 font-medium' %>">
-                    
-                    <div class="flex items-center gap-2.5 min-w-0">
-                      <!-- Indikator Checkmark -->
-                      <span id="badgeCheck-<%= l.id %>" class="w-4 h-4 rounded-full flex items-center justify-center shrink-0 <%= l.is_completed ? (l.id === activeLesson.id ? 'bg-white text-violet-600' : 'bg-emerald-500 text-white') : (l.id === activeLesson.id ? 'border border-white/60' : 'border border-slate-300') %>">
-                        <% if (l.is_completed) { %>
-                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                        <% } %>
-                      </span>
-                      <span class="truncate"><%= l.title %></span>
-                    </div>
-
-                    <span id="lessonDuration-<%= l.id %>" class="text-[10px] opacity-75 shrink-0 ml-2"><%= l.duration_minutes %>m</span>
-                  </a>
-                <% }) %>
-              </div>
-            </div>
+              <span id="lessonDuration-<%= l.id %>" class="text-[10px] opacity-75 shrink-0 ml-2 font-mono"><%= l.duration_minutes %>m</span>
+            </a>
           <% }) %>
         </div>
 
@@ -190,12 +236,12 @@
         const progressText = document.getElementById('courseProgressText');
 
         if (data.isCompleted) {
-          btn.className = "flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm bg-emerald-600 text-white hover:bg-emerald-700";
+          btn.className = "flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm bg-emerald-600 text-white hover:bg-emerald-700";
           icon.classList.remove('hidden');
           text.textContent = "✓ Materi Telah Diselesaikan";
           showToast("Materi berhasil ditandai selesai!");
         } else {
-          btn.className = "flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm bg-slate-100 text-slate-700 hover:bg-slate-200";
+          btn.className = "flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700";
           icon.classList.add('hidden');
           text.textContent = "Tandai Materi Selesai";
           showToast("Status materi dikembalikan belum selesai.");
@@ -209,12 +255,15 @@
         // Update badge sidebar
         const badge = document.getElementById('badgeCheck-' + lessonId);
         if (badge) {
+          const epNum = badge.getAttribute('data-ep-num') || '';
           if (data.isCompleted) {
-            badge.className = "w-4 h-4 rounded-full flex items-center justify-center shrink-0 bg-white text-violet-600";
+            badge.className = "w-5 h-5 rounded-md flex items-center justify-center shrink-0 text-[10px] font-bold " + 
+              (lessonId === currentActiveLessonId ? "bg-white text-brand-600 shadow-xs" : "bg-emerald-500 text-white");
             badge.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
           } else {
-            badge.className = "w-4 h-4 rounded-full flex items-center justify-center shrink-0 border border-white/60";
-            badge.innerHTML = "";
+            badge.className = "w-5 h-5 rounded-md flex items-center justify-center shrink-0 text-[10px] font-bold " + 
+              (lessonId === currentActiveLessonId ? "bg-white/25 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400");
+            badge.innerHTML = epNum;
           }
         }
       }
@@ -241,7 +290,7 @@
     // 1. Update Teks di Header Panduan Belajar
     const headerDur = document.getElementById('lessonHeaderDuration');
     if (headerDur) {
-      headerDur.textContent = `Estimasi Durasi: ${minutes} menit (${timeDisplay})`;
+      headerDur.textContent = `⏱️ ${minutes} menit (${timeDisplay})`;
     }
 
     // 2. Update Badge di Sidebar Daftar Modul & Materi

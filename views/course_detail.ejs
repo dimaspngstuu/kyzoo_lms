@@ -1,107 +1,141 @@
-<!-- Halaman Detail Kursus & Silabus -->
+<!-- Halaman Detail Kursus: Silabus Berbasis Daftar Episode Tunggal (Tanpa Hierarki Bab) -->
 
 <div class="space-y-6">
 
   <!-- Header Banner Kursus -->
-  <div class="bg-white rounded-[22px] border border-slate-100 p-6 shadow-sm flex flex-col md:flex-row items-center gap-6">
-    <div class="w-full md:w-56 h-36 rounded-2xl overflow-hidden shrink-0 shadow-sm border border-slate-100">
+  <div class="bg-white dark:bg-slate-900 rounded-[24px] border border-slate-100 dark:border-slate-800 p-6 sm:p-7 shadow-sm flex flex-col md:flex-row items-center gap-6 transition-colors">
+    <div class="w-full md:w-56 h-36 rounded-2xl overflow-hidden shrink-0 shadow-sm border border-slate-100 dark:border-slate-800 bg-slate-100 dark:bg-slate-800">
       <img src="<%= course.thumbnail %>" alt="<%= course.title %>" class="w-full h-full object-cover">
     </div>
 
-    <div class="flex-1 space-y-2 text-center md:text-left">
-      <span class="px-3 py-1 rounded-full text-xs font-bold bg-violet-50 text-violet-700 border border-violet-100">
-        <%= course.category %>
-      </span>
-      <h1 class="text-2xl font-black text-slate-900 tracking-tight"><%= course.title %></h1>
-      <p class="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-2xl"><%= course.description %></p>
+    <div class="flex-1 space-y-3 text-center md:text-left">
+      <div class="flex flex-wrap items-center justify-center md:justify-start gap-2">
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 border border-brand-100 dark:border-brand-900/60">
+          <%= course.category %>
+        </span>
+        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+          <%= lessons.length %> Total Episode
+        </span>
+      </div>
 
-      <div class="pt-2 flex items-center justify-center md:justify-start gap-4">
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight"><%= course.title %></h1>
+      <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl"><%= course.description %></p>
+
+      <!-- Progres Belajar Mini -->
+      <% if (completedCount > 0) { %>
+        <div class="pt-1 max-w-md">
+          <div class="flex justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">
+            <span>Progres Belajar Anda</span>
+            <span class="font-bold text-brand-600 dark:text-brand-400"><%= courseProgressPercent %>% (<%= completedCount %>/<%= lessons.length %> Episode)</span>
+          </div>
+          <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+            <div class="bg-brand-500 h-full rounded-full transition-all duration-500 shadow-dynamic-glow" style="width: <%= courseProgressPercent %>%"></div>
+          </div>
+        </div>
+      <% } %>
+
+      <div class="pt-2 flex items-center justify-center md:justify-start gap-3 flex-wrap">
         <% if (firstLessonId) { %>
-          <a href="/learn/<%= course.slug %>/<%= firstLessonId %>" class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#6c5dd3] hover:bg-violet-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md shadow-violet-200 transition-all">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <span>Mulai Nonton Tutorial</span>
+          <a href="/learn/<%= course.slug %>/<%= firstLessonId %>" class="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md shadow-dynamic-glow transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
+            <span><%= completedCount > 0 ? 'Lanjut Belajar Episode Berikutnya' : 'Mulai Belajar Materi' %></span>
           </a>
         <% } %>
-        <a href="/courses" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold text-xs transition-colors">
+        <a href="/courses" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs transition-colors">
           Kembali ke Katalog
         </a>
       </div>
     </div>
   </div>
 
-  <!-- Silabus Bab & Materi Pelajaran (Struktur Hierarki Kursus) -->
-  <div class="bg-white rounded-[22px] border border-slate-100 p-6 shadow-sm space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
+  <!-- Silabus Berbasis Daftar Episode Tunggal (Linear & Langsung Dapat Diklik) -->
+  <div class="bg-white dark:bg-slate-900 rounded-[24px] border border-slate-100 dark:border-slate-800 p-6 sm:p-7 shadow-sm space-y-5 transition-colors">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
       <div>
-        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
-          <span>Struktur & Silabus Pembelajaran</span>
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span>📚</span>
+          <span>Daftar Episode Pembelajaran</span>
         </h2>
-        <p class="text-xs text-slate-500 mt-0.5">
-          Hierarki materi kursus: <span class="font-bold text-slate-700"><%= course.title %></span> memiliki <span class="font-bold text-violet-600"><%= chapters.length %> Bab Turunan</span>.
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          Materi disusun berurutan per episode. Klik langsung pada baris episode untuk membuka materi.
         </p>
       </div>
 
-      <div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
-        <span class="w-2.5 h-2.5 rounded-full bg-violet-600"></span>
-        <span><%= chapters.reduce((acc, ch) => acc + ch.lessons.length, 0) %> Total Video Tutorial</span>
+      <div class="flex items-center gap-2 text-xs font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/60 px-3 py-1.5 rounded-xl border border-brand-200/60 dark:border-brand-800/60 self-start sm:self-auto">
+        <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+        <span><%= completedCount %> / <%= lessons.length %> Episode Selesai</span>
       </div>
     </div>
 
-    <div class="space-y-5">
-      <% if (chapters.length === 0) { %>
-        <div class="text-center py-8 text-slate-400 text-xs">
-          Belum ada bab turunan materi untuk kursus ini.
+    <!-- List Linear Episode -->
+    <div class="space-y-3">
+      <% if (lessons.length === 0) { %>
+        <div class="text-center py-12 text-slate-400 dark:text-slate-500 text-xs">
+          Belum ada episode materi yang tersedia untuk kursus ini.
         </div>
       <% } %>
 
-      <% chapters.forEach((ch, idx) => { %>
-        <div class="border border-slate-100 rounded-2xl p-4 sm:p-5 bg-slate-50/40 space-y-3">
-          <!-- Induk Turunan Bab (Chapter Header) -->
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="w-8 h-8 rounded-xl bg-violet-100 text-violet-700 font-bold text-xs flex items-center justify-center shrink-0">
-                <%= String(idx + 1).padStart(2, '0') %>
-              </span>
-              <div>
-                <h3 class="text-sm font-bold text-slate-900"><%= ch.title %></h3>
-                <span class="text-[11px] text-slate-400 font-medium">Turunan Bab <%= idx + 1 %></span>
+      <% lessons.forEach((l, idx) => { %>
+        <!-- Setiap Baris Episode adalah Link Utuh (Klik di Mana Saja untuk Masuk) -->
+        <a href="/learn/<%= course.slug %>/<%= l.id %>" 
+           class="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 bg-white dark:bg-slate-900/60 rounded-2xl border border-slate-150 dark:border-slate-800 hover:border-brand-500/80 dark:hover:border-brand-500/80 hover:shadow-md hover:bg-slate-50/70 dark:hover:bg-slate-800/70 transition-all gap-4 group cursor-pointer block">
+          
+          <div class="flex items-center gap-4 min-w-0">
+            <!-- Badge Nomor Episode / Checkmark Selesai -->
+            <div class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 font-extrabold text-xs transition-transform group-hover:scale-105 <%= l.is_completed ? 'bg-emerald-500 text-white shadow-sm' : 'bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 border border-brand-100 dark:border-brand-900/60 group-hover:bg-brand-500 group-hover:text-white' %>">
+              <% if (l.is_completed) { %>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+              <% } else { %>
+                EP <%= String(idx + 1).padStart(2, '0') %>
+              <% } %>
+            </div>
+
+            <!-- Judul & Metadata Episode -->
+            <div class="min-w-0 space-y-1">
+              <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors line-clamp-1">
+                <%= l.title %>
+              </h3>
+              
+              <div class="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500 flex-wrap">
+                <span class="font-medium text-slate-500 dark:text-slate-400">⏱️ <%= l.duration_minutes %> menit</span>
+                <span class="text-slate-300 dark:text-slate-700">•</span>
+                
+                <% if (l.video_url) { %>
+                  <span class="text-violet-600 dark:text-violet-400 font-semibold flex items-center gap-1">
+                    🎥 Teori & Video
+                  </span>
+                <% } else { %>
+                  <span class="text-slate-600 dark:text-slate-400 font-semibold flex items-center gap-1">
+                    📄 Materi Bacaan
+                  </span>
+                <% } %>
+
+                <% if (l.is_completed) { %>
+                  <span class="text-slate-300 dark:text-slate-700">•</span>
+                  <span class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                    ✓ Telah Diselesaikan
+                  </span>
+                <% } %>
               </div>
             </div>
-            <span class="text-xs font-bold text-slate-600 bg-white px-2.5 py-1 rounded-lg border border-slate-200/60 shadow-xs">
-              <%= ch.lessons.length %> Video Materi
-            </span>
           </div>
 
-          <!-- Turunan Lesson / Materi Video di dalam Bab -->
-          <div class="space-y-2 pl-3 border-l-2 border-violet-200 ml-4 pt-1">
-            <% ch.lessons.forEach((l, lIdx) => { %>
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-white rounded-xl border border-slate-100 hover:border-violet-200 hover:shadow-xs transition-all gap-3">
-                <div class="flex items-center gap-3 min-w-0">
-                  <span class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold <%= l.is_completed ? 'bg-emerald-500 text-white' : 'border border-slate-300 text-slate-400' %>">
-                    <%= l.is_completed ? '✓' : (lIdx + 1) %>
-                  </span>
-                  <div class="min-w-0">
-                    <h4 class="text-xs font-bold text-slate-800 truncate"><%= l.title %></h4>
-                    <div class="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
-                      <span class="text-violet-600 font-semibold uppercase"><%= l.video_source || 'Video' %></span>
-                      <span>•</span>
-                      <span><%= l.duration_minutes %> menit durasi</span>
-                      <% if (l.is_completed) { %>
-                        <span>•</span>
-                        <span class="text-emerald-600 font-semibold">Telah Ditonton</span>
-                      <% } %>
-                    </div>
-                  </div>
-                </div>
-
-                <a href="/learn/<%= course.slug %>/<%= l.id %>" class="self-end sm:self-auto px-3.5 py-1.5 bg-violet-50 hover:bg-[#6c5dd3] hover:text-white text-violet-700 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 shrink-0">
-                  <span>Putar Video</span>
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
-                </a>
-              </div>
-            <% }) %>
+          <!-- Indikator Aksi Masuk Materi (Tanpa tombol sempit 'Putar Video') -->
+          <div class="self-end sm:self-auto flex items-center gap-2 shrink-0">
+            <% if (l.is_completed) { %>
+              <span class="px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center gap-1.5 border border-emerald-100 dark:border-emerald-900/40">
+                <span>Selesai</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+              </span>
+            <% } else { %>
+              <span class="px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-brand-500 group-hover:text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-xs">
+                <span>Buka Materi</span>
+                <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+              </span>
+            <% } %>
           </div>
-        </div>
+
+        </a>
       <% }) %>
     </div>
   </div>

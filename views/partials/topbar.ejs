@@ -1,8 +1,8 @@
-<!-- Topbar Header ala Quyl / Kyzoo -->
-<header class="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between gap-4 sticky top-0 z-30">
+<!-- Topbar Header ala Quyl / Kyzoo (Interaktif & Dukung Tema Dinamis) -->
+<header class="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-6 py-4 flex items-center justify-between gap-4 sticky top-0 z-30 transition-colors duration-300">
   <div class="flex items-center gap-3">
     <!-- Tombol Hamburger Mobile -->
-    <button id="openSidebarBtn" class="md:hidden text-slate-600 hover:text-slate-900 p-1.5 rounded-lg hover:bg-slate-100">
+    <button id="openSidebarBtn" class="md:hidden text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
       </svg>
@@ -12,7 +12,7 @@
       <img src="/images/logo-horizontal.png" alt="Kyzoo" class="h-8 w-auto object-contain" />
     </a>
     <!-- Judul Halaman Desktop -->
-    <h1 class="text-xl font-bold text-slate-800 tracking-tight hidden md:block">
+    <h1 class="text-xl font-bold text-slate-800 dark:text-white tracking-tight hidden md:block">
       <%= typeof pageTitle !== 'undefined' ? pageTitle : (typeof title !== 'undefined' ? title.split('-')[0].trim() : 'Dashboard') %>
     </h1>
   </div>
@@ -31,7 +31,7 @@
         name="q" 
         placeholder="Cari materi tutorial..." 
         value="<%= typeof search !== 'undefined' ? search : '' %>"
-        class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all"
+        class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
       />
     </form>
   </div>
@@ -39,20 +39,87 @@
   <div class="flex-1 hidden md:block"></div>
   <% } %>
 
-  <!-- Profil Pengguna Kanan -->
-  <div class="flex items-center gap-3">
+  <!-- Area Kanan: Theme Customizer & Profil Pengguna -->
+  <div class="flex items-center gap-2 sm:gap-3">
+    <!-- 🎨 Interaktif Theme Customizer Dropdown -->
+    <div class="relative" id="themeDropdownContainer">
+      <button 
+        id="themeDropdownBtn" 
+        type="button" 
+        class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-750 transition-all text-xs font-bold shadow-2xs group"
+        title="Sesuaikan Mode Tampilan & Warna Aksen"
+      >
+        <!-- Ikon Mode Aktif -->
+        <span id="activeModeIcon" class="text-sm">☀️</span>
+        <!-- Dot Warna Aksen Aktif -->
+        <span id="activeAccentDot" class="w-2.5 h-2.5 rounded-full bg-brand-500 ring-2 ring-white dark:ring-slate-800 shadow-2xs"></span>
+        <span class="hidden sm:inline text-[11px] font-semibold text-slate-500 dark:text-slate-400">Tema</span>
+        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+
+      <!-- Panel Dropdown Pengaturan Tema -->
+      <div 
+        id="themeDropdownMenu" 
+        class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/90 dark:border-slate-700/90 shadow-2xl p-4 z-50 text-slate-800 dark:text-slate-100 animate-in fade-in zoom-in-95 duration-150"
+      >
+        <!-- 1. Mode Siang / Malam -->
+        <div class="mb-3.5 pb-3 border-b border-slate-100 dark:border-slate-700/70">
+          <div class="text-[10px] font-extrabold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-2">Mode Tampilan</div>
+          <div class="grid grid-cols-2 gap-1.5 bg-slate-100 dark:bg-slate-900/90 p-1 rounded-xl">
+            <button id="setLightModeBtn" type="button" class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+              <span>☀️</span>
+              <span>Terang</span>
+            </button>
+            <button id="setDarkModeBtn" type="button" class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+              <span>🌙</span>
+              <span>Gelap</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Palet Warna Aksen Interaktif -->
+        <div>
+          <div class="text-[10px] font-extrabold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-2">Warna Aksen Kyzoo</div>
+          <div class="grid grid-cols-4 gap-1.5">
+            <!-- Violet -->
+            <button type="button" data-accent="violet" class="accent-btn flex flex-col items-center gap-1 p-1.5 rounded-xl border border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all text-center">
+              <span class="w-6 h-6 rounded-full bg-[#6c5dd3] shadow-xs flex items-center justify-center text-white text-[10px] font-black">✓</span>
+              <span class="text-[9px] font-bold text-slate-600 dark:text-slate-300">Violet</span>
+            </button>
+            <!-- Ocean Blue -->
+            <button type="button" data-accent="ocean" class="accent-btn flex flex-col items-center gap-1 p-1.5 rounded-xl border border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all text-center">
+              <span class="w-6 h-6 rounded-full bg-[#0284c7] shadow-xs flex items-center justify-center text-white text-[10px] font-black"></span>
+              <span class="text-[9px] font-bold text-slate-600 dark:text-slate-300">Ocean</span>
+            </button>
+            <!-- Mint Emerald -->
+            <button type="button" data-accent="emerald" class="accent-btn flex flex-col items-center gap-1 p-1.5 rounded-xl border border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all text-center">
+              <span class="w-6 h-6 rounded-full bg-[#10b981] shadow-xs flex items-center justify-center text-white text-[10px] font-black"></span>
+              <span class="text-[9px] font-bold text-slate-600 dark:text-slate-300">Mint</span>
+            </button>
+            <!-- Sunset Coral -->
+            <button type="button" data-accent="coral" class="accent-btn flex flex-col items-center gap-1 p-1.5 rounded-xl border border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all text-center">
+              <span class="w-6 h-6 rounded-full bg-[#f97316] shadow-xs flex items-center justify-center text-white text-[10px] font-black"></span>
+              <span class="text-[9px] font-bold text-slate-600 dark:text-slate-300">Coral</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- User Profile Avatar & Name -->
-    <a href="/settings" class="relative flex items-center gap-2.5 p-1 rounded-xl hover:bg-slate-50 transition-colors">
+    <a href="/settings" class="relative flex items-center gap-2.5 p-1 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
       <img 
         src="<%= (currentUser && currentUser.avatar) ? currentUser.avatar : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80' %>" 
         alt="Avatar" 
-        class="w-9 h-9 rounded-full object-cover ring-2 ring-violet-100 shrink-0"
+        class="w-9 h-9 rounded-full object-cover ring-2 ring-brand-100 dark:ring-slate-700 shrink-0"
       />
       <div class="hidden sm:block text-left">
-        <div class="text-xs font-bold text-slate-800 leading-tight">
+        <div class="text-xs font-bold text-slate-800 dark:text-slate-100 leading-tight">
           <%= currentUser ? currentUser.name : 'Dipu Paul' %>
         </div>
-        <div class="text-[10px] font-semibold text-violet-600 uppercase tracking-wider">
+        <div class="text-[10px] font-semibold text-brand-500 uppercase tracking-wider">
           <%= currentUser ? (currentUser.role === 'admin' ? 'Administrator' : 'Pelanggan') : 'Pelanggan' %>
         </div>
       </div>

@@ -305,4 +305,40 @@ router.post('/settings/avatar', (req, res) => {
   });
 });
 
+// ==============================================================
+// KYZOO SKILL & RESOURCE HUB (MEMBER ACCESS)
+// ==============================================================
+router.get('/hub', async (req, res) => {
+  try {
+    const rawResources = await DB.all(
+      'SELECT * FROM resources WHERE is_active = 1 ORDER BY sort_order ASC, id DESC'
+    );
+    const resources = rawResources || [];
+
+    // Kategori Unik untuk Tab Filter
+    const rawCategories = Array.from(new Set(resources.map(r => r.category).filter(Boolean)));
+    const categories = ['Semua', ...rawCategories];
+
+    res.render('hub', {
+      title: 'Skill & Resource Hub - Kyzoo LMS',
+      pageTitle: 'Skill & Resource Hub',
+      currentPath: '/hub',
+      resources,
+      categories,
+      selectedCategory: req.query.category || 'Semua'
+    });
+  } catch (err) {
+    console.error('Error fetching hub resources:', err);
+    res.render('hub', {
+      title: 'Skill & Resource Hub - Kyzoo LMS',
+      pageTitle: 'Skill & Resource Hub',
+      currentPath: '/hub',
+      resources: [],
+      categories: ['Semua'],
+      selectedCategory: 'Semua',
+      error: 'Terjadi kendala saat memuat resource: ' + err.message
+    });
+  }
+});
+
 module.exports = router;

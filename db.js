@@ -45,12 +45,94 @@ function getPgPool() {
           keepAliveInitialDelayMillis: 10000
         });
         console.log('[DB] Mode Aktif: Terhubung ke Supabase PostgreSQL Cloud Database.');
+        ensurePgTables(pool).catch(() => {});
       } catch (err) {
         console.error('[DB] Gagal menginisialisasi PostgreSQL Pool:', err.message);
       }
     }
   }
   return pool;
+}
+
+let pgTablesEnsured = false;
+async function ensurePgTables(p) {
+  if (pgTablesEnsured || !p) return;
+  try {
+    await p.query(`
+      CREATE TABLE IF NOT EXISTS public.resources (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        category TEXT NOT NULL DEFAULT 'AI Skills',
+        platform TEXT DEFAULT 'antigravity',
+        description TEXT,
+        sop_instruction TEXT,
+        content_markdown TEXT,
+        external_url TEXT,
+        badge_text TEXT DEFAULT 'Khusus Member',
+        sort_order INTEGER DEFAULT 1,
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_resources_category ON public.resources(category);
+      CREATE INDEX IF NOT EXISTS idx_resources_active ON public.resources(is_active);
+      CREATE INDEX IF NOT EXISTS idx_resources_sort ON public.resources(sort_order);
+    `);
+    pgTablesEnsured = true;
+
+    const resCount = await p.query('SELECT COUNT(*) as count FROM public.resources');
+    if (resCount.rows[0] && parseInt(resCount.rows[0].count, 10) === 0) {
+      await p.query(`
+        INSERT INTO public.resources (title, category, platform, description, sop_instruction, content_markdown, external_url, badge_text, sort_order)
+        VALUES 
+          (
+            'Kyzoo Architect & System Designer SKILL.md',
+            'AI Skills',
+            'antigravity',
+            'Skill AI resmi Kyzoo untuk Google Antigravity IDE. Otomatisasi perancangan arsitektur sistem, PRD generator, dan standardisasi clean code.',
+            '1. Buat folder baru di proyek Anda: .gemini/skills/arsitek/\n2. Buat file SKILL.md di dalam folder tersebut.\n3. Salin dan tempel seluruh isi kode SKILL.md ke file tersebut.\n4. Buka obrolan Antigravity IDE dan ketik /arsitek untuk mengaktifkan persona.',
+            '---\nname: arsitek\ndescription: Universal Product Architect, Lead Engineering Mentor & PRD Generator by Kyzoo.\n---\n\n# KYZOO SYSTEM ARCHITECT (ARSITEK)\nAnda adalah Arsitek Perangkat Lunak Senior dan Mentor Rekayasa Produk Resmi Kyzoo.\n\n## Aturan Utama:\n1. Selalu utamakan Zero-Lag, Clean Code, dan Kesederhanaan Arsitektur.\n2. Berikan instruksi langkah demi langkah yang jelas dan terstruktur dalam Bahasa Indonesia.\n3. Jangan merusak atau menghapus fitur yang sudah berjalan stabil.',
+            'https://github.com/dimaspngstuu/kyzoo_lms',
+            '✦ Official Skill',
+            1
+          ),
+          (
+            'Kyzoo Assistant System Instructions for Gemini Web',
+            'AI Skills',
+            'gemini',
+            'Formula prompt sistem instruksi khusus Gemini Web & Claude untuk mengubah AI menjadi Senior Fullstack Mentor pribadi.',
+            '1. Buka situs Gemini Web (gemini.google.com)\n2. Buka Pengaturan (Settings) > System Instructions atau Custom Instructions.\n3. Tempel seluruh formula prompt yang telah Anda salin.\n4. Simpan dan mulai sesi obrolan baru.',
+            'Bertindaklah sebagai Senior Fullstack Architect dan Mentor Pemrograman Kyzoo.\nBantu saya memecahkan masalah koding, desain antarmuka, dan optimasi database dengan pola pikir clean code, efisiensi tinggi, dan penjelasan santun berbahasa Indonesia.',
+            'https://gemini.google.com',
+            '⚡ AI Prompt',
+            2
+          ),
+          (
+            'Kyzoo Design System & UI Kit Starter',
+            'Starter Code',
+            'github',
+            'Template repositori komponen Tailwind CSS, kartu dashboard interaktif, sistem tema dinamis, dan modal popup siap pakai.',
+            '1. Kunjungi repositori GitHub resmi.\n2. Lakukan Clone atau Download ZIP ke komputer Anda.\n3. Buka di VS Code atau Antigravity IDE dan jalankan npm install.',
+            '// Starter Code Kyzoo UI Kit\n// Komponen Tailwind CSS siap pakai untuk project aplikasi web modern.',
+            'https://github.com/dimaspngstuu/kyzoo_lms',
+            '🎨 UI Kit',
+            3
+          ),
+          (
+            'Google Sheets Otomasi Database Member & Billing',
+            'Google Sheets',
+            'sheets',
+            'Template Google Spreadsheet resmi untuk pembukuan membership, log aktivasi OTP, dan rekap metrik pelanggan.',
+            '1. Buka tautan Google Sheets berikut.\n2. Klik menu File > Buat Salinan (Make a Copy) ke Google Drive Anda sendiri.\n3. Sesuaikan kolom nama member dan status membership Anda.',
+            'Template Google Sheets resmi untuk manajemen membership dan operasional Kyzoo LMS.',
+            'https://docs.google.com/spreadsheets',
+            '📊 Spreadsheet',
+            4
+          );
+      `);
+    }
+  } catch (err) {
+    // Abaikan jika tabel sudah ada
+  }
 }
 
 // Inisialisasi awal saat boot
@@ -143,7 +225,79 @@ function initSqliteSchema(db) {
       is_used INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS resources (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      category TEXT NOT NULL DEFAULT 'AI Skills',
+      platform TEXT DEFAULT 'antigravity',
+      description TEXT,
+      sop_instruction TEXT,
+      content_markdown TEXT,
+      external_url TEXT,
+      badge_text TEXT DEFAULT 'Khusus Member',
+      sort_order INTEGER DEFAULT 1,
+      is_active INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
+
+  // Seed default resources jika kosong
+  try {
+    const resCount = db.prepare('SELECT COUNT(*) as count FROM resources').get();
+    if (resCount && resCount.count === 0) {
+      const stmt = db.prepare(`
+        INSERT INTO resources (title, category, platform, description, sop_instruction, content_markdown, external_url, badge_text, sort_order)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      stmt.run(
+        'Kyzoo Architect & System Designer SKILL.md',
+        'AI Skills',
+        'antigravity',
+        'Skill AI resmi Kyzoo untuk Google Antigravity IDE. Otomatisasi perancangan arsitektur sistem, PRD generator, dan standardisasi clean code.',
+        '1. Buat folder baru di proyek Anda: .gemini/skills/arsitek/\n2. Buat file SKILL.md di dalam folder tersebut.\n3. Salin dan tempel seluruh isi kode SKILL.md ke file tersebut.\n4. Buka obrolan Antigravity IDE dan ketik /arsitek untuk mengaktifkan persona.',
+        '---\nname: arsitek\ndescription: Universal Product Architect, Lead Engineering Mentor & PRD Generator by Kyzoo.\n---\n\n# KYZOO SYSTEM ARCHITECT (ARSITEK)\nAnda adalah Arsitek Perangkat Lunak Senior dan Mentor Rekayasa Produk Resmi Kyzoo.\n\n## Aturan Utama:\n1. Selalu utamakan Zero-Lag, Clean Code, dan Kesederhanaan Arsitektur.\n2. Berikan instruksi langkah demi langkah yang jelas dan terstruktur dalam Bahasa Indonesia.\n3. Jangan merusak atau menghapus fitur yang sudah berjalan stabil.',
+        'https://github.com/dimaspngstuu/kyzoo_lms',
+        '✦ Official Skill',
+        1
+      );
+      stmt.run(
+        'Kyzoo Assistant System Instructions for Gemini Web',
+        'AI Skills',
+        'gemini',
+        'Formula prompt sistem instruksi khusus Gemini Web & Claude untuk mengubah AI menjadi Senior Fullstack Mentor pribadi.',
+        '1. Buka situs Gemini Web (gemini.google.com)\n2. Buka Pengaturan (Settings) > System Instructions atau Custom Instructions.\n3. Tempel seluruh formula prompt yang telah Anda salin.\n4. Simpan dan mulai sesi obrolan baru.',
+        'Bertindaklah sebagai Senior Fullstack Architect dan Mentor Pemrograman Kyzoo.\nBantu saya memecahkan masalah koding, desain antarmuka, dan optimasi database dengan pola pikir clean code, efisiensi tinggi, dan penjelasan santun berbahasa Indonesia.',
+        'https://gemini.google.com',
+        '⚡ AI Prompt',
+        2
+      );
+      stmt.run(
+        'Kyzoo Design System & UI Kit Starter',
+        'Starter Code',
+        'github',
+        'Template repositori komponen Tailwind CSS, kartu dashboard interaktif, sistem tema dinamis, dan modal popup siap pakai.',
+        '1. Kunjungi repositori GitHub resmi.\n2. Lakukan Clone atau Download ZIP ke komputer Anda.\n3. Buka di VS Code atau Antigravity IDE dan jalankan npm install.',
+        '// Starter Code Kyzoo UI Kit\n// Komponen Tailwind CSS siap pakai untuk project aplikasi web modern.',
+        'https://github.com/dimaspngstuu/kyzoo_lms',
+        '🎨 UI Kit',
+        3
+      );
+      stmt.run(
+        'Google Sheets Otomasi Database Member & Billing',
+        'Google Sheets',
+        'sheets',
+        'Template Google Spreadsheet resmi untuk pembukuan membership, log aktivasi OTP, dan rekap metrik pelanggan.',
+        '1. Buka tautan Google Sheets berikut.\n2. Klik menu File > Buat Salinan (Make a Copy) ke Google Drive Anda sendiri.\n3. Sesuaikan kolom nama member dan status membership Anda.',
+        'Template Google Sheets resmi untuk manajemen membership dan operasional Kyzoo LMS.',
+        'https://docs.google.com/spreadsheets',
+        '📊 Spreadsheet',
+        4
+      );
+    }
+  } catch (e) {
+    // Abaikan jika sudah ada
+  }
 }
 
 // Database Helper Wrappers (Mendukung async/await untuk PostgreSQL & SQLite)

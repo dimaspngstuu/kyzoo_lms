@@ -1,0 +1,420 @@
+<!-- Admin Panel: Kelola Resource & SKILL.md (CRUD Penuh) -->
+
+<div class="space-y-6">
+
+  <!-- Alert Notifikasi -->
+  <% if (success) { %>
+    <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-2xl flex items-center gap-2">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+      <span class="font-bold"><%= success %></span>
+    </div>
+  <% } %>
+
+  <% if (error) { %>
+    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-2xl flex items-center gap-2">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span class="font-bold"><%= error %></span>
+    </div>
+  <% } %>
+
+  <!-- Header & Tombol Tambah Resource -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl border border-slate-100 p-6 sm:p-7 shadow-xs">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-800">Panel Admin</span>
+        <h2 class="text-xl font-bold text-slate-900 tracking-tight">Pusat Kelola Resource & SKILL.md</h2>
+      </div>
+      <p class="text-xs text-slate-400 mt-1">Tambah file SKILL.md, formula prompt AI, starter template, atau tautan tools khusus member.</p>
+    </div>
+
+    <button 
+      type="button" 
+      onclick="openCreateModal()" 
+      class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-xs shadow-md shadow-brand-200 transition-all">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+      <span>Tambah Resource Baru</span>
+    </button>
+  </div>
+
+  <!-- 3 Ringkasan Metrik Admin -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-xs">
+      <div class="text-xs font-semibold text-slate-400">Total Resource</div>
+      <div class="text-2xl font-black text-slate-900 mt-1"><%= stats.total %></div>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-xs">
+      <div class="text-xs font-semibold text-slate-400">Resource Aktif</div>
+      <div class="text-2xl font-black text-emerald-600 mt-1"><%= stats.active %></div>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-xs">
+      <div class="text-xs font-semibold text-slate-400">AI Skills & Prompts</div>
+      <div class="text-2xl font-black text-brand-600 mt-1"><%= stats.skills %></div>
+    </div>
+  </div>
+
+  <!-- Tabel CRUD Resource -->
+  <div class="bg-white rounded-3xl border border-slate-100 p-6 shadow-xs">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+      <h3 class="text-base font-bold text-slate-900">Daftar Resource & SKILL.md</h3>
+      <input 
+        type="text" 
+        id="adminResourceSearch" 
+        placeholder="Cari judul resource..." 
+        onkeyup="filterAdminResources()"
+        class="px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 w-full sm:w-64"
+      />
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse" id="adminResourceTable">
+        <thead>
+          <tr class="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-3">
+            <th class="py-3 px-3">Urutan</th>
+            <th class="py-3 px-3">Judul & Platform</th>
+            <th class="py-3 px-3">Kategori</th>
+            <th class="py-3 px-3">Tipe Konten</th>
+            <th class="py-3 px-3 text-center">Status</th>
+            <th class="py-3 px-3 text-right">Aksi Kelola</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-xs">
+          <% if (resources.length === 0) { %>
+            <tr>
+              <td colspan="6" class="py-8 text-center text-slate-400">Belum ada data resource. Klik tombol "Tambah Resource Baru" untuk membuat pertama.</td>
+            </tr>
+          <% } else { %>
+            <% resources.forEach(item => { %>
+              <tr class="hover:bg-slate-50/70 transition-colors resource-row" data-title="<%= item.title.toLowerCase() %>">
+                <td class="py-3 px-3 font-mono font-bold text-slate-400">#<%= item.sort_order %></td>
+                
+                <!-- Judul & Platform -->
+                <td class="py-3 px-3">
+                  <div class="font-bold text-slate-900"><%= item.title %></div>
+                  <div class="flex items-center gap-1.5 text-[10px] text-slate-400 mt-0.5">
+                    <% if (item.platform === 'antigravity') { %>
+                      <span class="text-brand-600 font-semibold">🪐 Antigravity IDE</span>
+                    <% } else if (item.platform === 'gemini') { %>
+                      <span class="text-blue-600 font-semibold">🤖 Gemini Web</span>
+                    <% } else if (item.platform === 'github') { %>
+                      <span class="text-purple-600 font-semibold">🐙 GitHub</span>
+                    <% } else if (item.platform === 'sheets') { %>
+                      <span class="text-emerald-600 font-semibold">📊 Google Sheets</span>
+                    <% } else { %>
+                      <span class="text-slate-500 font-semibold">⚡ Tool</span>
+                    <% } %>
+                    <span>•</span>
+                    <span><%= item.badge_text || 'Member' %></span>
+                  </div>
+                </td>
+
+                <!-- Kategori -->
+                <td class="py-3 px-3">
+                  <span class="px-2.5 py-1 rounded-md bg-slate-100 text-[10px] font-bold text-slate-600">
+                    <%= item.category %>
+                  </span>
+                </td>
+
+                <!-- Tipe Konten -->
+                <td class="py-3 px-3">
+                  <% if (item.content_markdown && item.content_markdown.trim()) { %>
+                    <span class="inline-flex items-center gap-1 text-[11px] text-brand-600 font-semibold">
+                      <span>📄</span>
+                      <span>Ada SKILL.md (<%= item.content_markdown.length %> chars)</span>
+                    </span>
+                  <% } else { %>
+                    <span class="inline-flex items-center gap-1 text-[11px] text-slate-400">
+                      <span>🔗</span>
+                      <span>Link Tautan Saja</span>
+                    </span>
+                  <% } %>
+                </td>
+
+                <!-- Status Visibilitas -->
+                <td class="py-3 px-3 text-center">
+                  <% if (item.is_active === 1) { %>
+                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      Aktif
+                    </span>
+                  <% } else { %>
+                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">
+                      Disembunyikan
+                    </span>
+                  <% } %>
+                </td>
+
+                <!-- Tombol Aksi -->
+                <td class="py-3 px-3 text-right">
+                  <div class="inline-flex items-center gap-1.5 justify-end">
+                    <!-- Toggle Visibilitas -->
+                    <form action="/admin/resources/<%= item.id %>/toggle" method="POST" class="inline">
+                      <button 
+                        type="submit" 
+                        class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors"
+                        title="<%= item.is_active === 1 ? 'Sembunyikan dari Member' : 'Tampilkan ke Member' %>">
+                        <%= item.is_active === 1 ? '👁️' : '🚫' %>
+                      </button>
+                    </form>
+
+                    <!-- Edit Modal Trigger -->
+                    <button 
+                      type="button" 
+                      onclick="openEditModal(<%= JSON.stringify(item).replace(/"/g, '&quot;') %>)"
+                      class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] transition-colors">
+                      Edit
+                    </button>
+
+                    <!-- Hapus Modal Trigger -->
+                    <button 
+                      type="button" 
+                      onclick="confirmDelete('<%= item.id %>', '<%= item.title.replace(/'/g, "\\'") %>')"
+                      class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[11px] transition-colors">
+                      Hapus
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================== -->
+<!-- MODAL 1: FORM TAMBAH RESOURCE BARU                             -->
+<!-- ============================================================== -->
+<div id="createResourceModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+  <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-100 my-8">
+    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+      <div>
+        <h3 class="text-lg font-bold text-slate-900">Tambah Resource & SKILL.md Baru</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Isi data skill atau template yang ingin Anda bagikan kepada member.</p>
+      </div>
+      <button type="button" onclick="closeCreateModal()" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg">✕</button>
+    </div>
+
+    <form action="/admin/resources/create" method="POST" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Judul Resource / Tool *</label>
+          <input type="text" name="title" required placeholder="Contoh: Kyzoo Architect SKILL.md" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Kategori</label>
+          <select name="category" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500">
+            <option value="AI Skills">AI Skills</option>
+            <option value="Starter Code">Starter Code</option>
+            <option value="Prompt Template">Prompt Template</option>
+            <option value="Google Sheets">Google Sheets</option>
+            <option value="Tools & Utility">Tools & Utility</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Target Platform</label>
+          <select name="platform" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500">
+            <option value="antigravity">🪐 Antigravity IDE</option>
+            <option value="gemini">🤖 Gemini Web / Claude</option>
+            <option value="github">🐙 GitHub Repo</option>
+            <option value="sheets">📊 Google Sheets</option>
+            <option value="general">⚡ Umum / Lainnya</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Label Badge</label>
+          <input type="text" name="badge_text" placeholder="Khusus Member" value="Khusus Member" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Urutan</label>
+          <input type="number" name="sort_order" value="1" min="1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Deskripsi Singkat</label>
+        <textarea name="description" rows="2" placeholder="Jelaskan secara singkat kegunaan tool ini..." class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Instruksi & SOP Penggunaan (Ditampilkan di Popup Member)</label>
+        <textarea name="sop_instruction" rows="3" placeholder="Langkah 1: ...&#10;Langkah 2: ..." class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Isi Konten SKILL.md / Prompt / Kode (Untuk Fitur 1-Klik Salin)</label>
+        <textarea name="content_markdown" rows="5" placeholder="Tempel seluruh format Markdown atau prompt di sini..." class="w-full px-3.5 py-2 bg-slate-900 text-slate-100 font-mono border border-slate-700 rounded-xl text-xs focus:outline-none focus:border-brand-500"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Tautan Luar / External URL (Opsional)</label>
+        <input type="url" name="external_url" placeholder="https://github.com/... atau https://docs.google.com/..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500" />
+      </div>
+
+      <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
+        <button type="button" onclick="closeCreateModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal</button>
+        <button type="submit" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs rounded-xl shadow-xs transition-all">Simpan Resource</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================== -->
+<!-- MODAL 2: FORM EDIT RESOURCE                                    -->
+<!-- ============================================================== -->
+<div id="editResourceModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+  <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-100 my-8">
+    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+      <div>
+        <h3 class="text-lg font-bold text-slate-900">Perbarui Resource & SKILL.md</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Edit detail informasi atau perbarui teks isi SKILL.md.</p>
+      </div>
+      <button type="button" onclick="closeEditModal()" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg">✕</button>
+    </div>
+
+    <form id="editResourceForm" action="" method="POST" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Judul Resource / Tool *</label>
+          <input type="text" id="edit_title" name="title" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Kategori</label>
+          <select id="edit_category" name="category" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500">
+            <option value="AI Skills">AI Skills</option>
+            <option value="Starter Code">Starter Code</option>
+            <option value="Prompt Template">Prompt Template</option>
+            <option value="Google Sheets">Google Sheets</option>
+            <option value="Tools & Utility">Tools & Utility</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Target Platform</label>
+          <select id="edit_platform" name="platform" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500">
+            <option value="antigravity">🪐 Antigravity IDE</option>
+            <option value="gemini">🤖 Gemini Web / Claude</option>
+            <option value="github">🐙 GitHub Repo</option>
+            <option value="sheets">📊 Google Sheets</option>
+            <option value="general">⚡ Umum / Lainnya</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Label Badge</label>
+          <input type="text" id="edit_badge_text" name="badge_text" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Urutan</label>
+          <input type="number" id="edit_sort_order" name="sort_order" min="1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Status</label>
+          <select id="edit_is_active" name="is_active" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500">
+            <option value="1">Aktif (Tampil)</option>
+            <option value="0">Disembunyikan</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Deskripsi Singkat</label>
+        <textarea id="edit_description" name="description" rows="2" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Instruksi & SOP Penggunaan</label>
+        <textarea id="edit_sop_instruction" name="sop_instruction" rows="3" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Isi Konten SKILL.md / Prompt / Kode</label>
+        <textarea id="edit_content_markdown" name="content_markdown" rows="6" class="w-full px-3.5 py-2 bg-slate-900 text-slate-100 font-mono border border-slate-700 rounded-xl text-xs focus:outline-none focus:border-brand-500"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Tautan Luar / External URL (Opsional)</label>
+        <input type="url" id="edit_external_url" name="external_url" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-brand-500" />
+      </div>
+
+      <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
+        <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal</button>
+        <button type="submit" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs rounded-xl shadow-xs transition-all">Simpan Perubahan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================== -->
+<!-- MODAL 3: KONFIRMASI HAPUS RESOURCE                             -->
+<!-- ============================================================== -->
+<div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+  <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-100">
+    <div class="w-12 h-12 mx-auto rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl mb-3">🗑️</div>
+    <h3 class="text-base font-bold text-slate-900">Hapus Resource?</h3>
+    <p class="text-xs text-slate-500 mt-1" id="deleteResourceName">Apakah Anda yakin ingin menghapus resource ini?</p>
+    
+    <form id="deleteForm" action="" method="POST" class="mt-5 flex items-center justify-center gap-2">
+      <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 transition-colors">Batal</button>
+      <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl transition-all">Hapus Permanen</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // 1. Live Filter Tabel Admin
+  function filterAdminResources() {
+    const q = (document.getElementById('adminResourceSearch').value || '').toLowerCase().trim();
+    const rows = document.querySelectorAll('.resource-row');
+    rows.forEach(r => {
+      const t = r.getAttribute('data-title') || '';
+      if (t.includes(q)) {
+        r.classList.remove('hidden');
+      } else {
+        r.classList.add('hidden');
+      }
+    });
+  }
+
+  // 2. Modal Tambah
+  function openCreateModal() {
+    document.getElementById('createResourceModal').classList.remove('hidden');
+  }
+  function closeCreateModal() {
+    document.getElementById('createResourceModal').classList.add('hidden');
+  }
+
+  // 3. Modal Edit
+  function openEditModal(item) {
+    document.getElementById('editResourceForm').action = '/admin/resources/' + item.id + '/update';
+    document.getElementById('edit_title').value = item.title || '';
+    document.getElementById('edit_category').value = item.category || 'AI Skills';
+    document.getElementById('edit_platform').value = item.platform || 'antigravity';
+    document.getElementById('edit_badge_text').value = item.badge_text || 'Khusus Member';
+    document.getElementById('edit_sort_order').value = item.sort_order || 1;
+    document.getElementById('edit_is_active').value = item.is_active !== undefined ? item.is_active : 1;
+    document.getElementById('edit_description').value = item.description || '';
+    document.getElementById('edit_sop_instruction').value = item.sop_instruction || '';
+    document.getElementById('edit_content_markdown').value = item.content_markdown || '';
+    document.getElementById('edit_external_url').value = item.external_url || '';
+
+    document.getElementById('editResourceModal').classList.remove('hidden');
+  }
+  function closeEditModal() {
+    document.getElementById('editResourceModal').classList.add('hidden');
+  }
+
+  // 4. Modal Hapus
+  function confirmDelete(id, title) {
+    document.getElementById('deleteForm').action = '/admin/resources/' + id + '/delete';
+    document.getElementById('deleteResourceName').textContent = 'Apakah Anda yakin ingin menghapus resource "' + title + '"?';
+    document.getElementById('deleteModal').classList.remove('hidden');
+  }
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+  }
+</script>

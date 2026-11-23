@@ -1,0 +1,417 @@
+<!-- Kyzoo Skill & Resource Hub (Member View) -->
+
+<div class="space-y-6">
+
+  <!-- 1. Header Banner -->
+  <div class="bg-gradient-to-br from-brand-50/70 via-white to-indigo-50/40 rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs relative overflow-hidden">
+    <!-- Ambient Soft Glow -->
+    <div class="absolute -top-20 -right-20 w-64 h-64 bg-brand-200/30 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-3xl">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-brand-100 text-brand-700">Hub Resources</span>
+        <span class="text-xs text-slate-400 font-medium">Eksklusif Member Kyzoo</span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+        Kyzoo Skill & <span class="font-accent font-normal italic text-brand-600">Resource Hub.</span>
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500 font-medium mt-2 leading-relaxed">
+        Koleksi resmi SKILL.md untuk Antigravity IDE, formula prompt AI, starter code, dan tools digital yang dibagikan khusus untuk member resmi Kyzoo.
+      </p>
+    </div>
+  </div>
+
+  <!-- 2. Filter Kategori & Pencarian Cepat -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <!-- Filter Tabs (Pills) -->
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+      <% categories.forEach(cat => { %>
+        <button 
+          type="button" 
+          onclick="filterCategory('<%= cat %>')" 
+          class="category-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 <%= selectedCategory === cat ? 'bg-brand-500 text-white shadow-xs' : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/70' %>"
+          data-category="<%= cat %>">
+          <%= cat %>
+          <% if (cat === 'Semua') { %>
+            <span class="opacity-80 text-[10px] ml-1">(<%= resources.length %>)</span>
+          <% } else { %>
+            <span class="opacity-80 text-[10px] ml-1">(<%= resources.filter(r => r.category === cat).length %>)</span>
+          <% } %>
+        </button>
+      <% }); %>
+    </div>
+
+    <!-- Live Search Input -->
+    <div class="relative w-full sm:w-64">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+      </div>
+      <input 
+        type="text" 
+        id="hubSearchInput" 
+        placeholder="Cari skill atau tool..." 
+        onkeyup="filterResourcesLive()"
+        class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200/80 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 shadow-2xs"
+      />
+    </div>
+  </div>
+
+  <!-- 3. Daftar Kartu Resource (Dikelompokkan atau Grid Rapi) -->
+  <% if (resources.length === 0) { %>
+    <div class="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm max-w-lg mx-auto">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-brand-50 text-brand-500 flex items-center justify-center text-2xl mb-3">📦</div>
+      <h3 class="text-base font-bold text-slate-800">Belum Ada Resource</h3>
+      <p class="text-xs text-slate-400 mt-1">Resource belum ditambahkan oleh Admin. Silakan periksa kembali nanti.</p>
+    </div>
+  <% } else { %>
+    <!-- Container Kartu -->
+    <div id="resourceGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-5">
+      <% resources.forEach((item, index) => { %>
+        <% 
+          // Icon & Warna Platform
+          let platformIcon = '⚡';
+          let platformLabel = 'Tool';
+          let platformColor = 'bg-slate-100 text-slate-700 border-slate-200';
+          if (item.platform === 'antigravity') {
+            platformIcon = '🪐';
+            platformLabel = 'Antigravity IDE';
+            platformColor = 'bg-brand-50 text-brand-700 border-brand-200/60';
+          } else if (item.platform === 'gemini') {
+            platformIcon = '🤖';
+            platformLabel = 'Gemini Web';
+            platformColor = 'bg-blue-50 text-blue-700 border-blue-200/60';
+          } else if (item.platform === 'github') {
+            platformIcon = '🐙';
+            platformLabel = 'GitHub Repo';
+            platformColor = 'bg-purple-50 text-purple-700 border-purple-200/60';
+          } else if (item.platform === 'sheets') {
+            platformIcon = '📊';
+            platformLabel = 'Google Sheets';
+            platformColor = 'bg-emerald-50 text-emerald-700 border-emerald-200/60';
+          }
+
+          const createdDate = item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '2026';
+        %>
+
+        <div 
+          class="resource-card bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:shadow-md hover:border-brand-300 transition-all flex flex-col justify-between group"
+          data-category="<%= item.category %>"
+          data-title="<%= item.title.toLowerCase() %>"
+          data-desc="<%= (item.description || '').toLowerCase() %>"
+        >
+          <div>
+            <!-- Header Kartu: Kategori & Tanggal -->
+            <div class="flex items-center justify-between text-[11px] mb-3">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg border font-bold <%= platformColor %>">
+                <span><%= platformIcon %></span>
+                <span><%= platformLabel %></span>
+              </span>
+              <span class="text-slate-400 font-medium font-mono text-[10px]"><%= createdDate %></span>
+            </div>
+
+            <!-- Judul Resource -->
+            <h3 class="text-base font-extrabold text-slate-900 group-hover:text-brand-600 transition-colors tracking-tight leading-snug">
+              <%= item.title %>
+            </h3>
+
+            <!-- Deskripsi Singkat -->
+            <% if (item.description) { %>
+              <p class="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">
+                <%= item.description %>
+              </p>
+            <% } %>
+
+            <!-- Badge Proteksi Khusus Member -->
+            <div class="mt-3.5 p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-semibold text-slate-600 flex items-center gap-2">
+              <span class="text-amber-500">🔒</span>
+              <span class="truncate uppercase tracking-wider text-[10px] font-bold"><%= item.badge_text || 'Khusus Member Resmi' %></span>
+            </div>
+
+            <!-- Tags & Link SOP -->
+            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100/80">
+              <span class="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-bold text-slate-600">
+                📁 <%= item.category %>
+              </span>
+              <button 
+                type="button"
+                onclick="openModalById('<%= item.id %>')" 
+                class="text-[11px] font-bold text-brand-600 hover:text-brand-700 hover:underline flex items-center gap-1 transition-colors">
+                <span>📄 Lihat SOP & Detail</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tombol Aksi di Bawah Kartu -->
+          <div class="flex items-center gap-2 mt-5 pt-3 border-t border-slate-100">
+            <!-- Tombol Buka Dokumen / Link -->
+            <% if (item.external_url) { %>
+              <a 
+                href="<%= item.external_url %>" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="flex-1 py-2.5 px-3 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-all hover:scale-[1.01]">
+                <span>Buka Dokumen</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              </a>
+            <% } else { %>
+              <button 
+                type="button" 
+                onclick="openModalById('<%= item.id %>')"
+                class="flex-1 py-2.5 px-3 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-all hover:scale-[1.01]">
+                <span>Buka Detail</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+              </button>
+            <% } %>
+
+            <!-- Tombol Salin 1-Klik -->
+            <button 
+              type="button" 
+              id="copyBtn-<%= item.id %>"
+              onclick="copyResourceById('<%= item.id %>')"
+              class="py-2.5 px-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all"
+              title="Salin Isi Konten / SKILL.md">
+              <span id="copyIcon-<%= item.id %>">📋</span>
+              <span id="copyText-<%= item.id %>">Salin</span>
+            </button>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+
+</div>
+
+<!-- ============================================================== -->
+<!-- 4. MODAL POPUP DETAIL & SOP RESMI (KYZOO BRANDED POPUP)        -->
+<!-- ============================================================== -->
+<div id="resourceModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150">
+  <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-slate-100 relative max-h-[90vh] flex flex-col justify-between">
+    
+    <!-- Header Modal -->
+    <div class="flex items-start justify-between pb-4 border-b border-slate-100">
+      <div>
+        <div class="flex items-center gap-2 mb-1.5">
+          <span id="modalCategoryBadge" class="px-2.5 py-0.5 rounded-md bg-brand-100 text-brand-700 text-[10px] font-bold">Category</span>
+          <span id="modalPlatformBadge" class="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-bold">Platform</span>
+          <span id="modalDate" class="text-slate-400 text-[10px] font-mono">Date</span>
+        </div>
+        <h2 id="modalTitle" class="text-xl font-black text-slate-900 tracking-tight leading-snug">Judul Resource</h2>
+      </div>
+      <button 
+        type="button" 
+        onclick="closeResourceModal()" 
+        class="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+
+    <!-- Body Modal: SOP & Preview -->
+    <div class="my-4 space-y-4 overflow-y-auto pr-1 flex-1">
+      <!-- Instruksi / SOP Penggunaan -->
+      <div>
+        <div class="flex items-center gap-1.5 text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-2">
+          <span>ℹ️</span>
+          <span>Instruksi & SOP Penggunaan:</span>
+        </div>
+        <div id="modalSopBox" class="p-3.5 bg-slate-900 text-slate-100 rounded-xl text-xs font-medium leading-relaxed whitespace-pre-line shadow-inner">
+          Instruksi panduan cara pasang...
+        </div>
+      </div>
+
+      <!-- Preview Konten SKILL.md / Code (Jika ada) -->
+      <div id="modalCodeSection" class="hidden">
+        <div class="flex items-center justify-between text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-2">
+          <div class="flex items-center gap-1.5">
+            <span>📄</span>
+            <span>Kode SKILL.md / Prompt:</span>
+          </div>
+          <button 
+            type="button" 
+            onclick="downloadModalMarkdown()" 
+            class="text-[11px] font-bold text-brand-600 hover:underline flex items-center gap-1">
+            <span>⬇️ Unduh .md</span>
+          </button>
+        </div>
+        <div class="relative">
+          <pre id="modalCodeBox" class="p-3.5 bg-slate-50 border border-slate-200 text-slate-800 rounded-xl text-[11px] font-mono max-h-48 overflow-y-auto whitespace-pre-wrap select-all"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Modal -->
+    <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+      <button 
+        type="button" 
+        onclick="closeResourceModal()" 
+        class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-all">
+        Tutup
+      </button>
+
+      <div class="flex items-center gap-2">
+        <!-- Tombol Salin di Modal -->
+        <button 
+          type="button" 
+          id="modalCopyBtn"
+          onclick="copyModalContent()" 
+          class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all">
+          <span>📋</span>
+          <span id="modalCopyBtnText">Salin Teks</span>
+        </button>
+
+        <!-- Tombol Buka Dokumen Luar -->
+        <a 
+          id="modalOpenBtn" 
+          href="#" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="py-2.5 px-4 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-xs transition-all">
+          <span>Buka Dokumen Sekarang</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Data JSON Resources untuk Interaktivitas Client -->
+<script>
+  const hubResources = <%- JSON.stringify(resources || []) %>;
+  let activeModalResource = null;
+
+  // 1. Filter Kategori Tabs
+  function filterCategory(categoryName) {
+    const tabs = document.querySelectorAll('.category-tab');
+    tabs.forEach(t => {
+      if (t.getAttribute('data-category') === categoryName) {
+        t.className = "category-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 bg-brand-500 text-white shadow-xs";
+      } else {
+        t.className = "category-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/70";
+      }
+    });
+
+    const cards = document.querySelectorAll('.resource-card');
+    cards.forEach(card => {
+      const cardCat = card.getAttribute('data-category');
+      if (categoryName === 'Semua' || cardCat === categoryName) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+  }
+
+  // 2. Live Search Filter
+  function filterResourcesLive() {
+    const query = (document.getElementById('hubSearchInput').value || '').toLowerCase().trim();
+    const cards = document.querySelectorAll('.resource-card');
+    cards.forEach(card => {
+      const title = card.getAttribute('data-title') || '';
+      const desc = card.getAttribute('data-desc') || '';
+      if (title.includes(query) || desc.includes(query)) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+  }
+
+  // 3. Salin Konten 1-Klik dari Kartu
+  function copyResourceById(id) {
+    const item = hubResources.find(r => String(r.id) === String(id));
+    if (!item) return;
+
+    const textToCopy = item.content_markdown || item.external_url || item.sop_instruction || item.title;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      // Feedback Tombol
+      const iconSpan = document.getElementById('copyIcon-' + id);
+      const textSpan = document.getElementById('copyText-' + id);
+      if (iconSpan) iconSpan.textContent = '✓';
+      if (textSpan) textSpan.textContent = 'Disalin!';
+
+      if (typeof showToast === 'function') {
+        showToast('Konten/SKILL.md berhasil disalin ke clipboard! 📋');
+      }
+
+      setTimeout(() => {
+        if (iconSpan) iconSpan.textContent = '📋';
+        if (textSpan) textSpan.textContent = 'Salin';
+      }, 2500);
+    });
+  }
+
+  // 4. Modal Handler
+  function openModalById(id) {
+    const item = hubResources.find(r => String(r.id) === String(id));
+    if (!item) return;
+    activeModalResource = item;
+
+    document.getElementById('modalTitle').textContent = item.title;
+    document.getElementById('modalCategoryBadge').textContent = '📁 ' + item.category;
+    document.getElementById('modalPlatformBadge').textContent = item.platform ? item.platform.toUpperCase() : 'TOOL';
+    document.getElementById('modalDate').textContent = item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID') : '2026';
+    document.getElementById('modalSopBox').textContent = item.sop_instruction || item.description || 'Tidak ada instruksi khusus.';
+
+    const codeSec = document.getElementById('modalCodeSection');
+    const codeBox = document.getElementById('modalCodeBox');
+    if (item.content_markdown && item.content_markdown.trim()) {
+      codeSec.classList.remove('hidden');
+      codeBox.textContent = item.content_markdown;
+    } else {
+      codeSec.classList.add('hidden');
+    }
+
+    const openBtn = document.getElementById('modalOpenBtn');
+    if (item.external_url && item.external_url.trim()) {
+      openBtn.classList.remove('hidden');
+      openBtn.href = item.external_url;
+    } else {
+      openBtn.classList.add('hidden');
+    }
+
+    document.getElementById('resourceModal').classList.remove('hidden');
+  }
+
+  function closeResourceModal() {
+    document.getElementById('resourceModal').classList.add('hidden');
+    activeModalResource = null;
+  }
+
+  function copyModalContent() {
+    if (!activeModalResource) return;
+    const textToCopy = activeModalResource.content_markdown || activeModalResource.external_url || activeModalResource.sop_instruction || activeModalResource.title;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      const btnText = document.getElementById('modalCopyBtnText');
+      if (btnText) btnText.textContent = 'Tersalin!';
+      if (typeof showToast === 'function') {
+        showToast('Berhasil disalin! 📋');
+      }
+      setTimeout(() => {
+        if (btnText) btnText.textContent = 'Salin Teks';
+      }, 2000);
+    });
+  }
+
+  function downloadModalMarkdown() {
+    if (!activeModalResource || !activeModalResource.content_markdown) return;
+    const blob = new Blob([activeModalResource.content_markdown], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (activeModalResource.title.replace(/[^a-zA-Z0-9_\-]/g, '_') || 'SKILL') + '.md';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    if (typeof showToast === 'function') {
+      showToast('File .md berhasil diunduh! ⬇️');
+    }
+  }
+
+  // Tutup Modal jika klik backdrop
+  document.getElementById('resourceModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeResourceModal();
+    }
+  });
+</script>

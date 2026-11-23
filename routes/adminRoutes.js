@@ -684,4 +684,168 @@ router.post('/admin/users/:id/delete', async (req, res) => {
   }
 });
 
+// ==============================================================
+// 5. CRUD PUSAT PENGELOLAAN RESOURCE & AI SKILLS (ADMIN)
+// ==============================================================
+
+// A. Daftar Seluruh Resource
+router.get('/admin/resources', async (req, res) => {
+  try {
+    const [resources, totalCountRow, activeCountRow, skillCountRow] = await Promise.all([
+      DB.all('SELECT * FROM resources ORDER BY sort_order ASC, id DESC'),
+      DB.get('SELECT COUNT(*) as count FROM resources'),
+      DB.get('SELECT COUNT(*) as count FROM resources WHERE is_active = 1'),
+      DB.get("SELECT COUNT(*) as count FROM resources WHERE category = 'AI Skills'")
+    ]);
+
+    const stats = {
+      total: totalCountRow ? parseInt(totalCountRow.count, 10) : 0,
+      active: activeCountRow ? parseInt(activeCountRow.count, 10) : 0,
+      skills: skillCountRow ? parseInt(skillCountRow.count, 10) : 0
+    };
+
+    res.render('admin/resources', {
+      title: 'Kelola Resource & SKILL.md - Panel Admin Kyzoo',
+      pageTitle: 'Kelola Resources',
+      currentPath: '/admin/resources',
+      resources: resources || [],
+      stats,
+      success: req.query.success || null,
+      error: req.query.error || null
+    });
+  } catch (err) {
+    console.error('Error admin resources:', err);
+    res.render('admin/resources', {
+      title: 'Kelola Resource & SKILL.md - Panel Admin Kyzoo',
+      pageTitle: 'Kelola Resources',
+      currentPath: '/admin/resources',
+      resources: [],
+      stats: { total: 0, active: 0, skills: 0 },
+      success: null,
+      error: 'Terjadi kendala saat memuat resource: ' + err.message
+    });
+  }
+});
+
+// B. Tambah Resource Baru
+router.post('/admin/resources/create', async (req, res) => {
+  try {
+    const {
+      title, category, platform, description,
+      sop_instruction, content_markdown, external_url,
+      badge_text, sort_order
+    } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.redirect('/admin/resources?error=' + encodeURIComponent('Judul resource wajib diisi.'));
+    }
+
+    await DB.run(`
+      INSERT INTO resources (
+        title, category, platform, description,
+        sop_instruction, content_markdown, external_url,
+        badge_text, sort_order, is_active
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+    `,
+      title.trim(),
+      (category || 'AI Skills').trim(),
+      (platform || 'antigravity').trim(),
+      (description || '').trim(),
+      (sop_instruction || '').trim(),
+      (content_markdown || '').trim(),
+      (external_url || '').trim(),
+      (badge_text || 'Khusus Member').trim(),
+      parseInt(sort_order, 10) || 1
+    );
+
+    res.redirect('/admin/resources?success=' + encodeURIComponent('Resource baru berhasil ditambahkan!'));
+  } catch (err) {
+    console.error('Error create resource:', err);
+    res.redirect('/admin/resources?error=' + encodeURIComponent('Gagal menambah resource: ' + err.message));
+  }
+});
+
+// C. Perbarui Resource (Edit)
+router.post('/admin/resources/:id/update', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      title, category, platform, description,
+      sop_instruction, content_markdown, external_url,
+      badge_text, sort_order, is_active
+    } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.redirect('/admin/resources?error=' + encodeURIComponent('Judul resource wajib diisi.'));
+    }
+
+    await DB.run(`
+      UPDATE resources SET
+        title = ?,
+        category = ?,
+        platform = ?,
+        description = ?,
+        sop_instruction = ?,
+        content_markdown = ?,
+        external_url = ?,
+        badge_text = ?,
+        sort_order = ?,
+        is_active = ?
+      WHERE id = ?
+    `,
+      title.trim(),
+      (category || 'AI Skills').trim(),
+      (platform || 'antigravity').trim(),
+      (description || '').trim(),
+      (sop_instruction || '').trim(),
+      (content_markdown || '').trim(),
+      (external_url || '').trim(),
+      (badge_text || 'Khusus Member').trim(),
+      parseInt(sort_order, 10) || 1,
+      (is_active === '1' || is_active === 1) ? 1 : 0,
+      id
+    );
+
+    res.redirect('/admin/resources?success=' + encodeURIComponent('Resource berhasil diperbarui!'));
+  } catch (err) {
+    console.error('Error update resource:', err);
+    res.redirect('/admin/resources?error=' + encodeURIComponent('Gagal memperbarui resource: ' + err.message));
+  }
+});
+
+// D. Toggle Visibilitas Resource (Aktif / Sembunyi)
+router.post('/admin/resources/:id/toggle', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const item = await DB.get('SELECT is_active, title FROM resources WHERE id = ?', id);
+    if (!item) {
+      return res.redirect('/admin/resources?error=' + encodeURIComponent('Resource tidak ditemukan.'));
+    }
+
+    const nextState = item.is_active === 1 ? 0 : 1;
+    await DB.run('UPDATE resources SET is_active = ? WHERE id = ?', nextState, id);
+
+    const statusMsg = nextState === 1 ? 'diaktifkan' : 'disembunyikan dari member';
+    res.redirect('/admin/resources?success=' + encodeURIComponent(`Resource "${item.title}" berhasil ${statusMsg}.`));
+  } catch (err) {
+    console.error('Error toggle resource:', err);
+    res.redirect('/admin/resources?error=' + encodeURIComponent(err.message));
+  }
+});
+
+// E. Hapus Resource
+router.post('/admin/resources/:id/delete', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const item = await DB.get('SELECT title FROM resources WHERE id = ?', id);
+    await DB.run('DELETE FROM resources WHERE id = ?', id);
+
+    const titleStr = item ? item.title : '';
+    res.redirect('/admin/resources?success=' + encodeURIComponent(`Resource "${titleStr}" berhasil dihapus permanen.`));
+  } catch (err) {
+    console.error('Error delete resource:', err);
+    res.redirect('/admin/resources?error=' + encodeURIComponent(err.message));
+  }
+});
+
 module.exports = router;

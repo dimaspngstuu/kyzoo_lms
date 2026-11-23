@@ -196,3 +196,74 @@ BEGIN
       (v_ch1_id, 'Formulir Interaktif & Validasi Input', 'youtube', 'https://www.youtube.com/watch?v=fNcJuPIZ2WE', 'Belajar membuat formulir input, tombol kirim, dropdown, dan tipe data input terkini.', 15, 2);
   END IF;
 END $$;
+
+-- ==============================================================================
+-- 7. TABEL KYZOO SKILL & RESOURCE HUB (resources)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.resources (
+  id SERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  category TEXT NOT NULL DEFAULT 'AI Skills',
+  platform TEXT DEFAULT 'antigravity',
+  description TEXT,
+  sop_instruction TEXT,
+  content_markdown TEXT,
+  external_url TEXT,
+  badge_text TEXT DEFAULT 'Khusus Member',
+  sort_order INTEGER DEFAULT 1,
+  is_active INTEGER DEFAULT 1,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_resources_category ON public.resources(category);
+CREATE INDEX IF NOT EXISTS idx_resources_active ON public.resources(is_active);
+CREATE INDEX IF NOT EXISTS idx_resources_sort ON public.resources(sort_order);
+
+-- Seed Data Awal Resource Hub
+INSERT INTO public.resources (title, category, platform, description, sop_instruction, content_markdown, external_url, badge_text, sort_order)
+VALUES 
+  (
+    'Kyzoo Architect & System Designer SKILL.md',
+    'AI Skills',
+    'antigravity',
+    'Skill AI resmi Kyzoo untuk Google Antigravity IDE. Otomatisasi perancangan arsitektur sistem, PRD generator, dan standardisasi clean code.',
+    '1. Buat folder baru di proyek Anda: .gemini/skills/arsitek/\n2. Buat file SKILL.md di dalam folder tersebut.\n3. Salin dan tempel seluruh isi kode SKILL.md ke file tersebut.\n4. Buka obrolan Antigravity IDE dan ketik /arsitek untuk mengaktifkan persona.',
+    '---\nname: arsitek\ndescription: Universal Product Architect, Lead Engineering Mentor & PRD Generator by Kyzoo.\n---\n\n# KYZOO SYSTEM ARCHITECT (ARSITEK)\nAnda adalah Arsitek Perangkat Lunak Senior dan Mentor Rekayasa Produk Resmi Kyzoo.\n\n## Aturan Utama:\n1. Selalu utamakan Zero-Lag, Clean Code, dan Kesederhanaan Arsitektur.\n2. Berikan instruksi langkah demi langkah yang jelas dan terstruktur dalam Bahasa Indonesia.\n3. Jangan merusak atau menghapus fitur yang sudah berjalan stabil.',
+    'https://github.com/dimaspngstuu/kyzoo_lms',
+    '✦ Official Skill',
+    1
+  ),
+  (
+    'Kyzoo Assistant System Instructions for Gemini Web',
+    'AI Skills',
+    'gemini',
+    'Formula prompt sistem instruksi khusus Gemini Web & Claude untuk mengubah AI menjadi Senior Fullstack Mentor pribadi.',
+    '1. Buka situs Gemini Web (gemini.google.com)\n2. Buka Pengaturan (Settings) > System Instructions atau Custom Instructions.\n3. Tempel seluruh formula prompt yang telah Anda salin.\n4. Simpan dan mulai sesi obrolan baru.',
+    'Bertindaklah sebagai Senior Fullstack Architect dan Mentor Pemrograman Kyzoo.\nBantu saya memecahkan masalah koding, desain antarmuka, dan optimasi database dengan pola pikir clean code, efisiensi tinggi, dan penjelasan santun berbahasa Indonesia.',
+    'https://gemini.google.com',
+    '⚡ AI Prompt',
+    2
+  ),
+  (
+    'Kyzoo Design System & UI Kit Starter',
+    'Starter Code',
+    'github',
+    'Template repositori komponen Tailwind CSS, kartu dashboard interaktif, sistem tema dinamis, dan modal popup siap pakai.',
+    '1. Kunjungi repositori GitHub resmi.\n2. Lakukan Clone atau Download ZIP ke komputer Anda.\n3. Buka di VS Code atau Antigravity IDE dan jalankan npm install.',
+    '// Starter Code Kyzoo UI Kit\n// Komponen Tailwind CSS siap pakai untuk project aplikasi web modern.',
+    'https://github.com/dimaspngstuu/kyzoo_lms',
+    '🎨 UI Kit',
+    3
+  ),
+  (
+    'Google Sheets Otomasi Database Member & Billing',
+    'Google Sheets',
+    'sheets',
+    'Template Google Spreadsheet resmi untuk pembukuan membership, log aktivasi OTP, dan rekap metrik pelanggan.',
+    '1. Buka tautan Google Sheets berikut.\n2. Klik menu File > Buat Salinan (Make a Copy) ke Google Drive Anda sendiri.\n3. Sesuaikan kolom nama member dan status membership Anda.',
+    'Template Google Sheets resmi untuk manajemen membership dan operasional Kyzoo LMS.',
+    'https://docs.google.com/spreadsheets',
+    '📊 Spreadsheet',
+    4
+  )
+ON CONFLICT DO NOTHING;

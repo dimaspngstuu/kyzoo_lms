@@ -18,7 +18,7 @@
         Progress: <span id="courseProgressText" class="text-brand-600 dark:text-brand-400 font-extrabold"><%= courseProgressPercent %>%</span>
       </div>
       <div class="w-24 sm:w-32 bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden p-0.5">
-        <div id="courseProgressBar" class="bg-brand-500 h-full rounded-full transition-all duration-500 shadow-dynamic-glow" style="width: <%= courseProgressPercent %>%"></div>
+        <div id="courseProgressBar" class="bg-brand-500 h-full rounded-full transition-all duration-500 shadow-dynamic-glow" style="<%= 'width: ' + (courseProgressPercent || 0) + '%;' %>"></div>
       </div>
     </div>
   </div>

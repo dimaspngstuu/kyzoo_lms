@@ -63,24 +63,56 @@
           </h1>
         </div>
 
-        <!-- ISI KONTEN TEORI TULISAN UTAMA (Terformat Rapi & Enak Dibaca) -->
-        <div class="prose-container space-y-4 pt-1">
-          <% if (typeof renderedContent !== 'undefined' && renderedContent) { %>
-            <%- renderedContent %>
-          <% } else if (activeLesson.content_text) { %>
-            <p class="text-sm sm:text-base leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-line">
-              <%= activeLesson.content_text %>
-            </p>
-          <% } else { %>
-            <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center text-slate-400 dark:text-slate-500 italic text-sm">
-              Belum ada rangkuman teori tertulis untuk materi ini.
-            </div>
-          <% } %>
-        </div>
+        <!-- 1. SEKSI VIDEO TUTORIAL (OPSIONAL: Tampil di atas jika materi memiliki video) -->
+        <% if (videoPlayerInfo && videoPlayerInfo.type !== 'none') { %>
+          <div class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 border border-brand-100 dark:border-brand-900/60">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
+                </div>
+                <div>
+                  <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <span>Langsung aja ditonton videonya:</span>
+                    <span class="text-[10px] font-bold text-slate-400 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full uppercase tracking-wider">Opsional</span>
+                  </h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Saksikan video di bawah ini untuk melihat demonstrasi dan implementasi praktiknya:
+                  </p>
+                </div>
+              </div>
 
-        <!-- SEKSI LAMPIRAN BERKAS / GAMBAR / SLIDE PPT (OPSIONAL: Tampil jika disematkan) -->
+              <span class="self-start sm:self-auto text-[11px] font-semibold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg">
+                <%= activeLesson.video_source === 'upload' ? 'Video Lokal MP4' : 'Streaming Online' %>
+              </span>
+            </div>
+
+            <!-- Wadah Pemutar Video (Responsive Aspect Ratio 16:9) -->
+            <div class="bg-slate-900 rounded-[22px] overflow-hidden shadow-lg border border-slate-800 relative aspect-video flex items-center justify-center">
+              <% if (videoPlayerInfo.type === 'video') { %>
+                <!-- HTML5 Video Player untuk File yang Diunggah Langsung -->
+                <video id="localLessonVideo" controls class="w-full h-full object-cover rounded-[22px]">
+                  <source src="<%= videoPlayerInfo.embedUrl %>" type="video/mp4">
+                  Peramban Anda tidak mendukung pemutar video HTML5.
+                </video>
+              <% } else if (videoPlayerInfo.type === 'iframe') { %>
+                <!-- Responsive Iframe Player untuk YouTube / Vimeo / Drive -->
+                <iframe 
+                  id="lessonIframePlayer"
+                  src="<%= videoPlayerInfo.embedUrl %>" 
+                  title="<%= activeLesson.title %>" 
+                  class="w-full h-full border-0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                  allowfullscreen>
+                </iframe>
+              <% } %>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- 2. SEKSI LAMPIRAN BERKAS / GAMBAR / SLIDE PPT (OPSIONAL: Tampil jika disematkan) -->
         <% if (activeLesson.attachment_url && activeLesson.attachment_url.trim()) { %>
-          <div class="pt-8 border-t border-slate-100 dark:border-slate-800 space-y-4">
+          <div class="space-y-4 <%= (videoPlayerInfo && videoPlayerInfo.type !== 'none') ? 'pt-6 border-t border-slate-100 dark:border-slate-800' : '' %>">
             
             <% if (activeLesson.attachment_type === 'image') { %>
               <%
@@ -159,52 +191,20 @@
           </div>
         <% } %>
 
-        <!-- SEKSI VIDEO TUTORIAL (OPSIONAL: Hanya tampil jika ada video pada materi ini) -->
-        <% if (videoPlayerInfo && videoPlayerInfo.type !== 'none') { %>
-          <div class="pt-8 border-t border-slate-100 dark:border-slate-800 space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 border border-brand-100 dark:border-brand-900/60">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
-                </div>
-                <div>
-                  <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <span>Langsung aja ditonton videonya:</span>
-                    <span class="text-[10px] font-bold text-slate-400 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full uppercase tracking-wider">Opsional</span>
-                  </h3>
-                  <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Saksikan video di bawah ini untuk melihat demonstrasi dan implementasi praktiknya:
-                  </p>
-                </div>
-              </div>
-
-              <span class="self-start sm:self-auto text-[11px] font-semibold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg">
-                <%= activeLesson.video_source === 'upload' ? 'Video Lokal MP4' : 'Streaming Online' %>
-              </span>
+        <!-- 3. ISI KONTEN TEORI TULISAN UTAMA (Tampil di Bawah Video / Gambar) -->
+        <div class="prose-container space-y-4 <%= ((videoPlayerInfo && videoPlayerInfo.type !== 'none') || (activeLesson.attachment_url && activeLesson.attachment_url.trim())) ? 'pt-6 border-t border-slate-100 dark:border-slate-800' : 'pt-1' %>">
+          <% if (typeof renderedContent !== 'undefined' && renderedContent) { %>
+            <%- renderedContent %>
+          <% } else if (activeLesson.content_text) { %>
+            <p class="text-sm sm:text-base leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-line">
+              <%= activeLesson.content_text %>
+            </p>
+          <% } else { %>
+            <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center text-slate-400 dark:text-slate-500 italic text-sm">
+              Belum ada rangkuman teori tertulis untuk materi ini.
             </div>
-
-            <!-- Wadah Pemutar Video (Responsive Aspect Ratio 16:9) -->
-            <div class="bg-slate-900 rounded-[22px] overflow-hidden shadow-lg border border-slate-800 relative aspect-video flex items-center justify-center">
-              <% if (videoPlayerInfo.type === 'video') { %>
-                <!-- HTML5 Video Player untuk File yang Diunggah Langsung -->
-                <video id="localLessonVideo" controls class="w-full h-full object-cover rounded-[22px]">
-                  <source src="<%= videoPlayerInfo.embedUrl %>" type="video/mp4">
-                  Peramban Anda tidak mendukung pemutar video HTML5.
-                </video>
-              <% } else if (videoPlayerInfo.type === 'iframe') { %>
-                <!-- Responsive Iframe Player untuk YouTube / Vimeo / Drive -->
-                <iframe 
-                  id="lessonIframePlayer"
-                  src="<%= videoPlayerInfo.embedUrl %>" 
-                  title="<%= activeLesson.title %>" 
-                  class="w-full h-full border-0" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                  allowfullscreen>
-                </iframe>
-              <% } %>
-            </div>
-          </div>
-        <% } %>
+          <% } %>
+        </div>
 
         <!-- Tips Penggunaan / Catatan Belajar -->
         <div class="bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60 rounded-2xl p-4 sm:p-5 flex items-start gap-3 mt-6">
@@ -212,7 +212,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           </div>
           <div class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-            <strong class="text-slate-800 dark:text-slate-100 font-bold">Tips Pembelajaran:</strong> Baca materi teori di atas terlebih dahulu untuk memahami konsep dasarnya. Anda dapat menonton video penjelasan praktiknya berulang kali, lalu klik tombol <em>Tandai Selesai</em> di bawah agar progres Anda tercatat di dashboard.
+            <strong class="text-slate-800 dark:text-slate-100 font-bold">Tips Pembelajaran:</strong> Simak materi video atau infografis visual di atas, lalu baca penjelasan teori pendukung di bawahnya. Klik tombol <em>Tandai Selesai</em> di bawah agar progres Anda tercatat di dashboard.
           </div>
         </div>
 

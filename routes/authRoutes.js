@@ -16,31 +16,9 @@ router.get('/login', (req, res) => {
   });
 });
 
-// 1-Click Demo Login (Admin atau Pelanggan)
-router.get('/demo-login/:role', async (req, res) => {
-  try {
-    const role = req.params.role === 'admin' ? 'admin' : 'pelanggan';
-    let user = null;
-    if (role === 'admin') {
-      user = await DB.get('SELECT * FROM users WHERE role = ? AND email = ?', 'admin', 'admin@kyzoo.com');
-    } else {
-      user = await DB.get('SELECT * FROM users WHERE role = ? ORDER BY id ASC LIMIT 1', 'pelanggan');
-    }
-    if (user) {
-      req.session.user = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        avatar: user.avatar
-      };
-      return res.redirect('/dashboard');
-    }
-    res.redirect('/login?error=Akun+demo+tidak+ditemukan');
-  } catch (err) {
-    console.error('Error demo login:', err);
-    res.redirect('/login?error=' + encodeURIComponent(err.message));
-  }
+// 1-Click Demo Login Dinonaktifkan (Keamanan Akun)
+router.get('/demo-login/:role', (req, res) => {
+  res.redirect('/login');
 });
 
 // Proses Login Tradisional

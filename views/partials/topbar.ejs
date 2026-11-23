@@ -41,67 +41,50 @@
 
   <!-- Area Kanan: Theme Customizer & Profil Pengguna -->
   <div class="flex items-center gap-2 sm:gap-3">
-    <!-- 🎨 Interaktif Theme Customizer Dropdown -->
+    <!-- 🎨 Interaktif Theme Customizer Dropdown (Warna Aksen Kyzoo) -->
     <div class="relative" id="themeDropdownContainer">
       <button 
         id="themeDropdownBtn" 
         type="button" 
-        class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-750 transition-all text-xs font-bold shadow-2xs group"
-        title="Sesuaikan Mode Tampilan & Warna Aksen"
+        class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200/80 bg-slate-50/80 text-slate-700 hover:bg-slate-100 transition-all text-xs font-bold shadow-2xs group"
+        title="Sesuaikan Warna Aksen Kyzoo"
       >
-        <!-- Ikon Mode Aktif -->
-        <span id="activeModeIcon" class="text-sm">☀️</span>
         <!-- Dot Warna Aksen Aktif -->
-        <span id="activeAccentDot" class="w-2.5 h-2.5 rounded-full bg-brand-500 ring-2 ring-white dark:ring-slate-800 shadow-2xs"></span>
-        <span class="hidden sm:inline text-[11px] font-semibold text-slate-500 dark:text-slate-400">Tema</span>
-        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <span id="activeAccentDot" class="w-2.5 h-2.5 rounded-full bg-brand-500 ring-2 ring-white shadow-2xs"></span>
+        <span class="hidden sm:inline text-[11px] font-semibold text-slate-500">Warna Aksen</span>
+        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
         </svg>
       </button>
 
-      <!-- Panel Dropdown Pengaturan Tema -->
+      <!-- Panel Dropdown Pengaturan Warna Aksen -->
       <div 
         id="themeDropdownMenu" 
-        class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/90 dark:border-slate-700/90 shadow-2xl p-4 z-50 text-slate-800 dark:text-slate-100 animate-in fade-in zoom-in-95 duration-150"
+        class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl border border-slate-200/90 shadow-2xl p-3.5 z-50 text-slate-800 animate-in fade-in zoom-in-95 duration-150"
       >
-        <!-- 1. Mode Siang / Malam -->
-        <div class="mb-3.5 pb-3 border-b border-slate-100 dark:border-slate-700/70">
-          <div class="text-[10px] font-extrabold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-2">Mode Tampilan</div>
-          <div class="grid grid-cols-2 gap-1.5 bg-slate-100 dark:bg-slate-900/90 p-1 rounded-xl">
-            <button id="setLightModeBtn" type="button" class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
-              <span>☀️</span>
-              <span>Terang</span>
-            </button>
-            <button id="setDarkModeBtn" type="button" class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
-              <span>🌙</span>
-              <span>Gelap</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- 2. Palet Warna Aksen Interaktif -->
+        <!-- Palet Warna Aksen Interaktif -->
         <div>
-          <div class="text-[10px] font-extrabold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-2">Warna Aksen Kyzoo</div>
+          <div class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Warna Aksen Kyzoo</div>
           <div class="grid grid-cols-4 gap-1.5">
             <!-- Violet -->
-            <button type="button" data-accent="violet" class="accent-btn flex flex-col items-center gap-1 p-1.5 rounded-xl border border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all text-center">
+            <button type="button" data-accent="violet" class="accent-btn flex flex-col items-center gap-1 p-1.5 rounded-xl border border-transparent hover:bg-slate-50 transition-all text-center">
               <span class="w-6 h-6 rounded-full bg-[#6c5dd3] shadow-xs flex items-center justify-center text-white text-[10px] font-black">✓</span>
-              <span class="text-[9px] font-bold text-slate-600 dark:text-slate-300">Violet</span>
+              <span class="text-[9px] font-bold text-slate-600">Violet</span>
             </button>
             <!-- Ocean Blue -->
-            <button type="button" data-accent="ocean" class="accent-btn flex flex-col items-center gap-1 p-1.5 rounded-xl border border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all text-center">
+            <button type="button" data-accent="ocean" class="accent-btn flex flex-col items-center gap-1 p-1.5 rounded-xl border border-transparent hover:bg-slate-50 transition-all text-center">
               <span class="w-6 h-6 rounded-full bg-[#0284c7] shadow-xs flex items-center justify-center text-white text-[10px] font-black"></span>
-              <span class="text-[9px] font-bold text-slate-600 dark:text-slate-300">Ocean</span>
+              <span class="text-[9px] font-bold text-slate-600">Ocean</span>
             </button>
             <!-- Mint Emerald -->
-            <button type="button" data-accent="emerald" class="accent-btn flex flex-col items-center gap-1 p-1.5 rounded-xl border border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all text-center">
+            <button type="button" data-accent="emerald" class="accent-btn flex flex-col items-center gap-1 p-1.5 rounded-xl border border-transparent hover:bg-slate-50 transition-all text-center">
               <span class="w-6 h-6 rounded-full bg-[#10b981] shadow-xs flex items-center justify-center text-white text-[10px] font-black"></span>
-              <span class="text-[9px] font-bold text-slate-600 dark:text-slate-300">Mint</span>
+              <span class="text-[9px] font-bold text-slate-600">Mint</span>
             </button>
             <!-- Sunset Coral -->
-            <button type="button" data-accent="coral" class="accent-btn flex flex-col items-center gap-1 p-1.5 rounded-xl border border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all text-center">
+            <button type="button" data-accent="coral" class="accent-btn flex flex-col items-center gap-1 p-1.5 rounded-xl border border-transparent hover:bg-slate-50 transition-all text-center">
               <span class="w-6 h-6 rounded-full bg-[#f97316] shadow-xs flex items-center justify-center text-white text-[10px] font-black"></span>
-              <span class="text-[9px] font-bold text-slate-600 dark:text-slate-300">Coral</span>
+              <span class="text-[9px] font-bold text-slate-600">Coral</span>
             </button>
           </div>
         </div>

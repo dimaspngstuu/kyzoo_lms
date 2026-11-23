@@ -49,15 +49,16 @@ document.addEventListener('DOMContentLoaded', () => {
   initInteractiveThemeSystem();
 });
 
-// Implementasi Sistem Tema Dinamis
+// Implementasi Sistem Tema Dinamis (Warna Aksen Kyzoo)
 function initInteractiveThemeSystem() {
   const dropdownBtn = document.getElementById('themeDropdownBtn');
   const dropdownMenu = document.getElementById('themeDropdownMenu');
-  const activeModeIcon = document.getElementById('activeModeIcon');
   const activeAccentDot = document.getElementById('activeAccentDot');
-  const lightModeBtn = document.getElementById('setLightModeBtn');
-  const darkModeBtn = document.getElementById('setDarkModeBtn');
   const accentBtns = document.querySelectorAll('.accent-btn');
+
+  // Pastikan Mode Gelap Dinonaktifkan Permanen
+  document.documentElement.classList.remove('dark');
+  localStorage.removeItem('kyzoo_theme_mode');
 
   const accentColors = {
     violet: '#6c5dd3',
@@ -87,25 +88,6 @@ function initInteractiveThemeSystem() {
     });
   }
 
-  // Fungsi Penerapan Mode (Light vs Dark)
-  function applyThemeMode(mode, notify = false) {
-    if (mode === 'dark') {
-      document.documentElement.classList.add('dark');
-      if (activeModeIcon) activeModeIcon.textContent = '🌙';
-      if (lightModeBtn) lightModeBtn.className = 'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white';
-      if (darkModeBtn) darkModeBtn.className = 'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-bold transition-all bg-white/10 text-white shadow-xs';
-    } else {
-      document.documentElement.classList.remove('dark');
-      if (activeModeIcon) activeModeIcon.textContent = '☀️';
-      if (lightModeBtn) lightModeBtn.className = 'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-bold transition-all bg-white text-slate-900 shadow-xs';
-      if (darkModeBtn) darkModeBtn.className = 'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-slate-800';
-    }
-    localStorage.setItem('kyzoo_theme_mode', mode);
-    if (notify) {
-      showToast(`Mode tema diubah ke ${mode === 'dark' ? 'Gelap 🌙' : 'Terang ☀️'}`);
-    }
-  }
-
   // Fungsi Penerapan Warna Aksen
   function applyAccentColor(accent, notify = false) {
     document.documentElement.setAttribute('data-accent', accent);
@@ -119,10 +101,10 @@ function initInteractiveThemeSystem() {
       const btnAccent = btn.getAttribute('data-accent');
       const checkIcon = btn.querySelector('span:first-child');
       if (btnAccent === accent) {
-        btn.classList.add('bg-brand-50', 'dark:bg-slate-700', 'border-brand-300', 'dark:border-brand-500');
+        btn.classList.add('bg-brand-50', 'border-brand-300');
         if (checkIcon) checkIcon.textContent = '✓';
       } else {
-        btn.classList.remove('bg-brand-50', 'dark:bg-slate-700', 'border-brand-300', 'dark:border-brand-500');
+        btn.classList.remove('bg-brand-50', 'border-brand-300');
         if (checkIcon) checkIcon.textContent = '';
       }
     });
@@ -130,14 +112,6 @@ function initInteractiveThemeSystem() {
     if (notify) {
       showToast(`Warna aksen diubah ke ${accentNames[accent] || accent}`);
     }
-  }
-
-  // Event Listener Tombol Mode
-  if (lightModeBtn) {
-    lightModeBtn.addEventListener('click', () => applyThemeMode('light', true));
-  }
-  if (darkModeBtn) {
-    darkModeBtn.addEventListener('click', () => applyThemeMode('dark', true));
   }
 
   // Event Listener Tombol Aksen
@@ -149,9 +123,6 @@ function initInteractiveThemeSystem() {
   });
 
   // Sinkronisasi Status Awal dari LocalStorage
-  const currentMode = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-  applyThemeMode(currentMode, false);
-
   const currentAccent = document.documentElement.getAttribute('data-accent') || 'violet';
   applyAccentColor(currentAccent, false);
 }

@@ -17,15 +17,53 @@ router.get('/login', (req, res) => {
 });
 
 // 1-Click Demo Login (Admin atau Pelanggan)
-router.get('/demo-login/:role', (req, res) => {
-  const role = req.params.role === 'admin' ? 'admin' : 'pelanggan';
-  let user = null;
-  if (role === 'admin') {
-    user = DB.get('SELECT * FROM users WHERE role = ? AND email = ?', 'admin', 'admin@kyzoo.com');
-  } else {
-    user = DB.get('SELECT * FROM users WHERE role = ? ORDER BY id ASC LIMIT 1', 'pelanggan');
+router.get('/demo-login/:role', async (req, res) => {
+  try {
+    const role = req.params.role === 'admin' ? 'admin' : 'pelanggan';
+    let user = null;
+    if (role === 'admin') {
+      user = await DB.get('SELECT * FROM users WHERE role = ? AND email = ?', 'admin', 'admin@kyzoo.com');
+    } else {
+      user = await DB.get('SELECT * FROM users WHERE role = ? ORDER BY id ASC LIMIT 1', 'pelanggan');
+    }
+    if (user) {
+      req.session.user = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar
+      };
+      return res.redirect('/dashboard');
+    }
+    res.redirect('/login?error=Akun+demo+tidak+ditemukan');
+  } catch (err) {
+    console.error('Error demo login:', err);
+    res.redirect('/login?error=' + encodeURIComponent(err.message));
   }
-  if (user) {
+});
+
+// Proses Login Tradisional
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.render('login', {
+        title: 'Masuk - Kyzoo LMS',
+        error: 'Harap isi email dan password.',
+        success: null
+      });
+    }
+
+    const user = await DB.get('SELECT * FROM users WHERE email = ?', email.trim().toLowerCase());
+    if (!user || user.password !== password.trim()) {
+      return res.render('login', {
+        title: 'Masuk - Kyzoo LMS',
+        error: 'Email atau password salah. Silakan coba kembali atau gunakan tombol Demo.',
+        success: null
+      });
+    }
+
     req.session.user = {
       id: user.id,
       name: user.name,
@@ -33,46 +71,27 @@ router.get('/demo-login/:role', (req, res) => {
       role: user.role,
       avatar: user.avatar
     };
-    return res.redirect('/dashboard');
-  }
-  res.redirect('/login?error=Akun+demo+tidak+ditemukan');
-});
-
-// Proses Login Tradisional
-router.post('/login', (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.render('login', {
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error('Error login:', err);
+    res.render('login', {
       title: 'Masuk - Kyzoo LMS',
-      error: 'Harap isi email dan password.',
+      error: 'Terjadi kesalahan sistem: ' + err.message,
       success: null
     });
   }
-
-  const user = DB.get('SELECT * FROM users WHERE email = ?', email.trim().toLowerCase());
-  if (!user || user.password !== password.trim()) {
-    return res.render('login', {
-      title: 'Masuk - Kyzoo LMS',
-      error: 'Email atau password salah. Silakan coba kembali atau gunakan tombol Demo.',
-      success: null
-    });
-  }
-
-  req.session.user = {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    avatar: user.avatar
-  };
-  res.redirect('/dashboard');
 });
 
 // Logout
 router.get('/logout', (req, res) => {
-  req.session.destroy(() => {
+  if (req.session && req.session.destroy) {
+    req.session.destroy(() => {
+      res.redirect('/login?success=Anda+berhasil+keluar');
+    });
+  } else {
+    req.session = null;
     res.redirect('/login?success=Anda+berhasil+keluar');
-  });
+  }
 });
 
 // ==============================================================
@@ -88,9 +107,9 @@ router.post('/send-otp', async (req, res) => {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const user = DB.get('SELECT * FROM users WHERE email = ?', cleanEmail);
+    const user = await DB.get('SELECT * FROM users WHERE email = ?', cleanEmail);
     if (!user) {
-      return res.redirect('/login?tab=otp&error=' + encodeURIComponent('Email belum terdaftar di Kyzoo LMS. Silakan buat akun terlebih dahulu.'));
+      return res.redirect('/login?tab=otp&error=' + encodeURIComponent('Email belum terdaftar di Kyzoo LMS. Silakan hubungi Admin untuk aktivasi membership.'));
     }
 
     // Generate 6 digit angka OTP acak
@@ -98,10 +117,10 @@ router.post('/send-otp', async (req, res) => {
     const expiresAt = Date.now() + 10 * 60 * 1000; // Berlaku 10 menit
 
     // Nonaktifkan kode OTP lama untuk email ini
-    DB.run('UPDATE email_otps SET is_used = 1 WHERE email = ?', cleanEmail);
+    await DB.run('UPDATE email_otps SET is_used = 1 WHERE email = ?', cleanEmail);
 
     // Simpan kode OTP baru ke database
-    DB.run(
+    await DB.run(
       'INSERT INTO email_otps (email, code, expires_at) VALUES (?, ?, ?)',
       cleanEmail, otpCode, expiresAt
     );
@@ -112,7 +131,7 @@ router.post('/send-otp', async (req, res) => {
     if (sendResult.mode === 'smtp') {
       res.redirect(`/verify-otp?email=${encodeURIComponent(cleanEmail)}&sent=true`);
     } else {
-      // Mode simulasi lokal (langsung sertakan kode untuk kemudahan uji coba cepat)
+      // Mode simulasi lokal
       res.redirect(`/verify-otp?email=${encodeURIComponent(cleanEmail)}&simulated=${otpCode}`);
     }
   } catch (err) {
@@ -139,7 +158,7 @@ router.get('/verify-otp', (req, res) => {
 });
 
 // 3. Proses Verifikasi Kode OTP & Auto Login
-router.post('/verify-otp', (req, res) => {
+router.post('/verify-otp', async (req, res) => {
   try {
     const { email, otp_code } = req.body;
     if (!email || !otp_code) {
@@ -150,7 +169,7 @@ router.post('/verify-otp', (req, res) => {
     const cleanCode = otp_code.trim().replace(/\s+/g, '');
 
     // Cari kode OTP aktif di basis data
-    const record = DB.get(
+    const record = await DB.get(
       'SELECT * FROM email_otps WHERE email = ? AND code = ? AND is_used = 0 ORDER BY id DESC LIMIT 1',
       cleanEmail, cleanCode
     );
@@ -160,15 +179,15 @@ router.post('/verify-otp', (req, res) => {
     }
 
     // Cek kedaluwarsa waktu
-    if (Date.now() > record.expires_at) {
+    if (Date.now() > Number(record.expires_at)) {
       return res.redirect(`/verify-otp?email=${encodeURIComponent(cleanEmail)}&error=` + encodeURIComponent('Kode OTP telah kedaluwarsa. Silakan minta kode baru.'));
     }
 
     // Tandai OTP telah digunakan
-    DB.run('UPDATE email_otps SET is_used = 1 WHERE id = ?', record.id);
+    await DB.run('UPDATE email_otps SET is_used = 1 WHERE id = ?', record.id);
 
     // Ambil data user dan set session login
-    const user = DB.get('SELECT * FROM users WHERE email = ?', cleanEmail);
+    const user = await DB.get('SELECT * FROM users WHERE email = ?', cleanEmail);
     if (!user) {
       return res.redirect('/login?error=' + encodeURIComponent('Pengguna tidak ditemukan.'));
     }

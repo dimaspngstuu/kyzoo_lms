@@ -1,126 +1,140 @@
-const { DatabaseSync } = require('node:sqlite');
+require('dotenv').config();
+const { Pool } = require('pg');
 const path = require('path');
 const fs = require('fs');
 
-const dataDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+let isPostgres = false;
+let pool = null;
+let sqliteDb = null;
+
+// Helper: Konversi penanda parameter SQLite '?' ke format PostgreSQL '$1, $2, $3...'
+function toPgSql(sql) {
+  let index = 1;
+  return sql.replace(/\?/g, () => `$${index++}`);
 }
 
-const dbPath = path.join(dataDir, 'kyzoo.db');
-const db = new DatabaseSync(dbPath);
+const databaseUrl = process.env.DATABASE_URL;
 
-// Enable WAL mode and foreign keys for high reliability & speed
-db.exec('PRAGMA journal_mode = WAL;');
-db.exec('PRAGMA foreign_keys = ON;');
-
-// Initialize Tables
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'pelanggan',
-    avatar TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-
-  CREATE TABLE IF NOT EXISTS courses (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    code TEXT UNIQUE NOT NULL,
-    title TEXT NOT NULL,
-    slug TEXT UNIQUE NOT NULL,
-    category TEXT NOT NULL,
-    description TEXT,
-    thumbnail TEXT,
-    is_active INTEGER DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-
-  CREATE TABLE IF NOT EXISTS chapters (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    course_id INTEGER NOT NULL,
-    title TEXT NOT NULL,
-    sort_order INTEGER DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
-  );
-
-  CREATE TABLE IF NOT EXISTS lessons (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    chapter_id INTEGER NOT NULL,
-    title TEXT NOT NULL,
-    video_source TEXT NOT NULL DEFAULT 'youtube',
-    video_url TEXT,
-    content_text TEXT,
-    duration_minutes INTEGER DEFAULT 10,
-    sort_order INTEGER DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (chapter_id) REFERENCES chapters(id) ON DELETE CASCADE
-  );
-
-  CREATE TABLE IF NOT EXISTS user_progress (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    lesson_id INTEGER NOT NULL,
-    is_completed INTEGER DEFAULT 1,
-    completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(user_id, lesson_id),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE
-  );
-
-  CREATE TABLE IF NOT EXISTS email_otps (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT NOT NULL,
-    code TEXT NOT NULL,
-    expires_at INTEGER NOT NULL,
-    is_used INTEGER DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-`);
-
-// Database Helper Wrappers
-const DB = {
-  raw: db,
-  get(sql, ...params) {
-    const stmt = db.prepare(sql);
-    return stmt.get(...params);
-  },
-  all(sql, ...params) {
-    const stmt = db.prepare(sql);
-    return stmt.all(...params);
-  },
-  run(sql, ...params) {
-    const stmt = db.prepare(sql);
-    return stmt.run(...params);
+if (databaseUrl && (databaseUrl.startsWith('postgres://') || databaseUrl.startsWith('postgresql://'))) {
+  try {
+    pool = new Pool({
+      connectionString: databaseUrl,
+      ssl: {
+        rejectUnauthorized: false
+      },
+      max: 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000
+    });
+    isPostgres = true;
+    console.log('[DB] Mode Aktif: Terhubung ke Supabase PostgreSQL Cloud Database.');
+  } catch (err) {
+    console.error('[DB] Gagal menginisialisasi PostgreSQL Pool:', err.message);
   }
-};
+}
 
-// Seed Default Data if empty
-function seedDatabase() {
-  const userCount = DB.get('SELECT COUNT(*) as count FROM users');
+if (!isPostgres) {
+  try {
+    const { DatabaseSync } = require('node:sqlite');
+    const dataDir = path.join(__dirname, 'data');
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+
+    const dbPath = path.join(dataDir, 'kyzoo.db');
+    sqliteDb = new DatabaseSync(dbPath);
+
+    sqliteDb.exec('PRAGMA journal_mode = WAL;');
+    sqliteDb.exec('PRAGMA foreign_keys = ON;');
+
+    initSqliteSchema(sqliteDb);
+    console.log('[DB] Mode Fallback: Menggunakan basis data lokal SQLite (kyzoo.db).');
+  } catch (sqliteErr) {
+    console.warn('[DB] SQLite tidak tersedia di environment ini:', sqliteErr.message);
+  }
+}
+
+function initSqliteSchema(db) {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'pelanggan',
+      avatar TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS courses (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      code TEXT UNIQUE NOT NULL,
+      title TEXT NOT NULL,
+      slug TEXT UNIQUE NOT NULL,
+      category TEXT NOT NULL,
+      description TEXT,
+      thumbnail TEXT,
+      is_active INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS chapters (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      course_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      sort_order INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS lessons (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      chapter_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      video_source TEXT NOT NULL DEFAULT 'youtube',
+      video_url TEXT,
+      content_text TEXT,
+      duration_minutes INTEGER DEFAULT 10,
+      sort_order INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (chapter_id) REFERENCES chapters(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS user_progress (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      lesson_id INTEGER NOT NULL,
+      is_completed INTEGER DEFAULT 1,
+      completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, lesson_id),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS email_otps (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT NOT NULL,
+      code TEXT NOT NULL,
+      expires_at INTEGER NOT NULL,
+      is_used INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // Seed default data if empty
+  const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
   if (userCount.count === 0) {
-    console.log('[DB] Seeding default users...');
-    // Seed Admin & Pelanggan
-    DB.run(`
+    db.prepare(`
       INSERT INTO users (name, email, password, role, avatar)
       VALUES 
         ('Admin Kyzoo', 'admin@kyzoo.com', 'admin123', 'admin', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'),
         ('Dimas Pangestu', 'user@kyzoo.com', 'user123', 'pelanggan', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80')
-    `);
-  } else {
-    // Update existing pelanggan name to Dimas Pangestu
-    DB.run("UPDATE users SET name = 'Dimas Pangestu' WHERE role = 'pelanggan'");
+    `).run();
   }
 
-  const courseCount = DB.get('SELECT COUNT(*) as count FROM courses');
+  const courseCount = db.prepare('SELECT COUNT(*) as count FROM courses').get();
   if (courseCount.count === 0) {
-    console.log('[DB] Seeding default courses and lessons...');
-
-    // Course 1 (Main reference match: Web Design: From Figma to Web)
-    const c1 = DB.run(`
+    const c1 = db.prepare(`
       INSERT INTO courses (code, title, slug, category, description, thumbnail)
       VALUES (
         'CRS-202611-001',
@@ -130,86 +144,82 @@ function seedDatabase() {
         'Panduan lengkap merancang antarmuka profesional di Figma dan mengubahnya menjadi kode web responsif siap pakai.',
         'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80'
       )
-    `);
+    `).run();
     const c1Id = c1.lastInsertRowid;
 
-    // Chapters for Course 1
-    const ch1 = DB.run(`INSERT INTO chapters (course_id, title, sort_order) VALUES (?, 'Bab 1: Konsep & Persiapan Desain', 1)`, c1Id);
-    const ch2 = DB.run(`INSERT INTO chapters (course_id, title, sort_order) VALUES (?, 'Bab 2: Desain Komponen & Sistem Warna', 2)`, c1Id);
-    const ch3 = DB.run(`INSERT INTO chapters (course_id, title, sort_order) VALUES (?, 'Bab 3: Implementasi Layout & Responsif', 3)`, c1Id);
+    const ch1 = db.prepare(`INSERT INTO chapters (course_id, title, sort_order) VALUES (?, 'Bab 1: Konsep & Persiapan Desain', 1)`).run(c1Id);
+    const ch2 = db.prepare(`INSERT INTO chapters (course_id, title, sort_order) VALUES (?, 'Bab 2: Desain Komponen & Sistem Warna', 2)`).run(c1Id);
+    const ch3 = db.prepare(`INSERT INTO chapters (course_id, title, sort_order) VALUES (?, 'Bab 3: Implementasi Layout & Responsif', 3)`).run(c1Id);
 
-    // Lessons for Chapter 1
-    DB.run(`
+    db.prepare(`
       INSERT INTO lessons (chapter_id, title, video_source, video_url, content_text, duration_minutes, sort_order)
       VALUES 
         (?, 'Pengenalan Workspace & Navigasi Alat', 'youtube', 'https://www.youtube.com/watch?v=jwPkfa858tc', 'Di materi awal ini, kita mempelajari tata letak lembar kerja, panel layer, serta pengaturan frame dasar untuk memulai proyek desain dengan rapi.', 12, 1),
         (?, 'Menyiapkan Grid System & Tipografi', 'youtube', 'https://www.youtube.com/watch?v=FTFaQWZBqQ8', 'Panduan menentukan 12-column grid layout, skala tipografi modular, dan font pairing agar teks nyaman dibaca di layar HP maupun laptop.', 15, 2)
-    `, ch1.lastInsertRowid, ch1.lastInsertRowid);
+    `).run(ch1.lastInsertRowid, ch1.lastInsertRowid);
 
-    // Lessons for Chapter 2
-    DB.run(`
+    db.prepare(`
       INSERT INTO lessons (chapter_id, title, video_source, video_url, content_text, duration_minutes, sort_order)
       VALUES 
         (?, 'Membuat Komponen Navbar & Tombol Interaktif', 'youtube', 'https://www.youtube.com/watch?v=F_f82GkKqE8', 'Teknik pembuatan komponen reusable dengan auto-layout, varian hover state, dan token warna konsisten.', 18, 1),
         (?, 'Merancang Kartu Metrik Dashboard Pastel', 'youtube', 'https://www.youtube.com/watch?v=1rP_858tc98', 'Tutorial membuat kartu ringkasan status dengan warna pastel yang lembut, ikon vektor tajam, dan indikator persentase bulat.', 14, 2)
-    `, ch2.lastInsertRowid, ch2.lastInsertRowid);
+    `).run(ch2.lastInsertRowid, ch2.lastInsertRowid);
 
-    // Lessons for Chapter 3
-    DB.run(`
+    db.prepare(`
       INSERT INTO lessons (chapter_id, title, video_source, video_url, content_text, duration_minutes, sort_order)
       VALUES 
         (?, 'Layouting 3-Kolom Anti-AI & Spasi Bersih', 'youtube', 'https://www.youtube.com/watch?v=7uK06h_R98k', 'Menerapkan hierarki visual buatan desainer manusia: spasi lapang, sudut membulat modern, dan sidebar ergonomis.', 20, 1)
-    `, ch3.lastInsertRowid);
-
-    // Course 2 (Html Basics)
-    const c2 = DB.run(`
-      INSERT INTO courses (code, title, slug, category, description, thumbnail)
-      VALUES (
-        'CRS-202611-002',
-        'Html Basics & Struktur Semantik',
-        'html-basics',
-        'Frontend Fundamental',
-        'Kuasai pondasi web modern menggunakan tag semantik HTML5 yang ramah SEO dan mudah dipahami mesin pencari.',
-        'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80'
-      )
-    `);
-    const c2Id = c2.lastInsertRowid;
-    const ch2_1 = DB.run(`INSERT INTO chapters (course_id, title, sort_order) VALUES (?, 'Bab 1: Tag Esensial HTML5', 1)`, c2Id);
-    DB.run(`
-      INSERT INTO lessons (chapter_id, title, video_source, video_url, content_text, duration_minutes, sort_order)
-      VALUES 
-        (?, 'Struktur Dasar Dokumen HTML5', 'youtube', 'https://www.youtube.com/watch?v=MDLn5-zSQQI', 'Memahami tag <!DOCTYPE html>, <html>, <head>, dan <body> serta cara kerja peramban membaca berkas.', 10, 1),
-        (?, 'Formulir Interaktif & Validasi Input', 'youtube', 'https://www.youtube.com/watch?v=fNcJuPIZ2WE', 'Belajar membuat formulir input, tombol kirim, dropdown, dan tipe data input terkini.', 15, 2)
-    `, ch2_1.lastInsertRowid, ch2_1.lastInsertRowid);
-
-    // Course 3 (Data with Python)
-    const c3 = DB.run(`
-      INSERT INTO courses (code, title, slug, category, description, thumbnail)
-      VALUES (
-        'CRS-202611-003',
-        'Data with Python & Visualisasi',
-        'data-with-python',
-        'Data & Analytics',
-        'Tutorial praktis menganalisis data spreadsheet, filtering, dan visualisasi grafik interaktif menggunakan Python.',
-        'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80'
-      )
-    `);
-    const c3Id = c3.lastInsertRowid;
-    const ch3_1 = DB.run(`INSERT INTO chapters (course_id, title, sort_order) VALUES (?, 'Bab 1: Pengolahan Dataset', 1)`, c3Id);
-    DB.run(`
-      INSERT INTO lessons (chapter_id, title, video_source, video_url, content_text, duration_minutes, sort_order)
-      VALUES 
-        (?, 'Membaca Berkas CSV & Pembersihan Data', 'youtube', 'https://www.youtube.com/watch?v=vmEHCJofslg', 'Langkah awal membaca data eksternal, membersihkan nilai kosong (null), dan mengubah tipe data kolom.', 18, 1)
-    `, ch3_1.lastInsertRowid);
-
-    // Seed progress for pelanggan on Course 1 first lessons
-    const firstTwoLessons = DB.all('SELECT id FROM lessons ORDER BY id ASC LIMIT 2');
-    for (const fl of firstTwoLessons) {
-      DB.run('INSERT OR IGNORE INTO user_progress (user_id, lesson_id, is_completed) VALUES (2, ?, 1)', fl.id);
-    }
+    `).run(ch3.lastInsertRowid);
   }
 }
 
-seedDatabase();
+// Database Helper Wrappers (Mendukung async/await untuk PostgreSQL & SQLite)
+const DB = {
+  isPostgres,
+  raw: isPostgres ? pool : sqliteDb,
+
+  async get(sql, ...params) {
+    if (this.isPostgres) {
+      const pgSql = toPgSql(sql);
+      const res = await pool.query(pgSql, params);
+      return res.rows[0] || null;
+    } else {
+      if (!sqliteDb) throw new Error('Database tidak terhubung');
+      const stmt = sqliteDb.prepare(sql);
+      return stmt.get(...params) || null;
+    }
+  },
+
+  async all(sql, ...params) {
+    if (this.isPostgres) {
+      const pgSql = toPgSql(sql);
+      const res = await pool.query(pgSql, params);
+      return res.rows;
+    } else {
+      if (!sqliteDb) throw new Error('Database tidak terhubung');
+      const stmt = sqliteDb.prepare(sql);
+      return stmt.all(...params);
+    }
+  },
+
+  async run(sql, ...params) {
+    if (this.isPostgres) {
+      let pgSql = toPgSql(sql);
+      const isInsert = /^\s*INSERT\s+INTO/i.test(sql);
+      if (isInsert && !/RETURNING/i.test(sql)) {
+        pgSql += ' RETURNING id';
+      }
+      const res = await pool.query(pgSql, params);
+      return {
+        changes: res.rowCount,
+        lastInsertRowid: res.rows && res.rows[0] ? res.rows[0].id : null
+      };
+    } else {
+      if (!sqliteDb) throw new Error('Database tidak terhubung');
+      const stmt = sqliteDb.prepare(sql);
+      return stmt.run(...params);
+    }
+  }
+};
 
 module.exports = DB;

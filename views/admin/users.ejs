@@ -221,7 +221,7 @@
                     <!-- Tombol Edit -->
                     <button 
                       type="button"
-                      onclick="openEditUserModal('<%= u.id %>', '<%= encodeURIComponent(u.name) %>', '<%= u.email %>', '<%= u.role %>')"
+                      onclick="openEditUserModal('<%= u.id %>', '<%= encodeURIComponent(u.name) %>', '<%= u.email %>', '<%= u.role %>', '<%= encodeURIComponent(u.avatar || '') %>')"
                       class="p-2 rounded-xl text-slate-500 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-slate-800 transition-colors"
                       title="Edit Data Anggota"
                     >
@@ -276,7 +276,26 @@
       <button type="button" onclick="closeAddUserModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg">✕</button>
     </div>
 
-    <form action="/admin/users" method="POST" class="space-y-4">
+    <form action="/admin/users" method="POST" enctype="multipart/form-data" class="space-y-4">
+      <!-- Foto Profil / Avatar (Opsional) -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Foto Profil / Avatar <span class="text-slate-400 font-normal">(Opsional)</span></label>
+        <div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+          <img id="addUserAvatarPreview" src="https://api.dicebear.com/7.x/bottts/svg?seed=new" alt="Preview" class="w-12 h-12 rounded-xl object-cover ring-2 ring-brand-500/30 border border-slate-200 dark:border-slate-700 shrink-0">
+          <div class="flex-1 min-w-0">
+            <input 
+              type="file" 
+              name="avatar_file" 
+              id="addUserAvatarInput"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onchange="previewAddUserAvatar(this)"
+              class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-2.5 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brand-50 dark:file:bg-brand-950/50 file:text-brand-600 dark:file:text-brand-400 hover:file:bg-brand-100 cursor-pointer"
+            />
+            <p class="text-[10px] text-slate-400 mt-1">Format: JPG, PNG, WEBP, GIF (Maks. 8MB). Jika kosong, avatar default akan dibuat otomatis.</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Nama Lengkap -->
       <div>
         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Nama Lengkap <span class="text-rose-500">*</span></label>
@@ -379,7 +398,26 @@
       <button type="button" onclick="closeEditUserModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg">✕</button>
     </div>
 
-    <form id="editUserForm" method="POST" class="space-y-4">
+    <form id="editUserForm" method="POST" enctype="multipart/form-data" class="space-y-4">
+      <!-- Foto Profil / Avatar -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Foto Profil / Avatar</label>
+        <div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+          <img id="editUserAvatarPreview" src="https://api.dicebear.com/7.x/bottts/svg?seed=preview" alt="Avatar" class="w-12 h-12 rounded-xl object-cover ring-2 ring-brand-500/30 border border-slate-200 dark:border-slate-700 shrink-0">
+          <div class="flex-1 min-w-0">
+            <input 
+              type="file" 
+              name="avatar_file" 
+              id="editUserAvatarInput"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onchange="previewEditUserAvatar(this)"
+              class="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-2.5 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brand-50 dark:file:bg-brand-950/50 file:text-brand-600 dark:file:text-brand-400 hover:file:bg-brand-100 cursor-pointer"
+            />
+            <p class="text-[10px] text-slate-400 mt-1">Pilih foto baru untuk mengganti avatar anggota ini (JPG, PNG, WEBP, GIF, Maks. 8MB).</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Nama Lengkap -->
       <div>
         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Nama Lengkap <span class="text-rose-500">*</span></label>
@@ -518,8 +556,33 @@
     }
   }
 
+  // Preview Avatar Tambah Anggota
+  function previewAddUserAvatar(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('addUserAvatarPreview').src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // Preview Avatar Edit Anggota
+  function previewEditUserAvatar(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('editUserAvatarPreview').src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
   // Modal Tambah Anggota
   function openAddUserModal() {
+    const input = document.getElementById('addUserAvatarInput');
+    if (input) input.value = '';
+    document.getElementById('addUserAvatarPreview').src = 'https://api.dicebear.com/7.x/bottts/svg?seed=new';
     document.getElementById('addUserModal').classList.remove('hidden');
   }
   function closeAddUserModal() {
@@ -527,12 +590,16 @@
   }
 
   // Modal Edit Anggota
-  function openEditUserModal(id, rawName, email, role) {
+  function openEditUserModal(id, rawName, email, role, rawAvatar) {
     const name = decodeURIComponent(rawName);
+    const avatar = rawAvatar ? decodeURIComponent(rawAvatar) : ('https://api.dicebear.com/7.x/bottts/svg?seed=' + encodeURIComponent(name));
     document.getElementById('editUserForm').action = `/admin/users/${id}/edit`;
     document.getElementById('editUserName').value = name;
     document.getElementById('editUserEmail').value = email;
     document.getElementById('editPasswordInput').value = '';
+    document.getElementById('editUserAvatarPreview').src = avatar;
+    const input = document.getElementById('editUserAvatarInput');
+    if (input) input.value = '';
 
     if (role === 'admin') {
       document.getElementById('editRoleAdmin').checked = true;

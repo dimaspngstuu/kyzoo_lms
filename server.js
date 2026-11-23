@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
-const session = require('express-session');
+const compression = require('compression');
+const cookieSession = require('cookie-session');
 const path = require('path');
 const fs = require('fs');
 const DB = require('./db');
@@ -9,31 +10,52 @@ const { setUserLocals } = require('./middleware/auth');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Setup Direktori Public & Uploads
+// Security & Performance: Disable X-Powered-By & Enable Gzip Compression
+app.disable('x-powered-by');
+app.use(compression());
+
+// Setup Direktori Public & Uploads (Hanya jika filesystem writeable)
 const publicDir = path.join(__dirname, 'public');
-const uploadVideosDir = path.join(__dirname, 'public/uploads/videos');
-const uploadThumbnailsDir = path.join(__dirname, 'public/uploads/thumbnails');
-if (!fs.existsSync(uploadVideosDir)) fs.mkdirSync(uploadVideosDir, { recursive: true });
-if (!fs.existsSync(uploadThumbnailsDir)) fs.mkdirSync(uploadThumbnailsDir, { recursive: true });
+try {
+  const uploadVideosDir = path.join(__dirname, 'public/uploads/videos');
+  const uploadThumbnailsDir = path.join(__dirname, 'public/uploads/thumbnails');
+  const uploadAvatarsDir = path.join(__dirname, 'public/uploads/avatars');
+  if (!fs.existsSync(uploadVideosDir)) fs.mkdirSync(uploadVideosDir, { recursive: true });
+  if (!fs.existsSync(uploadThumbnailsDir)) fs.mkdirSync(uploadThumbnailsDir, { recursive: true });
+  if (!fs.existsSync(uploadAvatarsDir)) fs.mkdirSync(uploadAvatarsDir, { recursive: true });
+} catch (e) {
+  // Ignored on read-only environments like Vercel Serverless
+}
 
 // Setup View Engine (EJS)
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// Body Parser & Static Assets
+// Body Parser & Static Assets (dengan browser HTTP caching untuk kecepatan maksimal)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(publicDir));
-
-// Express Session
-app.use(session({
-  secret: 'kyzoo-lms-secure-key-2026',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24 * 7 // 7 hari
-  }
+app.use(express.static(publicDir, {
+  maxAge: '1d',
+  etag: true
 }));
+
+// Cookie Session (Serverless-Friendly untuk Vercel & Multi-Instance)
+app.use(cookieSession({
+  name: 'kyzoo_session',
+  keys: [process.env.SESSION_SECRET || 'kyzoo-lms-secure-key-2026'],
+  maxAge: 1000 * 60 * 60 * 24 * 7 // 7 hari
+}));
+
+// Polyfill req.session.destroy untuk kompatibilitas cookie-session
+app.use((req, res, next) => {
+  if (req.session && !req.session.destroy) {
+    req.session.destroy = function (cb) {
+      req.session = null;
+      if (typeof cb === 'function') cb();
+    };
+  }
+  next();
+});
 
 // Set User Locals Middleware (untuk akses session user di EJS)
 app.use(setUserLocals);

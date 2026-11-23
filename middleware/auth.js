@@ -1,6 +1,7 @@
 module.exports = {
   requireAuth(req, res, next) {
     if (!req.session || !req.session.user) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
       return res.redirect('/login');
     }
     next();
@@ -8,6 +9,7 @@ module.exports = {
 
   requireAdmin(req, res, next) {
     if (!req.session || !req.session.user) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
       return res.redirect('/login');
     }
     if (req.session.user.role !== 'admin') {

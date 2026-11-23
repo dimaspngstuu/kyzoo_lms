@@ -95,6 +95,7 @@ const adminRoutes = require('./routes/adminRoutes');
 
 // Root Route Redirect
 app.get('/', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   if (req.session && req.session.user) {
     return res.redirect('/dashboard');
   }

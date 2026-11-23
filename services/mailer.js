@@ -3,20 +3,27 @@ const nodemailer = require('nodemailer');
 const path = require('path');
 const fs = require('fs');
 
+let cachedTransporter = null;
+
 // Deteksi apakah kredensial SMTP telah dikonfigurasi di Environment
 function isSmtpConfigured() {
   return Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
 }
 
-// Buat transporter jika kredensial SMTP tersedia
+// Buat transporter jika kredensial SMTP tersedia (dengan Connection Pooling & Keep-Alive)
 function getTransporter() {
   if (!isSmtpConfigured()) return null;
+  if (cachedTransporter) return cachedTransporter;
 
   const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-  // Optimasi otomatis untuk Gmail
-  if (host.includes('gmail.com')) {
-    return nodemailer.createTransport({
+  const isGmail = host.includes('gmail.com');
+
+  const config = isGmail
+    ? {
       service: 'gmail',
+      pool: true,
+      maxConnections: 3,
+      maxMessages: 100,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
@@ -24,21 +31,25 @@ function getTransporter() {
       tls: {
         rejectUnauthorized: false
       }
-    });
-  }
-
-  return nodemailer.createTransport({
-    host: host,
-    port: parseInt(process.env.SMTP_PORT, 10) || 587,
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    },
-    tls: {
-      rejectUnauthorized: false
     }
-  });
+    : {
+      host: host,
+      port: parseInt(process.env.SMTP_PORT, 10) || 587,
+      secure: process.env.SMTP_SECURE === 'true',
+      pool: true,
+      maxConnections: 3,
+      maxMessages: 100,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
+    };
+
+  cachedTransporter = nodemailer.createTransport(config);
+  return cachedTransporter;
 }
 
 // Fungsi Utama: Mengirimkan Kode OTP ke Email Terdaftar

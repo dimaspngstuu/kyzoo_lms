@@ -230,6 +230,18 @@
         tabOtp.className = "flex-1 py-2.5 rounded-xl transition-all text-center text-slate-500 hover:text-slate-800";
       }
     }
+
+    // Instant Zero-Lag UX: Indikator Loading Cepat saat Submit
+    document.querySelectorAll('form').forEach(f => {
+      f.addEventListener('submit', function() {
+        const btn = this.querySelector('button[type="submit"]');
+        if (btn && !btn.disabled) {
+          btn.disabled = true;
+          btn.classList.add('opacity-80', 'cursor-not-allowed');
+          btn.innerHTML = '<span class="inline-block animate-spin mr-2">⏳</span> Sedang Memproses...';
+        }
+      });
+    });
   </script>
 
 </body>

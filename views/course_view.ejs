@@ -78,6 +78,81 @@
           <% } %>
         </div>
 
+        <!-- SEKSI LAMPIRAN BERKAS / GAMBAR / SLIDE PPT (OPSIONAL: Tampil jika disematkan) -->
+        <% if (activeLesson.attachment_url && activeLesson.attachment_url.trim()) { %>
+          <div class="pt-8 border-t border-slate-100 dark:border-slate-800 space-y-4">
+            
+            <% if (activeLesson.attachment_type === 'image') { %>
+              <!-- Lampiran Gambar / Diagram Infografis -->
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200/80">
+                      <span>🖼️</span>
+                    </div>
+                    <div>
+                      <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                        <%= activeLesson.attachment_name || 'Gambar & Diagram Materi' %>
+                      </h3>
+                      <p class="text-[11px] text-slate-400">Infografis & diagram visual pelengkap pembelajaran</p>
+                    </div>
+                  </div>
+                  <a 
+                    href="<%= activeLesson.attachment_url %>" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all">
+                    <span>Buka Resolusi Penuh</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                  </a>
+                </div>
+                <div class="rounded-2xl overflow-hidden border border-slate-200/80 bg-slate-50 p-2 sm:p-3 text-center">
+                  <img 
+                    src="<%= activeLesson.attachment_url %>" 
+                    alt="<%= activeLesson.attachment_name || 'Gambar Materi' %>" 
+                    class="max-h-[520px] w-auto mx-auto rounded-xl object-contain shadow-xs" 
+                    loading="lazy" 
+                  />
+                </div>
+              </div>
+
+            <% } else { %>
+              <!-- Lampiran Slide Presentasi PPT / PDF / Dokumen -->
+              <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-50/70 via-orange-50/40 to-amber-50/30 border border-amber-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-xl shrink-0 shadow-sm shadow-amber-200">
+                    <%= activeLesson.attachment_type === 'ppt' ? '📊' : (activeLesson.attachment_type === 'pdf' ? '📑' : '📎') %>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wider">
+                        <%= activeLesson.attachment_type === 'ppt' ? 'Slide Presentasi PPT' : (activeLesson.attachment_type === 'pdf' ? 'Dokumen PDF' : 'Berkas Lampiran') %>
+                      </span>
+                      <span class="text-[10px] font-semibold text-slate-400">Materi Tambahan</span>
+                    </div>
+                    <h4 class="text-sm sm:text-base font-bold text-slate-900 mt-1">
+                      <%= activeLesson.attachment_name || 'Slide Materi Pembelajaran' %>
+                    </h4>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                      Buka atau unduh file materi ini untuk menyimak rangkuman poin secara terstruktur.
+                    </p>
+                  </div>
+                </div>
+
+                <a 
+                  href="<%= activeLesson.attachment_url %>" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  class="shrink-0 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all hover:scale-[1.02]">
+                  <span>Unduh / Buka Berkas</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                </a>
+              </div>
+            <% } %>
+
+          </div>
+        <% } %>
+
         <!-- SEKSI VIDEO TUTORIAL (OPSIONAL: Hanya tampil jika ada video pada materi ini) -->
         <% if (videoPlayerInfo && videoPlayerInfo.type !== 'none') { %>
           <div class="pt-8 border-t border-slate-100 dark:border-slate-800 space-y-4">
@@ -206,7 +281,14 @@
                 </span>
               </div>
 
-              <span id="lessonDuration-<%= l.id %>" class="text-[10px] opacity-75 shrink-0 ml-2 font-mono"><%= l.duration_minutes %>m</span>
+              <div class="flex items-center gap-1 shrink-0 ml-2">
+                <% if (l.attachment_url) { %>
+                  <span title="<%= l.attachment_name || 'Lampiran Berkas' %>" class="text-[10px] <%= l.id === activeLesson.id ? 'text-white' : 'text-amber-600' %>">
+                    <%= l.attachment_type === 'image' ? '🖼️' : '📎' %>
+                  </span>
+                <% } %>
+                <span id="lessonDuration-<%= l.id %>" class="text-[10px] opacity-75 font-mono"><%= l.duration_minutes %>m</span>
+              </div>
             </a>
           <% }) %>
         </div>

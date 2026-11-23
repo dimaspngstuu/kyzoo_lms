@@ -237,14 +237,36 @@ router.get('/admin/courses/:id/curriculum', async (req, res) => {
   }
 });
 
-// 8. Tambah Episode Baru ke Kursus
-router.post('/admin/courses/:id/episodes/new', upload.single('video_file'), async (req, res) => {
+// Helper Deteksi Tipe Lampiran (Gambar, PPT, PDF, Dokumen)
+function detectAttachmentType(url, originalName = '') {
+  const target = ((originalName || '') + ' ' + (url || '')).toLowerCase();
+  if (target.match(/\.(png|jpg|jpeg|webp|svg|gif)($|\?)/)) {
+    return 'image';
+  }
+  if (target.match(/\.(ppt|pptx|key)($|\?)/) || target.includes('presentation') || target.includes('slides')) {
+    return 'ppt';
+  }
+  if (target.match(/\.pdf($|\?)/)) {
+    return 'pdf';
+  }
+  return 'document';
+}
+
+// 8. Tambah Episode Baru ke Kursus (Mendukung Video & Lampiran Gambar/PPT Opsional)
+router.post('/admin/courses/:id/episodes/new', upload.fields([
+  { name: 'video_file', maxCount: 1 },
+  { name: 'attachment_file', maxCount: 1 }
+]), async (req, res) => {
   try {
     const courseId = req.params.id;
     const course = await DB.get('SELECT * FROM courses WHERE id = ?', courseId);
     if (!course) return res.redirect('/admin?error=Kursus+tidak+ditemukan');
 
-    const { title, has_video, video_source, video_url, content_text, duration_minutes } = req.body;
+    const {
+      title, has_video, video_source, video_url, content_text, duration_minutes,
+      has_attachment, attachment_source, attachment_url, attachment_name
+    } = req.body;
+
     if (!title || !title.trim()) {
       return res.redirect(`/admin/courses/${courseId}/curriculum?error=Judul+episode+wajib+diisi`);
     }
@@ -256,16 +278,36 @@ router.post('/admin/courses/:id/episodes/new', upload.single('video_file'), asyn
       chapter = { id: result.lastInsertRowid };
     }
 
+    // 1. Penanganan Video (Opsional)
     let finalVideoUrl = '';
     let finalSource = 'youtube';
+    const videoFile = req.files && req.files['video_file'] ? req.files['video_file'][0] : null;
 
-    if (has_video === 'yes' || has_video === '1') {
-      if (req.file) {
+    if (has_video === 'yes' || has_video === '1' || has_video === 'on') {
+      if (videoFile) {
         finalSource = 'upload';
-        finalVideoUrl = await uploadToStorage(req.file, 'videos');
+        finalVideoUrl = await uploadToStorage(videoFile, 'videos');
       } else if (video_url && video_url.trim()) {
         finalSource = video_source || 'youtube';
         finalVideoUrl = video_url.trim();
+      }
+    }
+
+    // 2. Penanganan Berkas Gambar / Slide PPT / Dokumen (Opsional)
+    let finalAttachmentUrl = '';
+    let finalAttachmentName = '';
+    let finalAttachmentType = '';
+    const attachmentFile = req.files && req.files['attachment_file'] ? req.files['attachment_file'][0] : null;
+
+    if (has_attachment === 'yes' || has_attachment === '1' || has_attachment === 'on') {
+      if (attachmentFile) {
+        finalAttachmentUrl = await uploadToStorage(attachmentFile, 'attachments');
+        finalAttachmentName = (attachment_name && attachment_name.trim()) || attachmentFile.originalname;
+        finalAttachmentType = detectAttachmentType(finalAttachmentUrl, attachmentFile.originalname);
+      } else if (attachment_url && attachment_url.trim()) {
+        finalAttachmentUrl = attachment_url.trim();
+        finalAttachmentName = (attachment_name && attachment_name.trim()) || 'Berkas Lampiran Materi';
+        finalAttachmentType = detectAttachmentType(finalAttachmentUrl, finalAttachmentName);
       }
     }
 
@@ -273,9 +315,23 @@ router.post('/admin/courses/:id/episodes/new', upload.single('video_file'), asyn
     const nextOrder = (lastOrder && lastOrder.max_order) ? parseInt(lastOrder.max_order, 10) + 1 : 1;
 
     await DB.run(`
-      INSERT INTO lessons (chapter_id, title, video_source, video_url, content_text, duration_minutes, sort_order)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, chapter.id, title.trim(), finalSource, finalVideoUrl, content_text ? content_text.trim() : '', parseInt(duration_minutes, 10) || 10, nextOrder);
+      INSERT INTO lessons (
+        chapter_id, title, video_source, video_url, content_text, duration_minutes,
+        attachment_url, attachment_name, attachment_type, sort_order
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+      chapter.id,
+      title.trim(),
+      finalSource,
+      finalVideoUrl,
+      content_text ? content_text.trim() : '',
+      parseInt(duration_minutes, 10) || 10,
+      finalAttachmentUrl,
+      finalAttachmentName,
+      finalAttachmentType,
+      nextOrder
+    );
 
     res.redirect(`/admin/courses/${courseId}/curriculum?success=Episode+baru+berhasil+ditambahkan!`);
   } catch (err) {
@@ -284,24 +340,33 @@ router.post('/admin/courses/:id/episodes/new', upload.single('video_file'), asyn
   }
 });
 
-// 9. Edit Data Episode (Judul, Teori, Video Opsional, Durasi)
-router.post('/admin/lessons/:id/edit', upload.single('video_file'), async (req, res) => {
+// 9. Edit Data Episode (Judul, Teori, Video & Lampiran Gambar/PPT)
+router.post('/admin/lessons/:id/edit', upload.fields([
+  { name: 'video_file', maxCount: 1 },
+  { name: 'attachment_file', maxCount: 1 }
+]), async (req, res) => {
   try {
     const lesson = await DB.get('SELECT l.*, ch.course_id FROM lessons l JOIN chapters ch ON l.chapter_id = ch.id WHERE l.id = ?', req.params.id);
     if (!lesson) return res.redirect('/admin?error=Episode+tidak+ditemukan');
 
-    const { title, has_video, video_source, video_url, content_text, duration_minutes } = req.body;
+    const {
+      title, has_video, video_source, video_url, content_text, duration_minutes,
+      has_attachment, attachment_source, attachment_url, attachment_name
+    } = req.body;
+
     if (!title || !title.trim()) {
       return res.redirect(`/admin/courses/${lesson.course_id}/curriculum?error=Judul+episode+wajib+diisi`);
     }
 
+    // 1. Penanganan Video
     let finalVideoUrl = '';
     let finalSource = 'youtube';
+    const videoFile = req.files && req.files['video_file'] ? req.files['video_file'][0] : null;
 
-    if (has_video === 'yes' || has_video === '1') {
-      if (req.file) {
+    if (has_video === 'yes' || has_video === '1' || has_video === 'on') {
+      if (videoFile) {
         finalSource = 'upload';
-        finalVideoUrl = await uploadToStorage(req.file, 'videos');
+        finalVideoUrl = await uploadToStorage(videoFile, 'videos');
       } else if (video_url && video_url.trim()) {
         finalSource = video_source || 'youtube';
         finalVideoUrl = video_url.trim();
@@ -311,11 +376,44 @@ router.post('/admin/lessons/:id/edit', upload.single('video_file'), async (req, 
       }
     }
 
+    // 2. Penanganan Lampiran Gambar / PPT / Dokumen
+    let finalAttachmentUrl = '';
+    let finalAttachmentName = '';
+    let finalAttachmentType = '';
+    const attachmentFile = req.files && req.files['attachment_file'] ? req.files['attachment_file'][0] : null;
+
+    if (has_attachment === 'yes' || has_attachment === '1' || has_attachment === 'on') {
+      if (attachmentFile) {
+        finalAttachmentUrl = await uploadToStorage(attachmentFile, 'attachments');
+        finalAttachmentName = (attachment_name && attachment_name.trim()) || attachmentFile.originalname;
+        finalAttachmentType = detectAttachmentType(finalAttachmentUrl, attachmentFile.originalname);
+      } else if (attachment_url && attachment_url.trim()) {
+        finalAttachmentUrl = attachment_url.trim();
+        finalAttachmentName = (attachment_name && attachment_name.trim()) || lesson.attachment_name || 'Berkas Lampiran';
+        finalAttachmentType = detectAttachmentType(finalAttachmentUrl, finalAttachmentName);
+      } else if (lesson.attachment_url) {
+        finalAttachmentUrl = lesson.attachment_url;
+        finalAttachmentName = (attachment_name && attachment_name.trim()) || lesson.attachment_name || 'Berkas Lampiran';
+        finalAttachmentType = lesson.attachment_type || detectAttachmentType(finalAttachmentUrl, finalAttachmentName);
+      }
+    }
+
     await DB.run(`
       UPDATE lessons 
-      SET title = ?, video_source = ?, video_url = ?, content_text = ?, duration_minutes = ?
+      SET title = ?, video_source = ?, video_url = ?, content_text = ?, duration_minutes = ?,
+          attachment_url = ?, attachment_name = ?, attachment_type = ?
       WHERE id = ?
-    `, title.trim(), finalSource, finalVideoUrl, content_text ? content_text.trim() : '', parseInt(duration_minutes, 10) || 10, lesson.id);
+    `,
+      title.trim(),
+      finalSource,
+      finalVideoUrl,
+      content_text ? content_text.trim() : '',
+      parseInt(duration_minutes, 10) || 10,
+      finalAttachmentUrl,
+      finalAttachmentName,
+      finalAttachmentType,
+      lesson.id
+    );
 
     res.redirect(`/admin/courses/${lesson.course_id}/curriculum?success=Episode+berhasil+diperbarui!`);
   } catch (err) {

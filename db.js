@@ -76,6 +76,11 @@ async function ensurePgTables(p) {
       CREATE INDEX IF NOT EXISTS idx_resources_category ON public.resources(category);
       CREATE INDEX IF NOT EXISTS idx_resources_active ON public.resources(is_active);
       CREATE INDEX IF NOT EXISTS idx_resources_sort ON public.resources(sort_order);
+
+      -- Kolom Lampiran Gambar / PPT / Dokumen pada tabel lessons (Opsional)
+      ALTER TABLE public.lessons ADD COLUMN IF NOT EXISTS attachment_url TEXT;
+      ALTER TABLE public.lessons ADD COLUMN IF NOT EXISTS attachment_name TEXT;
+      ALTER TABLE public.lessons ADD COLUMN IF NOT EXISTS attachment_type TEXT;
     `);
     pgTablesEnsured = true;
 
@@ -201,6 +206,9 @@ function initSqliteSchema(db) {
       video_url TEXT,
       content_text TEXT,
       duration_minutes INTEGER DEFAULT 10,
+      attachment_url TEXT,
+      attachment_name TEXT,
+      attachment_type TEXT,
       sort_order INTEGER DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (chapter_id) REFERENCES chapters(id) ON DELETE CASCADE
@@ -241,6 +249,11 @@ function initSqliteSchema(db) {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  // Migrasi kolom attachment untuk SQLite (jika database sudah ada sebelumnya)
+  try { db.prepare("ALTER TABLE lessons ADD COLUMN attachment_url TEXT").run(); } catch (e) {}
+  try { db.prepare("ALTER TABLE lessons ADD COLUMN attachment_name TEXT").run(); } catch (e) {}
+  try { db.prepare("ALTER TABLE lessons ADD COLUMN attachment_type TEXT").run(); } catch (e) {}
 
   // Seed default resources jika kosong
   try {

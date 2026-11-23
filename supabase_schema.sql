@@ -45,6 +45,9 @@ CREATE TABLE IF NOT EXISTS public.lessons (
   video_url TEXT,
   content_text TEXT,
   duration_minutes INTEGER DEFAULT 10,
+  attachment_url TEXT,
+  attachment_name TEXT,
+  attachment_type TEXT,
   sort_order INTEGER DEFAULT 1,
   created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );

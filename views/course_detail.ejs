@@ -110,6 +110,13 @@
                   </span>
                 <% } %>
 
+                <% if (l.attachment_url) { %>
+                  <span class="text-slate-300 dark:text-slate-700">•</span>
+                  <span class="text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                    <%= l.attachment_type === 'image' ? '🖼️ Gambar / Diagram' : (l.attachment_type === 'ppt' ? '📊 Slide PPT' : '📎 Lampiran') %>
+                  </span>
+                <% } %>
+
                 <% if (l.is_completed) { %>
                   <span class="text-slate-300 dark:text-slate-700">•</span>
                   <span class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">

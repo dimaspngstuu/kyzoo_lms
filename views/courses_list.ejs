@@ -22,6 +22,18 @@
     </div>
   </div>
 
+  <!-- State Kosong / Grid Kursus -->
+  <% if (courses.length === 0) { %>
+    <div class="bg-white rounded-2xl border border-slate-100 p-12 text-center shadow-xs">
+      <div class="w-16 h-16 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center mx-auto text-2xl font-bold mb-4">
+        📚
+      </div>
+      <h3 class="text-base font-bold text-slate-800">Belum Ada Kursus Ditemukan</h3>
+      <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+        Materi kursus sedang dipersiapkan atau belum dipublikasikan oleh admin.
+      </p>
+    </div>
+  <% } else { %>
   <!-- Grid Kursus -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <% courses.forEach(course => { %>
@@ -70,6 +82,7 @@
       </div>
     <% }) %>
   </div>
+  <% } %>
 
 </div>
 

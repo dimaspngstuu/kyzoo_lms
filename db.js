@@ -86,6 +86,9 @@ async function ensurePgTables(p) {
       UPDATE public.lessons 
       SET attachment_name = 'Infografis & Diagram Materi' 
       WHERE attachment_name ILIKE '%gemini_generated%' OR attachment_name ILIKE '%.jpg' OR attachment_name ILIKE '%.png';
+
+      -- Pastikan seluruh kursus aktif secara default dan tampil di katalog siswa
+      UPDATE public.courses SET is_active = 1 WHERE is_active = 0 OR is_active IS NULL;
     `);
     pgTablesEnsured = true;
 
@@ -261,6 +264,9 @@ function initSqliteSchema(db) {
   try { db.prepare("ALTER TABLE lessons ADD COLUMN attachment_type TEXT").run(); } catch (e) {}
   try {
     db.prepare(`UPDATE lessons SET attachment_name = 'Infografis & Diagram Materi' WHERE attachment_name LIKE '%gemini_generated%' OR attachment_name LIKE '%Gemini_Generated%' OR attachment_name LIKE '%.jpg' OR attachment_name LIKE '%.png'`).run();
+  } catch (e) {}
+  try {
+    db.prepare(`UPDATE courses SET is_active = 1 WHERE is_active = 0 OR is_active IS NULL`).run();
   } catch (e) {}
 
   // Seed default resources jika kosong

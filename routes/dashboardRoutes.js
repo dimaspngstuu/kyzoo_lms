@@ -56,7 +56,7 @@ router.get('/dashboard', async (req, res) => {
       DB.get('SELECT COUNT(*) as count FROM lessons'),
       DB.get('SELECT COUNT(*) as count FROM user_progress WHERE user_id = ? AND is_completed = 1', userId),
       DB.get('SELECT COUNT(*) as count FROM chapters'),
-      DB.get('SELECT COUNT(*) as count FROM courses WHERE is_active = 1')
+      DB.get('SELECT COUNT(*) as count FROM courses WHERE (is_active = 1 OR is_active IS NULL)')
     ]);
 
     const totalLessons = totalLessonsRow ? parseInt(totalLessonsRow.count, 10) : 0;
@@ -74,7 +74,7 @@ router.get('/dashboard', async (req, res) => {
           (SELECT COUNT(*) FROM chapters ch JOIN lessons l ON l.chapter_id = ch.id WHERE ch.course_id = c.id) as total_lessons,
           (SELECT COUNT(*) FROM chapters ch JOIN lessons l ON l.chapter_id = ch.id JOIN user_progress up ON up.lesson_id = l.id WHERE ch.course_id = c.id AND up.user_id = ? AND up.is_completed = 1) as completed_lessons
         FROM courses c
-        WHERE c.is_active = 1
+        WHERE (c.is_active = 1 OR c.is_active IS NULL)
         ORDER BY c.id ASC
       `, userId),
 
@@ -83,7 +83,7 @@ router.get('/dashboard', async (req, res) => {
           (SELECT COUNT(1) FROM lessons l WHERE l.chapter_id = ch.id) as lesson_count
         FROM chapters ch
         JOIN courses c ON c.id = ch.course_id
-        WHERE c.is_active = 1
+        WHERE (c.is_active = 1 OR c.is_active IS NULL)
         ORDER BY ch.sort_order ASC, ch.id ASC
       `),
 
@@ -93,7 +93,7 @@ router.get('/dashboard', async (req, res) => {
         FROM lessons l
         JOIN chapters ch ON ch.id = l.chapter_id
         JOIN courses c ON c.id = ch.course_id
-        WHERE c.is_active = 1
+        WHERE (c.is_active = 1 OR c.is_active IS NULL)
         ORDER BY l.sort_order ASC, l.id ASC
       `, userId)
     ]);

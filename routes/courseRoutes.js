@@ -135,7 +135,7 @@ router.get('/courses', async (req, res) => {
         (SELECT COUNT(*) FROM chapters ch JOIN lessons l ON l.chapter_id = ch.id WHERE ch.course_id = c.id) as total_lessons,
         (SELECT COUNT(*) FROM chapters ch JOIN lessons l ON l.chapter_id = ch.id JOIN user_progress up ON up.lesson_id = l.id WHERE ch.course_id = c.id AND up.user_id = ? AND up.is_completed = 1) as completed_lessons
       FROM courses c
-      WHERE c.is_active = 1
+      WHERE (c.is_active = 1 OR c.is_active IS NULL)
     `;
     const params = [userId];
 
@@ -159,7 +159,7 @@ router.get('/courses', async (req, res) => {
       return { ...c, percent };
     });
 
-    const rawCategories = await DB.all('SELECT DISTINCT category FROM courses WHERE is_active = 1');
+    const rawCategories = await DB.all('SELECT DISTINCT category FROM courses WHERE (is_active = 1 OR is_active IS NULL)');
     const categories = rawCategories.map(r => r.category);
 
     res.render('courses_list', {
@@ -184,7 +184,7 @@ router.get('/courses', async (req, res) => {
 router.get('/courses/:slug', async (req, res) => {
   try {
     const userId = req.session.user.id;
-    const course = await DB.get('SELECT * FROM courses WHERE slug = ? AND is_active = 1', req.params.slug);
+    const course = await DB.get('SELECT * FROM courses WHERE slug = ? AND (is_active = 1 OR is_active IS NULL)', req.params.slug);
     if (!course) {
       return res.status(404).render('error', {
         title: 'Kursus Tidak Ditemukan',
@@ -233,7 +233,7 @@ async function handleLearnView(req, res) {
     const userId = req.session.user.id;
     const courseSlug = req.params.courseSlug;
 
-    const course = await DB.get('SELECT * FROM courses WHERE slug = ? AND is_active = 1', courseSlug);
+    const course = await DB.get('SELECT * FROM courses WHERE slug = ? AND (is_active = 1 OR is_active IS NULL)', courseSlug);
     if (!course) {
       return res.status(404).render('error', {
         title: 'Tutorial Tidak Ditemukan',

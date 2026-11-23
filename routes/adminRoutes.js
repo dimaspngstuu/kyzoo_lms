@@ -54,6 +54,11 @@ function slugify(text) {
 // 1. Dashboard Admin
 router.get('/admin', async (req, res) => {
   try {
+    // Pastikan seluruh kursus aktif secara default jika pernah tersembunyi
+    try {
+      await DB.run('UPDATE courses SET is_active = 1 WHERE is_active = 0 OR is_active IS NULL');
+    } catch (migErr) {}
+
     // Eksekusi seluruh metrik dan daftar kursus secara paralel (High-Speed Zero-Lag)
     const [totalCoursesRow, totalChaptersRow, totalLessonsRow, totalUsersRow, courses] = await Promise.all([
       DB.get('SELECT COUNT(*) as count FROM courses'),
@@ -112,7 +117,7 @@ router.get('/admin/courses/new', async (req, res) => {
 // 3. Proses Simpan Kursus Baru
 router.post('/admin/courses/new', upload.single('thumbnail_file'), async (req, res) => {
   try {
-    const { title, category, description, custom_thumbnail } = req.body;
+    const { title, category, description, custom_thumbnail, is_active } = req.body;
     if (!title || !category) {
       const generatedCode = await generateCourseCode();
       return res.render('admin/course_form', {
@@ -138,10 +143,14 @@ router.post('/admin/courses/new', upload.single('thumbnail_file'), async (req, r
       thumbnail = await uploadToStorage(req.file, 'thumbnails');
     }
 
+    const activeVal = (is_active !== undefined)
+      ? ((is_active === '0' || is_active === 0) ? 0 : 1)
+      : 1;
+
     await DB.run(`
       INSERT INTO courses (code, title, slug, category, description, thumbnail, is_active)
-      VALUES (?, ?, ?, ?, ?, ?, 1)
-    `, code, title.trim(), finalSlug, category.trim(), description ? description.trim() : '', thumbnail);
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, code, title.trim(), finalSlug, category.trim(), description ? description.trim() : '', thumbnail, activeVal);
 
     res.redirect('/admin?success=Kursus+baru+berhasil+dibuat!');
   } catch (err) {
@@ -184,15 +193,33 @@ router.post('/admin/courses/:id/edit', upload.single('thumbnail_file'), async (r
       thumbnail = custom_thumbnail.trim();
     }
 
+    const activeVal = (is_active !== undefined)
+      ? ((is_active === '0' || is_active === 0) ? 0 : 1)
+      : (course.is_active ?? 1);
+
     await DB.run(`
       UPDATE courses 
       SET title = ?, category = ?, description = ?, thumbnail = ?, is_active = ?
       WHERE id = ?
-    `, title.trim(), category.trim(), description ? description.trim() : '', thumbnail, is_active ? 1 : 0, course.id);
+    `, title.trim(), category.trim(), description ? description.trim() : '', thumbnail, activeVal, course.id);
 
     res.redirect('/admin?success=Perubahan+kursus+berhasil+disimpan!');
   } catch (err) {
     console.error('Error update kursus:', err);
+    res.redirect('/admin?error=' + encodeURIComponent(err.message));
+  }
+});
+
+// 5b. Toggle Status Kursus (Aktif <-> Nonaktif/Draft)
+router.post('/admin/courses/:id/toggle-status', async (req, res) => {
+  try {
+    const course = await DB.get('SELECT id, is_active, title FROM courses WHERE id = ?', req.params.id);
+    if (!course) return res.redirect('/admin?error=Kursus+tidak+ditemukan');
+    const nextState = (course.is_active === 1 || course.is_active === '1' || course.is_active === undefined) ? 0 : 1;
+    await DB.run('UPDATE courses SET is_active = ? WHERE id = ?', nextState, course.id);
+    const msg = nextState === 1 ? 'Kursus+berhasil+dipublikasikan+ke+katalog+member!' : 'Kursus+berhasil+disembunyikan+(draft).';
+    res.redirect(`/admin?success=${msg}`);
+  } catch (err) {
     res.redirect('/admin?error=' + encodeURIComponent(err.message));
   }
 });
@@ -282,9 +309,12 @@ router.post('/admin/courses/:id/episodes/new', upload.fields([
 
     // Pastikan ada chapter penampung episode di database
     let chapter = await DB.get('SELECT id FROM chapters WHERE course_id = ? ORDER BY id ASC LIMIT 1', courseId);
-    if (!chapter) {
+    if (!chapter || !chapter.id) {
       const result = await DB.run('INSERT INTO chapters (course_id, title, sort_order) VALUES (?, ?, ?)', courseId, 'Episode Silabus', 1);
       chapter = { id: result.lastInsertRowid };
+      if (!chapter.id) {
+        chapter = await DB.get('SELECT id FROM chapters WHERE course_id = ? ORDER BY id DESC LIMIT 1', courseId);
+      }
     }
 
     // 1. Penanganan Video (Opsional)

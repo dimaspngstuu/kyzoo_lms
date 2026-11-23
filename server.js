@@ -45,8 +45,20 @@ app.use(express.static(publicDir, {
 app.use(cookieSession({
   name: 'kyzoo_session',
   keys: [process.env.SESSION_SECRET || 'kyzoo-lms-secure-key-2026'],
-  maxAge: 1000 * 60 * 60 * 24 * 7 // 7 hari
+  maxAge: 1000 * 60 * 60 * 24 * 7, // 7 hari
+  httpOnly: true,
+  sameSite: 'lax'
 }));
+
+// Mencegah Vercel CDN atau browser proxy menyimpan cache halaman akun pribadi
+app.use((req, res, next) => {
+  if (!req.path.startsWith('/uploads') && !req.path.includes('.')) {
+    res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+  next();
+});
 
 // Polyfill req.session.destroy untuk kompatibilitas cookie-session
 app.use((req, res, next) => {

@@ -63,14 +63,9 @@ router.post('/login', async (req, res) => {
 
 // Logout
 router.get('/logout', (req, res) => {
-  if (req.session && req.session.destroy) {
-    req.session.destroy(() => {
-      res.redirect('/login?success=Anda+berhasil+keluar');
-    });
-  } else {
-    req.session = null;
-    res.redirect('/login?success=Anda+berhasil+keluar');
-  }
+  req.session = null;
+  res.clearCookie('kyzoo_session', { path: '/' });
+  res.redirect('/login?success=Anda+berhasil+keluar');
 });
 
 // ==============================================================

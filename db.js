@@ -1,4 +1,5 @@
 require('dotenv').config();
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const { Pool } = require('pg');
 const path = require('path');
 const fs = require('fs');
@@ -20,11 +21,20 @@ function toPgSql(sql) {
 // Inisialisasi Pool PostgreSQL (Lazy-safe untuk Serverless Vercel)
 function getPgPool() {
   if (!pool) {
-    const databaseUrl = getDatabaseUrl();
+    let databaseUrl = getDatabaseUrl();
     if (databaseUrl && (databaseUrl.startsWith('postgres://') || databaseUrl.startsWith('postgresql://'))) {
       try {
+        let cleanUrl = databaseUrl;
+        try {
+          const parsed = new URL(databaseUrl);
+          parsed.searchParams.delete('sslmode');
+          cleanUrl = parsed.toString();
+        } catch (e) {
+          cleanUrl = databaseUrl.replace(/([?&])sslmode=[^&]*(&|$)/g, '$1').replace(/[?&]$/, '');
+        }
+
         pool = new Pool({
-          connectionString: databaseUrl,
+          connectionString: cleanUrl,
           ssl: {
             rejectUnauthorized: false
           },

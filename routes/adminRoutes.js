@@ -727,7 +727,7 @@ router.get('/admin/resources', async (req, res) => {
   }
 });
 
-// B. Tambah Resource Baru
+// B. Tambah Resource Baru (Simpel & Cepat)
 router.post('/admin/resources/create', async (req, res) => {
   try {
     const {
@@ -740,6 +740,28 @@ router.post('/admin/resources/create', async (req, res) => {
       return res.redirect('/admin/resources?error=' + encodeURIComponent('Judul resource wajib diisi.'));
     }
 
+    const cleanTitle = title.trim();
+    const cleanUrl = (external_url || '').trim();
+    const cleanDesc = (description || '').trim();
+
+    // Auto-detect platform dari link / judul jika tidak diisi
+    let derivedPlatform = (platform || '').trim();
+    if (!derivedPlatform) {
+      const urlLower = cleanUrl.toLowerCase();
+      const titleLower = cleanTitle.toLowerCase();
+      if (urlLower.includes('gemini.google.com') || titleLower.includes('gemini')) {
+        derivedPlatform = 'gemini';
+      } else if (urlLower.includes('github.com') || titleLower.includes('github')) {
+        derivedPlatform = 'github';
+      } else if (urlLower.includes('spreadsheets') || titleLower.includes('sheet')) {
+        derivedPlatform = 'sheets';
+      } else if (urlLower.includes('antigravity') || titleLower.includes('antigravity')) {
+        derivedPlatform = 'antigravity';
+      } else {
+        derivedPlatform = 'general';
+      }
+    }
+
     await DB.run(`
       INSERT INTO resources (
         title, category, platform, description,
@@ -747,13 +769,13 @@ router.post('/admin/resources/create', async (req, res) => {
         badge_text, sort_order, is_active
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
     `,
-      title.trim(),
+      cleanTitle,
       (category || 'AI Skills').trim(),
-      (platform || 'antigravity').trim(),
-      (description || '').trim(),
-      (sop_instruction || '').trim(),
+      derivedPlatform,
+      cleanDesc,
+      (sop_instruction || cleanDesc || '').trim(),
       (content_markdown || '').trim(),
-      (external_url || '').trim(),
+      cleanUrl,
       (badge_text || 'Khusus Member').trim(),
       parseInt(sort_order, 10) || 1
     );
@@ -765,7 +787,7 @@ router.post('/admin/resources/create', async (req, res) => {
   }
 });
 
-// C. Perbarui Resource (Edit)
+// C. Perbarui Resource (Edit Simpel)
 router.post('/admin/resources/:id/update', async (req, res) => {
   try {
     const { id } = req.params;
@@ -779,27 +801,49 @@ router.post('/admin/resources/:id/update', async (req, res) => {
       return res.redirect('/admin/resources?error=' + encodeURIComponent('Judul resource wajib diisi.'));
     }
 
+    const cleanTitle = title.trim();
+    const cleanUrl = (external_url || '').trim();
+    const cleanDesc = (description || '').trim();
+
+    // Auto-detect platform jika belum ditentukan
+    let derivedPlatform = (platform || '').trim();
+    if (!derivedPlatform) {
+      const urlLower = cleanUrl.toLowerCase();
+      const titleLower = cleanTitle.toLowerCase();
+      if (urlLower.includes('gemini.google.com') || titleLower.includes('gemini')) {
+        derivedPlatform = 'gemini';
+      } else if (urlLower.includes('github.com') || titleLower.includes('github')) {
+        derivedPlatform = 'github';
+      } else if (urlLower.includes('spreadsheets') || titleLower.includes('sheet')) {
+        derivedPlatform = 'sheets';
+      } else if (urlLower.includes('antigravity') || titleLower.includes('antigravity')) {
+        derivedPlatform = 'antigravity';
+      } else {
+        derivedPlatform = 'general';
+      }
+    }
+
     await DB.run(`
       UPDATE resources SET
         title = ?,
         category = ?,
         platform = ?,
         description = ?,
-        sop_instruction = ?,
-        content_markdown = ?,
+        sop_instruction = COALESCE(NULLIF(?, ''), description),
+        content_markdown = COALESCE(?, content_markdown),
         external_url = ?,
-        badge_text = ?,
+        badge_text = COALESCE(NULLIF(?, ''), badge_text),
         sort_order = ?,
         is_active = ?
       WHERE id = ?
     `,
-      title.trim(),
+      cleanTitle,
       (category || 'AI Skills').trim(),
-      (platform || 'antigravity').trim(),
-      (description || '').trim(),
-      (sop_instruction || '').trim(),
-      (content_markdown || '').trim(),
-      (external_url || '').trim(),
+      derivedPlatform,
+      cleanDesc,
+      (sop_instruction || cleanDesc || '').trim(),
+      (content_markdown !== undefined) ? content_markdown.trim() : '',
+      cleanUrl,
       (badge_text || 'Khusus Member').trim(),
       parseInt(sort_order, 10) || 1,
       (is_active === '1' || is_active === 1) ? 1 : 0,

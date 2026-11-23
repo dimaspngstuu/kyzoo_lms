@@ -83,6 +83,12 @@
           <div class="pt-8 border-t border-slate-100 dark:border-slate-800 space-y-4">
             
             <% if (activeLesson.attachment_type === 'image') { %>
+              <%
+                let displayImgTitle = (activeLesson.attachment_name || '').trim();
+                if (!displayImgTitle || displayImgTitle.toLowerCase().includes('gemini_generated') || displayImgTitle.match(/\.(png|jpg|jpeg|webp|svg|gif)$/i)) {
+                  displayImgTitle = 'Infografis & Diagram Materi';
+                }
+              %>
               <!-- Lampiran Gambar / Diagram Infografis -->
               <div class="space-y-3">
                 <div class="flex items-center justify-between">
@@ -92,7 +98,7 @@
                     </div>
                     <div>
                       <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-                        <%= activeLesson.attachment_name || 'Gambar & Diagram Materi' %>
+                        <%= displayImgTitle %>
                       </h3>
                       <p class="text-[11px] text-slate-400">Infografis & diagram visual pelengkap pembelajaran</p>
                     </div>
@@ -109,7 +115,7 @@
                 <div class="rounded-2xl overflow-hidden border border-slate-200/80 bg-slate-50 p-2 sm:p-3 text-center">
                   <img 
                     src="<%= activeLesson.attachment_url %>" 
-                    alt="<%= activeLesson.attachment_name || 'Gambar Materi' %>" 
+                    alt="<%= displayImgTitle %>" 
                     class="max-h-[520px] w-auto mx-auto rounded-xl object-contain shadow-xs" 
                     loading="lazy" 
                   />

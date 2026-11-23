@@ -252,6 +252,15 @@ function detectAttachmentType(url, originalName = '') {
   return 'document';
 }
 
+// Helper Pembersih Nama Lampiran (Menghapus nama mentah seperti Gemini_Generated)
+function cleanAttachmentDisplayName(name, type, originalName = '') {
+  const candidate = (name && name.trim()) || (originalName && originalName.trim()) || '';
+  if (!candidate || candidate.toLowerCase().includes('gemini_generated') || candidate.match(/\.(png|jpg|jpeg|webp|svg|gif)$/i)) {
+    return type === 'image' ? 'Infografis & Diagram Materi' : 'Berkas Materi Pembelajaran';
+  }
+  return candidate;
+}
+
 // 8. Tambah Episode Baru ke Kursus (Mendukung Video & Lampiran Gambar/PPT Opsional)
 router.post('/admin/courses/:id/episodes/new', upload.fields([
   { name: 'video_file', maxCount: 1 },
@@ -302,12 +311,12 @@ router.post('/admin/courses/:id/episodes/new', upload.fields([
     if (has_attachment === 'yes' || has_attachment === '1' || has_attachment === 'on') {
       if (attachmentFile) {
         finalAttachmentUrl = await uploadToStorage(attachmentFile, 'attachments');
-        finalAttachmentName = (attachment_name && attachment_name.trim()) || attachmentFile.originalname;
         finalAttachmentType = detectAttachmentType(finalAttachmentUrl, attachmentFile.originalname);
+        finalAttachmentName = cleanAttachmentDisplayName(attachment_name, finalAttachmentType, attachmentFile.originalname);
       } else if (attachment_url && attachment_url.trim()) {
         finalAttachmentUrl = attachment_url.trim();
-        finalAttachmentName = (attachment_name && attachment_name.trim()) || 'Berkas Lampiran Materi';
-        finalAttachmentType = detectAttachmentType(finalAttachmentUrl, finalAttachmentName);
+        finalAttachmentType = detectAttachmentType(finalAttachmentUrl, attachment_name || '');
+        finalAttachmentName = cleanAttachmentDisplayName(attachment_name, finalAttachmentType, 'Berkas Lampiran Materi');
       }
     }
 
@@ -385,16 +394,16 @@ router.post('/admin/lessons/:id/edit', upload.fields([
     if (has_attachment === 'yes' || has_attachment === '1' || has_attachment === 'on') {
       if (attachmentFile) {
         finalAttachmentUrl = await uploadToStorage(attachmentFile, 'attachments');
-        finalAttachmentName = (attachment_name && attachment_name.trim()) || attachmentFile.originalname;
         finalAttachmentType = detectAttachmentType(finalAttachmentUrl, attachmentFile.originalname);
+        finalAttachmentName = cleanAttachmentDisplayName(attachment_name, finalAttachmentType, attachmentFile.originalname);
       } else if (attachment_url && attachment_url.trim()) {
         finalAttachmentUrl = attachment_url.trim();
-        finalAttachmentName = (attachment_name && attachment_name.trim()) || lesson.attachment_name || 'Berkas Lampiran';
-        finalAttachmentType = detectAttachmentType(finalAttachmentUrl, finalAttachmentName);
+        finalAttachmentType = detectAttachmentType(finalAttachmentUrl, attachment_name || '');
+        finalAttachmentName = cleanAttachmentDisplayName(attachment_name, finalAttachmentType, lesson.attachment_name || 'Berkas Lampiran');
       } else if (lesson.attachment_url) {
         finalAttachmentUrl = lesson.attachment_url;
-        finalAttachmentName = (attachment_name && attachment_name.trim()) || lesson.attachment_name || 'Berkas Lampiran';
-        finalAttachmentType = lesson.attachment_type || detectAttachmentType(finalAttachmentUrl, finalAttachmentName);
+        finalAttachmentType = lesson.attachment_type || detectAttachmentType(finalAttachmentUrl, lesson.attachment_name || '');
+        finalAttachmentName = cleanAttachmentDisplayName(attachment_name, finalAttachmentType, lesson.attachment_name || 'Berkas Lampiran');
       }
     }
 

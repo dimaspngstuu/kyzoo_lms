@@ -167,10 +167,52 @@
         <input type="text" name="title" required placeholder="Contoh: Cara Download & Install Antigravity IDE" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 font-medium">
       </div>
 
-      <!-- Teks Panduan & Rangkuman Materi Teori -->
+      <!-- Teks Panduan & Rangkuman Materi Teori dengan Toolbar Format Teks Cepat -->
       <div>
-        <label class="block text-xs font-bold text-slate-700 mb-1">Teks Panduan / Teori Pembelajaran</label>
-        <textarea name="content_text" rows="5" placeholder="Tuliskan rangkuman konsep, penjelasan teori, atau poin-poin langkah... (Mendukung judul subtopik, bullet points, dan **teks tebal**)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 leading-relaxed"></textarea>
+        <div class="flex items-center justify-between mb-1.5">
+          <label class="block text-xs font-bold text-slate-700">Teks Panduan / Teori Pembelajaran</label>
+          <span class="text-[10px] text-slate-400 font-medium">Klik tombol untuk format cepat</span>
+        </div>
+
+        <!-- Toolbar Format Cepat (Bold, Italic, Judul, List, Quote, Code, Link) -->
+        <div class="flex items-center gap-1 p-1.5 bg-slate-100 border border-slate-200 rounded-t-xl overflow-x-auto no-scrollbar">
+          <button type="button" onclick="formatLessonText('add', 'bold')" class="px-2.5 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-black shadow-2xs transition-colors" title="Tebal (**teks**)">
+            B
+          </button>
+          <button type="button" onclick="formatLessonText('add', 'italic')" class="px-2.5 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs italic font-serif shadow-2xs transition-colors" title="Miring (*teks*)">
+            I
+          </button>
+          <div class="h-4 w-px bg-slate-300 mx-0.5"></div>
+          <button type="button" onclick="formatLessonText('add', 'h2')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-bold shadow-2xs transition-colors" title="Subjudul (## Judul)">
+            H2
+          </button>
+          <button type="button" onclick="formatLessonText('add', 'h3')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold shadow-2xs transition-colors" title="Poin Topik (### Poin)">
+            H3
+          </button>
+          <div class="h-4 w-px bg-slate-300 mx-0.5"></div>
+          <button type="button" onclick="formatLessonText('add', 'bullet')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-medium shadow-2xs transition-colors flex items-center gap-1" title="Daftar Poin (- Poin)">
+            <span>•</span>
+            <span>List</span>
+          </button>
+          <button type="button" onclick="formatLessonText('add', 'number')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-medium shadow-2xs transition-colors flex items-center gap-1" title="Daftar Nomor (1. Langkah)">
+            <span>1.</span>
+            <span>Nomor</span>
+          </button>
+          <div class="h-4 w-px bg-slate-300 mx-0.5"></div>
+          <button type="button" onclick="formatLessonText('add', 'quote')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-medium shadow-2xs transition-colors flex items-center gap-1" title="Kotak Catatan / Tips (> Catatan)">
+            <span>💡</span>
+            <span>Tips</span>
+          </button>
+          <button type="button" onclick="formatLessonText('add', 'code')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-mono shadow-2xs transition-colors" title="Kode / Istilah (`kode`)">
+            &lt;/&gt;
+          </button>
+          <button type="button" onclick="formatLessonText('add', 'link')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-medium shadow-2xs transition-colors flex items-center gap-1" title="Tautan Link ([Teks](url))">
+            <span>🔗</span>
+            <span>Link</span>
+          </button>
+        </div>
+
+        <textarea id="addContentText" name="content_text" rows="5" placeholder="Tuliskan rangkuman konsep, penjelasan teori, atau poin-poin langkah... (Blok kalimat lalu klik tombol B di atas untuk membuat teks tebal!)" class="w-full px-4 py-2.5 bg-slate-50 border border-t-0 border-slate-200 rounded-b-xl text-xs sm:text-sm text-slate-800 leading-relaxed focus:outline-none focus:border-brand-500"></textarea>
       </div>
 
       <!-- 1. Seksi Opsi Video Tutorial (Opsional) -->
@@ -288,10 +330,52 @@
         <input type="text" id="editTitle" name="title" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 font-medium">
       </div>
 
-      <!-- Teks Panduan & Rangkuman Materi Teori -->
+      <!-- Teks Panduan & Rangkuman Materi Teori dengan Toolbar Format Teks Cepat -->
       <div>
-        <label class="block text-xs font-bold text-slate-700 mb-1">Teks Panduan / Teori Pembelajaran</label>
-        <textarea id="editContentText" name="content_text" rows="5" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 leading-relaxed"></textarea>
+        <div class="flex items-center justify-between mb-1.5">
+          <label class="block text-xs font-bold text-slate-700">Teks Panduan / Teori Pembelajaran</label>
+          <span class="text-[10px] text-slate-400 font-medium">Klik tombol untuk format cepat</span>
+        </div>
+
+        <!-- Toolbar Format Cepat (Bold, Italic, Judul, List, Quote, Code, Link) -->
+        <div class="flex items-center gap-1 p-1.5 bg-slate-100 border border-slate-200 rounded-t-xl overflow-x-auto no-scrollbar">
+          <button type="button" onclick="formatLessonText('edit', 'bold')" class="px-2.5 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-black shadow-2xs transition-colors" title="Tebal (**teks**)">
+            B
+          </button>
+          <button type="button" onclick="formatLessonText('edit', 'italic')" class="px-2.5 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs italic font-serif shadow-2xs transition-colors" title="Miring (*teks*)">
+            I
+          </button>
+          <div class="h-4 w-px bg-slate-300 mx-0.5"></div>
+          <button type="button" onclick="formatLessonText('edit', 'h2')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-bold shadow-2xs transition-colors" title="Subjudul (## Judul)">
+            H2
+          </button>
+          <button type="button" onclick="formatLessonText('edit', 'h3')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold shadow-2xs transition-colors" title="Poin Topik (### Poin)">
+            H3
+          </button>
+          <div class="h-4 w-px bg-slate-300 mx-0.5"></div>
+          <button type="button" onclick="formatLessonText('edit', 'bullet')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-medium shadow-2xs transition-colors flex items-center gap-1" title="Daftar Poin (- Poin)">
+            <span>•</span>
+            <span>List</span>
+          </button>
+          <button type="button" onclick="formatLessonText('edit', 'number')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-medium shadow-2xs transition-colors flex items-center gap-1" title="Daftar Nomor (1. Langkah)">
+            <span>1.</span>
+            <span>Nomor</span>
+          </button>
+          <div class="h-4 w-px bg-slate-300 mx-0.5"></div>
+          <button type="button" onclick="formatLessonText('edit', 'quote')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-medium shadow-2xs transition-colors flex items-center gap-1" title="Kotak Catatan / Tips (> Catatan)">
+            <span>💡</span>
+            <span>Tips</span>
+          </button>
+          <button type="button" onclick="formatLessonText('edit', 'code')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-mono shadow-2xs transition-colors" title="Kode / Istilah (`kode`)">
+            &lt;/&gt;
+          </button>
+          <button type="button" onclick="formatLessonText('edit', 'link')" class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-medium shadow-2xs transition-colors flex items-center gap-1" title="Tautan Link ([Teks](url))">
+            <span>🔗</span>
+            <span>Link</span>
+          </button>
+        </div>
+
+        <textarea id="editContentText" name="content_text" rows="5" class="w-full px-4 py-2.5 bg-slate-50 border border-t-0 border-slate-200 rounded-b-xl text-xs sm:text-sm text-slate-800 leading-relaxed focus:outline-none focus:border-brand-500"></textarea>
       </div>
 
       <!-- 1. Seksi Opsi Video (Opsional) -->
@@ -516,5 +600,76 @@
       boxFile.classList.add('hidden');
       boxLink.classList.remove('hidden');
     }
+  }
+
+  // Format Teks Cepat (Bold, Italic, Judul, List, dll)
+  function formatLessonText(prefix, action) {
+    const textarea = document.getElementById(prefix === 'add' ? 'addContentText' : 'editContentText');
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selected = text.substring(start, end);
+
+    let replacement = '';
+    let cursorOffset = 0;
+
+    switch (action) {
+      case 'bold':
+        replacement = selected ? `**${selected}**` : '**teks tebal**';
+        cursorOffset = selected ? replacement.length : 2;
+        break;
+      case 'italic':
+        replacement = selected ? `*${selected}*` : '*teks miring*';
+        cursorOffset = selected ? replacement.length : 1;
+        break;
+      case 'h2':
+        replacement = selected ? `\n\n## ${selected}\n` : '\n\n## Judul Subtopik\n';
+        cursorOffset = replacement.length;
+        break;
+      case 'h3':
+        replacement = selected ? `\n\n### ${selected}\n` : '\n\n### Poin Pembahasan\n';
+        cursorOffset = replacement.length;
+        break;
+      case 'bullet':
+        if (selected) {
+          replacement = selected.split('\n').map(l => l.startsWith('- ') ? l : `- ${l}`).join('\n');
+        } else {
+          replacement = '\n- Poin materi pertama\n- Poin materi kedua\n';
+        }
+        cursorOffset = replacement.length;
+        break;
+      case 'number':
+        if (selected) {
+          replacement = selected.split('\n').map((l, i) => `${i + 1}. ${l}`).join('\n');
+        } else {
+          replacement = '\n1. Langkah pertama\n2. Langkah kedua\n';
+        }
+        cursorOffset = replacement.length;
+        break;
+      case 'quote':
+        replacement = selected ? `\n> ${selected}\n` : '\n> Catatan: Poin penting yang wajib diingat...\n';
+        cursorOffset = replacement.length;
+        break;
+      case 'code':
+        replacement = selected ? `\`${selected}\`` : '`kode_atau_istilah`';
+        cursorOffset = selected ? replacement.length : 1;
+        break;
+      case 'link':
+        const url = prompt('Masukkan URL tautan:', 'https://');
+        if (url) {
+          replacement = selected ? `[${selected}](${url})` : `[Buka Tautan](${url})`;
+          cursorOffset = replacement.length;
+        } else {
+          return;
+        }
+        break;
+    }
+
+    textarea.value = text.substring(0, start) + replacement + text.substring(end);
+    textarea.focus();
+    const newPos = start + cursorOffset;
+    textarea.setSelectionRange(newPos, newPos);
   }
 </script>

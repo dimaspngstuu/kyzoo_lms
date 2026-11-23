@@ -81,6 +81,11 @@ async function ensurePgTables(p) {
       ALTER TABLE public.lessons ADD COLUMN IF NOT EXISTS attachment_url TEXT;
       ALTER TABLE public.lessons ADD COLUMN IF NOT EXISTS attachment_name TEXT;
       ALTER TABLE public.lessons ADD COLUMN IF NOT EXISTS attachment_type TEXT;
+
+      -- Pembersihan otomatis nama berkas mentah Gemini_Generated pada tabel lessons
+      UPDATE public.lessons 
+      SET attachment_name = 'Infografis & Diagram Materi' 
+      WHERE attachment_name ILIKE '%gemini_generated%' OR attachment_name ILIKE '%.jpg' OR attachment_name ILIKE '%.png';
     `);
     pgTablesEnsured = true;
 
@@ -254,6 +259,9 @@ function initSqliteSchema(db) {
   try { db.prepare("ALTER TABLE lessons ADD COLUMN attachment_url TEXT").run(); } catch (e) {}
   try { db.prepare("ALTER TABLE lessons ADD COLUMN attachment_name TEXT").run(); } catch (e) {}
   try { db.prepare("ALTER TABLE lessons ADD COLUMN attachment_type TEXT").run(); } catch (e) {}
+  try {
+    db.prepare(`UPDATE lessons SET attachment_name = 'Infografis & Diagram Materi' WHERE attachment_name LIKE '%gemini_generated%' OR attachment_name LIKE '%Gemini_Generated%' OR attachment_name LIKE '%.jpg' OR attachment_name LIKE '%.png'`).run();
+  } catch (e) {}
 
   // Seed default resources jika kosong
   try {

@@ -82,12 +82,12 @@
         </svg>
       </div>
       <div class="min-w-0 flex-1">
-        <div class="text-xs font-semibold text-slate-400">Materi Ditonton</div>
+        <div class="text-xs font-semibold text-slate-400">Materi Selesai</div>
         <div class="text-xl sm:text-2xl font-black text-slate-800 dark:text-white leading-tight">
-          <%= stats.completedLessons %> <span class="text-xs font-bold text-slate-400">/ <%= stats.totalLessons %> Video</span>
+          <%= stats.completedLessons %> <span class="text-xs font-bold text-slate-400">/ <%= stats.totalLessons %> Materi</span>
         </div>
         <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
-          <%= stats.totalLessons - stats.completedLessons %> materi siap ditonton
+          <%= stats.totalLessons - stats.completedLessons %> materi siap dipelajari
         </div>
       </div>
     </div>
@@ -196,8 +196,8 @@
             </div>
             <span>•</span>
             <div class="flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
-              <span><%= course.total_lessons || 0 %> Video</span>
+              <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+              <span><%= course.total_lessons || 0 %> Materi</span>
             </div>
           </div>
 
@@ -211,7 +211,7 @@
               <div class="h-full rounded-full transition-all duration-500 dashboard-bar" data-progress="<%= course.percent || 0 %>" data-color="<%= course.barColor || '#6c5dd3' %>"></div>
             </div>
             <div class="text-[11px] text-slate-400 font-medium">
-              <%= course.completed_lessons || 0 %> dari <%= course.total_lessons || 0 %> video selesai
+              <%= course.completed_lessons || 0 %> dari <%= course.total_lessons || 0 %> materi selesai
             </div>
           </div>
         </div>
@@ -224,7 +224,7 @@
                   class="w-full py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-brand-500 dark:hover:text-brand-400 text-xs font-bold flex items-center justify-between transition-colors">
             <span class="flex items-center gap-1.5">
               <span>📂</span>
-              <span>Daftar Bab & Video</span>
+              <span>Daftar Bab & Materi</span>
             </span>
             <svg id="bentoDrawerIcon-<%= course.id %>" class="w-4 h-4 transition-transform duration-200 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -331,7 +331,7 @@
 
             <td class="py-4 px-4 text-right">
               <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                <%= course.completed_lessons || 0 %> / <%= course.total_lessons || 0 %> video
+                <%= course.completed_lessons || 0 %> / <%= course.total_lessons || 0 %> materi
               </span>
             </td>
 
@@ -370,7 +370,7 @@
                             </span>
                             <span><%= ch.title %></span>
                           </span>
-                          <span class="text-[10px] text-slate-400 font-semibold"><%= ch.lessons ? ch.lessons.length : 0 %> Video Pembelajaran</span>
+                          <span class="text-[10px] text-slate-400 font-semibold"><%= ch.lessons ? ch.lessons.length : 0 %> Materi</span>
                         </div>
 
                         <div class="mt-2 space-y-1 pl-4">
@@ -385,12 +385,12 @@
                                 </div>
                                 <div class="flex items-center gap-3 text-[10px] text-slate-400 shrink-0 ml-2">
                                   <span><%= l.duration_minutes %> menit</span>
-                                  <span class="text-violet-600 font-bold group-hover:underline">Putar Video ▶</span>
+                                  <span class="text-brand-600 font-bold group-hover:underline">Buka Materi →</span>
                                 </div>
                               </a>
                             <% }) %>
                           <% } else { %>
-                            <span class="text-[10px] text-slate-400 italic">Belum ada video materi di bab ini.</span>
+                            <span class="text-[10px] text-slate-400 italic">Belum ada materi di bab ini.</span>
                           <% } %>
                         </div>
                       </div>

@@ -29,7 +29,7 @@
             <span class="font-bold text-brand-600 dark:text-brand-400"><%= courseProgressPercent %>% (<%= completedCount %>/<%= lessons.length %> Episode)</span>
           </div>
           <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-            <div class="bg-brand-500 h-full rounded-full transition-all duration-500 shadow-dynamic-glow" style="<%= 'width: ' + (courseProgressPercent || 0) + '%;' %>"></div>
+            <div id="courseDetailProgressBar" class="bg-brand-500 h-full rounded-full transition-all duration-500 shadow-dynamic-glow" data-progress="<%= courseProgressPercent || 0 %>"></div>
           </div>
         </div>
       <% } %>
@@ -148,3 +148,12 @@
   </div>
 
 </div>
+
+<script>
+  (function() {
+    const pb = document.getElementById('courseDetailProgressBar');
+    if (pb) {
+      pb.style.width = (pb.getAttribute('data-progress') || 0) + '%';
+    }
+  })();
+</script>

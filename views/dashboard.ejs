@@ -105,7 +105,7 @@
           <span class="text-sm font-extrabold text-blue-600 dark:text-blue-400"><%= stats.overallPercentage %>%</span>
         </div>
         <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
-          <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-full rounded-full transition-all duration-700" style="<%= 'width: ' + (stats.overallPercentage || 0) + '%;' %>"></div>
+          <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-full rounded-full transition-all duration-700 dashboard-bar" data-progress="<%= stats.overallPercentage || 0 %>"></div>
         </div>
         <div class="text-[11px] text-slate-400 mt-1 truncate">Rata-rata progres pembelajaran</div>
       </div>
@@ -208,7 +208,7 @@
               <span class="font-extrabold text-slate-800 dark:text-white"><%= course.percent %>%</span>
             </div>
             <div class="w-full bg-slate-200/70 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
-              <div class="h-full rounded-full transition-all duration-500" style="<%= 'width: ' + (course.percent || 0) + '%; background-color: ' + (course.barColor || '#6c5dd3') + ';' %>"></div>
+              <div class="h-full rounded-full transition-all duration-500 dashboard-bar" data-progress="<%= course.percent || 0 %>" data-color="<%= course.barColor || '#6c5dd3' %>"></div>
             </div>
             <div class="text-[11px] text-slate-400 font-medium">
               <%= course.completed_lessons || 0 %> dari <%= course.total_lessons || 0 %> video selesai
@@ -321,8 +321,8 @@
             <td class="py-4 px-4" onclick="window.location.href='/courses/<%= course.slug %>'">
               <div class="flex items-center gap-3">
                 <div class="flex-1 bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
-                  <div class="h-full rounded-full transition-all duration-500" 
-                       style="<%= 'width: ' + (course.percent || 0) + '%; background-color: ' + (course.barColor || '#6c5dd3') + ';' %>">
+                  <div class="h-full rounded-full transition-all duration-500 dashboard-bar" 
+                       data-progress="<%= course.percent || 0 %>" data-color="<%= course.barColor || '#6c5dd3' %>">
                   </div>
                 </div>
                 <span class="text-xs font-bold text-slate-600 dark:text-slate-300 w-9 text-right"><%= course.percent %>%</span>
@@ -632,4 +632,14 @@
       "'": '&#039;'
     })[m]);
   }
+
+  // Inisialisasi visual progress bar aman tanpa error linter
+  (function() {
+    document.querySelectorAll('.dashboard-bar').forEach(el => {
+      const p = el.getAttribute('data-progress') || 0;
+      const c = el.getAttribute('data-color');
+      el.style.width = p + '%';
+      if (c) el.style.backgroundColor = c;
+    });
+  })();
 </script>

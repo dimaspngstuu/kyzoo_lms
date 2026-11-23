@@ -18,7 +18,7 @@
         Progress: <span id="courseProgressText" class="text-brand-600 dark:text-brand-400 font-extrabold"><%= courseProgressPercent %>%</span>
       </div>
       <div class="w-24 sm:w-32 bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden p-0.5">
-        <div id="courseProgressBar" class="bg-brand-500 h-full rounded-full transition-all duration-500 shadow-dynamic-glow" style="<%= 'width: ' + (courseProgressPercent || 0) + '%;' %>"></div>
+        <div id="courseProgressBar" class="bg-brand-500 h-full rounded-full transition-all duration-500 shadow-dynamic-glow" data-progress="<%= courseProgressPercent || 0 %>"></div>
       </div>
     </div>
   </div>
@@ -223,7 +223,8 @@
         <!-- Tombol Tandai Selesai (Checklist Interaktif) -->
         <button 
           id="btnToggleComplete" 
-          onclick="toggleLessonCompletion(<%= activeLesson.id %>)" 
+          data-lesson-id="<%= activeLesson.id %>"
+          onclick="toggleLessonCompletion(Number(this.getAttribute('data-lesson-id')))" 
           class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm <%= activeLesson.is_completed ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700' %>">
           <svg id="completeCheckIcon" class="w-4 h-4 <%= activeLesson.is_completed ? 'block' : 'hidden' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
@@ -306,6 +307,11 @@
 
 </div>
 
+<!-- Data Lesson JSON Client (Aman dari parser JS linter) -->
+<script type="application/json" id="activeLessonJson">
+<%- JSON.stringify({ id: activeLesson.id, duration_minutes: activeLesson.duration_minutes || 0 }) %>
+</script>
+
 <script>
   async function toggleLessonCompletion(lessonId) {
     try {
@@ -364,9 +370,19 @@
   // ==============================================================
   // SISTEM DETEKSI & SINKRONISASI OTOMATIS DURASI VIDEO (YT & LOKAL)
   // ==============================================================
-  const currentActiveLessonId = <%= activeLesson.id %>;
-  let currentDbMinutes = <%= activeLesson.duration_minutes || 0 %>;
+  // Inisialisasi data materi aktif aman tanpa error linter
+  const activeLessonData = JSON.parse(document.getElementById('activeLessonJson').textContent || '{}');
+  const currentActiveLessonId = Number(activeLessonData.id || 0);
+  let currentDbMinutes = Number(activeLessonData.duration_minutes || 0);
   let hasSyncedDuration = false;
+
+  // Inisialisasi progress bar saat pertama kali dimuat
+  (function() {
+    const pb = document.getElementById('courseProgressBar');
+    if (pb) {
+      pb.style.width = (pb.getAttribute('data-progress') || 0) + '%';
+    }
+  })();
 
   function syncDetectedDuration(lessonId, totalSeconds) {
     if (!totalSeconds || totalSeconds <= 0 || hasSyncedDuration) return;

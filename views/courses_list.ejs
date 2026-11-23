@@ -57,7 +57,7 @@
                 <span class="font-bold text-slate-800"><%= course.percent %>%</span>
               </div>
               <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                <div class="bg-[#6c5dd3] h-full rounded-full transition-all duration-500" style="<%= 'width: ' + (course.percent || 0) + '%;' %>"></div>
+                <div class="bg-[#6c5dd3] h-full rounded-full transition-all duration-500 course-progress-bar" data-progress="<%= course.percent || 0 %>"></div>
               </div>
             </div>
 
@@ -72,3 +72,11 @@
   </div>
 
 </div>
+
+<script>
+  (function() {
+    document.querySelectorAll('.course-progress-bar').forEach(el => {
+      el.style.width = (el.getAttribute('data-progress') || 0) + '%';
+    });
+  })();
+</script>

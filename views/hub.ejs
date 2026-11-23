@@ -228,9 +228,13 @@
   </div>
 </div>
 
-<!-- Data JSON Resources untuk Interaktivitas Client -->
+<!-- Data JSON Resources (Disimpan sebagai application/json agar aman dari parser JS & linter) -->
+<script type="application/json" id="hubResourcesJson">
+<%- JSON.stringify(resources || []) %>
+</script>
+
 <script>
-  const hubResources = <%- JSON.stringify(resources || []) %>;
+  const hubResources = JSON.parse(document.getElementById('hubResourcesJson').textContent || '[]');
   let activeModalResource = null;
 
   // 1. Filter Kategori Tabs

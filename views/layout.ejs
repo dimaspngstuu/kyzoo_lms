@@ -129,7 +129,7 @@
     html:not(.dark) ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
-<body class="h-full flex flex-col text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-950 antialiased selection:bg-brand-500 selection:text-white">
+<body data-user-logged-in="<%= currentUser ? 'true' : 'false' %>" class="h-full flex flex-col text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-950 antialiased selection:bg-brand-500 selection:text-white">
 
   <div class="flex-1 flex overflow-hidden">
     <!-- Sidebar Kiri -->
@@ -188,6 +188,36 @@
       <span>Profil</span>
     </a>
   </nav>
+
+  <% if (currentUser) { %>
+  <!-- Modal Peringatan Sesi Tidak Aktif (Clean Editorial Style) -->
+  <div id="inactivityModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 max-w-sm w-full shadow-2xl text-slate-800 dark:text-white space-y-4 animate-in fade-in zoom-in-95 duration-200">
+      <div class="flex items-start gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-900/60 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"></circle><polyline points="12 6 12 12 16 14" stroke-width="2" stroke-linecap="round"></polyline></svg>
+        </div>
+        <div class="min-w-0">
+          <h4 class="text-sm font-bold text-slate-900 dark:text-white">Peringatan Tidak Ada Pergerakan</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Sistem mendeteksi Anda tidak aktif selama 9 menit.</p>
+        </div>
+      </div>
+
+      <div class="p-3 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 rounded-xl text-xs text-amber-800 dark:text-amber-300">
+        Sesi LMS Anda akan otomatis logout dalam <span id="inactivityCountdown" class="font-bold font-mono text-sm text-amber-900 dark:text-amber-200 bg-amber-100/80 dark:bg-amber-900/60 px-1.5 py-0.5 rounded">60</span> detik jika tetap tidak ada pergerakan.
+      </div>
+
+      <div class="flex items-center gap-2 pt-1">
+        <button type="button" id="btnStayActive" class="flex-1 py-2.5 px-4 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs rounded-xl shadow-xs transition-all">
+          Saya Masih Di Sini
+        </button>
+        <button type="button" onclick="window.location.href='/logout'" class="py-2.5 px-3.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold text-xs rounded-xl transition-colors">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+  <% } %>
 
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>

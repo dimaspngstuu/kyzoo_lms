@@ -47,6 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 3. Sistem Tema Interaktif & Dinamis (Dark/Light Mode + Aksen Warna Kyzoo)
   initInteractiveThemeSystem();
+
+  // 4. Sistem Deteksi Inaktivitas & Otomatis Logout (10 Menit Tanpa Pergerakan)
+  initInactivityTimer();
 });
 
 // Implementasi Sistem Tema Dinamis (Warna Aksen Kyzoo)
@@ -155,4 +158,116 @@ function showToast(message, type = 'success') {
       toast.remove();
     }, 300);
   }, 3000);
+}
+
+// 4. Sistem Deteksi Inaktivitas & Otomatis Logout (10 Menit Tanpa Pergerakan)
+function initInactivityTimer() {
+  const isUserLoggedIn = document.body.getAttribute('data-user-logged-in') === 'true';
+  if (!isUserLoggedIn) return;
+
+  const INACTIVITY_LIMIT_MS = 10 * 60 * 1000; // 10 menit = 600.000 ms
+  const WARNING_BEFORE_MS = 60 * 1000;        // Peringatan 60 detik sebelum logout (menit ke-9)
+  const STORAGE_KEY = 'kyzoo_lms_last_activity';
+
+  const modal = document.getElementById('inactivityModal');
+  const countdownEl = document.getElementById('inactivityCountdown');
+  const btnStayActive = document.getElementById('btnStayActive');
+
+  let lastActivity = Date.now();
+  let lastRecordedMovement = Date.now();
+
+  // Sinkronisasi awal atau buat baru jika belum ada
+  try {
+    const saved = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+    if (saved && !isNaN(saved) && saved <= Date.now()) {
+      lastActivity = saved;
+    } else {
+      localStorage.setItem(STORAGE_KEY, String(lastActivity));
+    }
+  } catch (e) {}
+
+  // Fungsi saat terdeteksi pergerakan pengguna (mouse, keyboard, touch, scroll)
+  function recordUserActivity() {
+    const now = Date.now();
+    // Throttle pembaruan maksimal sekali tiap 1 detik agar hemat resource
+    if (now - lastRecordedMovement > 1000) {
+      lastRecordedMovement = now;
+      lastActivity = now;
+      try {
+        localStorage.setItem(STORAGE_KEY, String(now));
+      } catch (e) {}
+
+      // Jika modal peringatan sedang terbuka dan pengguna bergerak, tutup otomatis
+      if (modal && !modal.classList.contains('hidden')) {
+        modal.classList.add('hidden');
+      }
+    }
+  }
+
+  // Pantau seluruh bentuk pergerakan & interaksi pengguna
+  const activityEvents = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click', 'wheel'];
+  activityEvents.forEach(evt => {
+    window.addEventListener(evt, recordUserActivity, { passive: true });
+  });
+
+  // Tombol "Saya Masih Di Sini"
+  if (btnStayActive) {
+    btnStayActive.addEventListener('click', () => {
+      recordUserActivity();
+      if (modal) modal.classList.add('hidden');
+      if (typeof showToast === 'function') {
+        showToast('Sesi belajar Anda telah diperpanjang.');
+      }
+    });
+  }
+
+  // Fungsi pengecekan inaktivitas berkala
+  function checkInactivity() {
+    let currentLast = lastActivity;
+    try {
+      const stored = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+      if (stored && !isNaN(stored)) {
+        currentLast = Math.max(lastActivity, stored);
+      }
+    } catch (e) {}
+
+    const idleTime = Date.now() - currentLast;
+    const remainingMs = INACTIVITY_LIMIT_MS - idleTime;
+
+    // 1. Waktu habis (10 menit tanpa pergerakan): Logout otomatis
+    if (remainingMs <= 0) {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (e) {}
+      window.location.href = '/logout?reason=inactivity';
+      return;
+    }
+
+    // 2. Masuk zona peringatan (sisa <= 60 detik)
+    if (remainingMs <= WARNING_BEFORE_MS) {
+      if (modal && modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+      }
+      if (countdownEl) {
+        countdownEl.textContent = Math.max(1, Math.ceil(remainingMs / 1000));
+      }
+    } else {
+      // Masih aktif, pastikan modal tertutup
+      if (modal && !modal.classList.contains('hidden')) {
+        modal.classList.add('hidden');
+      }
+    }
+  }
+
+  // Interval deteksi setiap 1 detik
+  setInterval(checkInactivity, 1000);
+
+  // Jika tab kembali dibuka setelah layar mati/laptop ditutup lebih dari 10 menit
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      checkInactivity();
+    }
+  });
+
+  window.addEventListener('focus', checkInactivity);
 }

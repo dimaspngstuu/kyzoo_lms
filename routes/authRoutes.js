@@ -50,6 +50,7 @@ router.post('/login', async (req, res) => {
       role: user.role,
       avatar: user.avatar
     };
+    req.session.lastActivity = Date.now();
     res.redirect('/dashboard');
   } catch (err) {
     console.error('Error login:', err);
@@ -65,6 +66,9 @@ router.post('/login', async (req, res) => {
 router.get('/logout', (req, res) => {
   req.session = null;
   res.clearCookie('kyzoo_session', { path: '/' });
+  if (req.query.reason === 'inactivity') {
+    return res.redirect('/login?error=' + encodeURIComponent('Sesi Anda telah berakhir otomatis karena tidak ada pergerakan/aktivitas selama 10 menit. Silakan masuk kembali.'));
+  }
   res.redirect('/login?success=Anda+berhasil+keluar');
 });
 
@@ -173,6 +177,7 @@ router.post('/verify-otp', async (req, res) => {
       role: user.role,
       avatar: user.avatar
     };
+    req.session.lastActivity = Date.now();
 
     console.log(`[Auth] Pengguna ${user.email} (${user.role}) berhasil masuk menggunakan kode OTP.`);
     res.redirect('/dashboard');

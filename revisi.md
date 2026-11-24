@@ -55,3 +55,15 @@ Tampilan aplikasi saat ini masih memiliki karakteristik khas buatan generator AI
   6. `views/login.ejs` & `views/verify_otp.ejs`: Tab switcher, notifikasi simulasi, dan timer OTP dibersihkan dari emoji menjadi SVG profesional.
   7. `views/hub.ejs`: Resource library ala Notion database, copy link instan berfungsi mulus dengan feedback bersih.
   8. **Syntax & Kompilasi**: `node -c server.js` dan kompilasi seluruh template EJS lulus 100% tanpa error.
+
+---
+
+## 6. Fitur Sesi 10 Menit & Otomatis Logout Inaktivitas
+- **Latar Belakang**: Pengguna meminta sesi LMS dibatasi maksimal 10 menit jika tidak ada pergerakan (inaktivitas), maka sistem wajib otomatis logout demi keamanan akun.
+- **Implementasi**:
+  1. `server.js`: Memperbarui `cookieSession` `maxAge` menjadi `10 * 60 * 1000` (10 menit).
+  2. `middleware/auth.js`: Menerapkan validasi inaktivitas pada `requireAuth` dan `requireAdmin`. Jika selisih waktu `req.session.lastActivity` melebihi 10 menit, sesi dihancurkan, cookie dihapus, dan dialihkan ke `/login` dengan pesan error.
+  3. `routes/authRoutes.js`: Inisialisasi `lastActivity` saat login sukses, serta penanganan rute `/logout?reason=inactivity`.
+  4. `public/js/app.js`: Sistem pendeteksi pergerakan client-side (`mousemove`, `mousedown`, `keydown`, `touchstart`, `scroll`, `click`, `wheel`) dengan sinkronisasi `localStorage` lintas tab. Menampilkan modal peringatan interaktif pada sisa 60 detik (menit ke-9) dan otomatis redirect logout tepat di menit ke-10 jika tetap tidak ada pergerakan.
+  5. `views/layout.ejs`: Menambahkan dialog modal peringatan inaktivitas bergaya Clean Editorial SaaS.
+- **Status Pengujian**: ✅ Lulus pengujian unit test dan simulasi inaktivitas (> 10 menit).

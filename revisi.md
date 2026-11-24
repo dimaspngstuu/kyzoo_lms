@@ -66,4 +66,13 @@ Tampilan aplikasi saat ini masih memiliki karakteristik khas buatan generator AI
   3. `routes/authRoutes.js`: Inisialisasi `lastActivity` saat login sukses, serta penanganan rute `/logout?reason=inactivity`.
   4. `public/js/app.js`: Sistem pendeteksi pergerakan client-side (`mousemove`, `mousedown`, `keydown`, `touchstart`, `scroll`, `click`, `wheel`) dengan sinkronisasi `localStorage` lintas tab. Menampilkan modal peringatan interaktif pada sisa 60 detik (menit ke-9) dan otomatis redirect logout tepat di menit ke-10 jika tetap tidak ada pergerakan.
   5. `views/layout.ejs`: Menambahkan dialog modal peringatan inaktivitas bergaya Clean Editorial SaaS.
-- **Status Pengujian**: ✅ Lulus pengujian unit test dan simulasi inaktivitas (> 10 menit).
+---
+
+## 7. Fitur Background Interaktif & Bergerak (Auth Screens)
+- **Latar Belakang**: Pengguna meminta tampilan latar belakang pada halaman login dibuat lebih hidup, keren, dan interaktif mengikuti pergerakan mouse tanpa mengubah kode logika/form login yang sudah ada.
+- **Implementasi**:
+  1. **Interactive Constellation Canvas**: Kanvas partikel mengambang halus berbasis palet warna Kyzoo (Violet, Cyan, Coral, Emerald) yang saling terhubung dan merespons pergerakan kursor mouse secara dinamis.
+  2. **Ambient Glowing Orbs**: Lapisan gradien bercahaya halus dengan efek paralaks lembut saat mouse digerakkan.
+  3. **Dot Matrix Grid**: Pola titik-titik modern dengan masking radial untuk estetika SaaS premium.
+  4. **Perlindungan Kode**: Kartu form login/OTP tetap berada di atas (`relative z-10 backdrop-blur-xl`) dan lapisan kanvas diatur `pointer-events-none` agar interaksi form, tab, input, dan tombol login 100% aman dan tidak terganggu.
+- **Status Pengujian**: ✅ Lulus pengujian kompilasi EJS dan render animasi 60fps.

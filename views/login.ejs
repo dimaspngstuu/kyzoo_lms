@@ -9,15 +9,30 @@
   </title>
   <link rel="icon" type="image/png" href="/images/logo-icon.png">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#6c5dd3',
+              600: '#5b4dc2',
+              700: '#4a3da8',
+            }
+          }
+        }
+      }
+    };
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Outfit', system-ui, -apple-system, sans-serif;
-    }
-    .font-serif, .font-accent {
-      font-family: 'Instrument Serif', Georgia, serif;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      letter-spacing: -0.012em;
     }
   </style>
 </head>
@@ -66,16 +81,16 @@
         type="button" 
         id="tabPasswordBtn" 
         onclick="switchLoginMode('password')" 
-        class="flex-1 py-2.5 rounded-xl transition-all inline-flex items-center justify-center gap-1.5 <%= (typeof tab === 'undefined' || tab === 'password') ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800' %>">
-        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+        class="flex-1 py-2.5 rounded-xl transition-all inline-flex items-center justify-center gap-2 <%= (typeof tab === 'undefined' || tab === 'password') ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800' %>">
+        <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
         <span>Kata Sandi</span>
       </button>
       <button 
         type="button" 
         id="tabOtpBtn" 
         onclick="switchLoginMode('otp')" 
-        class="flex-1 py-2.5 rounded-xl transition-all inline-flex items-center justify-center gap-1.5 <%= (typeof tab !== 'undefined' && tab === 'otp') ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800' %>">
-        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+        class="flex-1 py-2.5 rounded-xl transition-all inline-flex items-center justify-center gap-2 <%= (typeof tab !== 'undefined' && tab === 'otp') ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800' %>">
+        <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
         <span>Kode OTP Email</span>
       </button>
     </div>
@@ -155,7 +170,7 @@
 
       <button 
         type="submit"
-        class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md shadow-dynamic-glow flex items-center justify-center gap-2">
+        class="w-full py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md shadow-violet-200 flex items-center justify-center gap-2">
         <span>Kirim Kode OTP ke Email</span>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
       </button>
@@ -196,16 +211,19 @@
       const tabPass = document.getElementById('tabPasswordBtn');
       const tabOtp = document.getElementById('tabOtpBtn');
 
+      const activeClass = "flex-1 py-2.5 rounded-xl transition-all inline-flex items-center justify-center gap-2 bg-white text-slate-900 shadow-xs";
+      const inactiveClass = "flex-1 py-2.5 rounded-xl transition-all inline-flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800";
+
       if (mode === 'otp') {
         formPass.classList.add('hidden');
         formOtp.classList.remove('hidden');
-        tabOtp.className = "flex-1 py-2.5 rounded-xl transition-all text-center bg-white text-slate-900 shadow-xs";
-        tabPass.className = "flex-1 py-2.5 rounded-xl transition-all text-center text-slate-500 hover:text-slate-800";
+        tabOtp.className = activeClass;
+        tabPass.className = inactiveClass;
       } else {
         formOtp.classList.add('hidden');
         formPass.classList.remove('hidden');
-        tabPass.className = "flex-1 py-2.5 rounded-xl transition-all text-center bg-white text-slate-900 shadow-xs";
-        tabOtp.className = "flex-1 py-2.5 rounded-xl transition-all text-center text-slate-500 hover:text-slate-800";
+        tabPass.className = activeClass;
+        tabOtp.className = inactiveClass;
       }
     }
 
@@ -216,7 +234,7 @@
         if (btn && !btn.disabled) {
           btn.disabled = true;
           btn.classList.add('opacity-80', 'cursor-not-allowed');
-          btn.innerHTML = '<span class="inline-block animate-spin mr-2">⏳</span> Sedang Memproses...';
+          btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Sedang Memproses...';
         }
       });
     });

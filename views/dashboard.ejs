@@ -2,35 +2,28 @@
 
 <div class="space-y-6">
 
-  <!-- 1. HERO GREETING BANNER (Modern Clean & Adaptif Tema) -->
-  <div class="bg-gradient-to-br from-brand-50/70 via-white to-indigo-50/50 dark:from-slate-900/95 dark:via-slate-900/70 dark:to-slate-900/95 rounded-[28px] p-7 sm:p-10 text-center shadow-xs border border-slate-200/90 dark:border-slate-800 relative z-20 transition-all duration-300">
-    <!-- Ambient Soft Glow Efek Dinamis -->
-    <div class="absolute inset-0 rounded-[28px] overflow-hidden pointer-events-none">
-      <div class="absolute -top-24 -right-24 w-80 h-80 bg-brand-200/30 dark:bg-brand-500/10 rounded-full blur-3xl animate-pulse"></div>
-      <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-fuchsia-200/25 dark:bg-indigo-500/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 1.5s;"></div>
-    </div>
-
-    <div class="relative z-10 max-w-3xl mx-auto space-y-3">
-      <!-- Badge Sapaan Hangat -->
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-100/80 dark:bg-slate-800 border border-brand-200/60 dark:border-slate-700 text-xs font-semibold text-brand-600 dark:text-brand-300 shadow-2xs">
-        <span>👋</span>
-        <span><%= greeting %>, Selamat Datang Kembali!</span>
+  <!-- 1. HERO HEADER (Clean Editorial SaaS ala Stripe / Notion) -->
+  <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-2xs relative z-20 transition-all duration-300">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="space-y-1.5">
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <span>Portal Pembelajaran Kyzoo</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <%= greeting %>, <%= (user && user.name) ? user.name : 'Member' %>
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-normal">
+          Lanjutkan materi kursus dan pantau pencapaian belajar Anda secara terstruktur.
+        </p>
       </div>
 
-      <!-- Judul Sapaan Dinamis & Nama Pengguna -->
-      <h1 class="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight transition-colors">
-        <%= (user && user.name) ? user.name : 'Member Kyzoo' %>
-      </h1>
-      <p class="text-xs sm:text-base text-slate-500 dark:text-slate-400 font-medium max-w-xl mx-auto">
-        Portal pembelajaran dan materi panduan Kyzoo Agent.
-      </p>
-
-      <!-- Input Pencarian Tunggal Terintegrasi (Live Search & Shortcut Ctrl K) -->
-      <div class="pt-4 max-w-2xl mx-auto relative">
+      <!-- Bilah Pencarian Cepat (Command Palette Input) -->
+      <div class="w-full md:w-96 relative">
         <form action="/courses" method="GET" id="heroSearchForm" autocomplete="off">
           <div class="relative flex items-center">
-            <div class="absolute inset-y-0 left-0 pl-4 sm:pl-5 flex items-center pointer-events-none text-slate-400">
-              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </div>
@@ -38,76 +31,74 @@
               type="text" 
               name="q" 
               id="heroSearchInput"
-              placeholder="Cari materi tutorial, modul, atau catatan panduan..." 
-              class="w-full pl-11 sm:pl-13 pr-20 sm:pr-24 py-3 sm:py-3.5 bg-white dark:bg-slate-800/90 hover:border-slate-300 dark:hover:border-slate-600 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs sm:text-sm text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all shadow-xs"
+              placeholder="Cari materi tutorial atau modul..." 
+              class="w-full pl-10 pr-20 py-2.5 bg-slate-50 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
             />
-            <div class="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center pointer-events-none">
-              <kbd class="px-2 sm:px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg shadow-2xs">Ctrl K</kbd>
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <kbd class="px-2 py-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md shadow-2xs">Ctrl K</kbd>
             </div>
           </div>
         </form>
 
         <!-- Dropdown Live Search Hasil Cepat -->
-        <div id="heroSearchResults" class="hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 rounded-2xl shadow-xl z-50 overflow-hidden text-left max-h-96 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700">
+        <div id="heroSearchResults" class="hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden text-left max-h-96 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700">
           <!-- Diisi secara dinamis melalui JavaScript -->
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 2. BENTO METRIC STRIP (3 Ringkasan Metrik Interaktif & Halus) -->
+  <!-- 2. METRIC STRIP (Clean Neutral SaaS ala Stripe) -->
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
     <!-- Card 1: Total Modul Aktif -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex items-center gap-4 hover:border-brand-300 dark:hover:border-brand-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
-      <div class="w-12 h-12 rounded-2xl bg-brand-50 dark:bg-brand-950/40 border border-brand-100 dark:border-brand-900/50 flex items-center justify-center text-brand-500 shrink-0 group-hover:scale-110 transition-transform">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-        </svg>
-      </div>
-      <div class="min-w-0 flex-1">
-        <div class="text-xs font-semibold text-slate-400">Modul Kursus</div>
-        <div class="text-xl sm:text-2xl font-black text-slate-800 dark:text-white leading-tight">
-          <%= stats.totalCourses %> <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Kelas Aktif</span>
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all group">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Modul Kursus</span>
+        <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
         </div>
-        <div class="text-[11px] text-slate-400 mt-0.5 truncate">Tersedia untuk dipelajari</div>
       </div>
-    </div>
-
-    <!-- Card 2: Video Selesai / Ditonton -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex items-center gap-4 hover:border-emerald-300 dark:hover:border-emerald-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
-      <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/50 flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-110 transition-transform">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
+      <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+        <%= stats.totalCourses %>
       </div>
-      <div class="min-w-0 flex-1">
-        <div class="text-xs font-semibold text-slate-400">Materi Selesai</div>
-        <div class="text-xl sm:text-2xl font-black text-slate-800 dark:text-white leading-tight">
-          <%= stats.completedLessons %> <span class="text-xs font-bold text-slate-400">/ <%= stats.totalLessons %> Materi</span>
-        </div>
-        <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
-          <%= stats.totalLessons - stats.completedLessons %> materi siap dipelajari
-        </div>
+      <div class="flex items-center gap-1.5 text-[11px] text-slate-400 mt-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        <span>Kelas aktif tersedia</span>
       </div>
     </div>
 
-    <!-- Card 3: Capaian Belajar Akun -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex items-center gap-4 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group">
-      <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-110 transition-transform">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-        </svg>
+    <!-- Card 2: Materi Selesai -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all group">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Materi Selesai</span>
+        <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
       </div>
-      <div class="min-w-0 flex-1">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-400">Capaian Belajar</span>
-          <span class="text-sm font-extrabold text-blue-600 dark:text-blue-400"><%= stats.overallPercentage %>%</span>
-        </div>
-        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
-          <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-full rounded-full transition-all duration-700 dashboard-bar" data-progress="<%= stats.overallPercentage || 0 %>"></div>
-        </div>
-        <div class="text-[11px] text-slate-400 mt-1 truncate">Rata-rata progres pembelajaran</div>
+      <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+        <%= stats.completedLessons %> <span class="text-xs font-medium text-slate-400">/ <%= stats.totalLessons %></span>
+      </div>
+      <div class="flex items-center gap-1.5 text-[11px] text-slate-400 mt-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+        <span><%= stats.totalLessons - stats.completedLessons %> materi tersisa</span>
+      </div>
+    </div>
+
+    <!-- Card 3: Capaian Belajar -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all group">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Capaian Belajar</span>
+        <span class="text-xs font-extrabold text-slate-900 dark:text-white"><%= stats.overallPercentage %>%</span>
+      </div>
+      <div class="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+        <%= stats.overallPercentage %>%
+      </div>
+      <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mt-3">
+        <div class="bg-slate-900 dark:bg-white h-full rounded-full transition-all duration-700 dashboard-bar" data-progress="<%= stats.overallPercentage || 0 %>"></div>
       </div>
     </div>
   </div>
@@ -163,19 +154,20 @@
            data-type="<%= course.isFinished ? 'completed' : 'active' %>">
         
         <div>
-          <!-- Thumbnail & Badges -->
-          <div class="relative w-full aspect-video rounded-xl overflow-hidden mb-4 bg-slate-200 dark:bg-slate-700 border border-slate-100 dark:border-slate-700 shadow-xs">
+          <!-- Thumbnail & Status Meta -->
+          <div class="relative w-full aspect-video rounded-xl overflow-hidden mb-3.5 bg-slate-100 dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700 shadow-2xs">
             <img src="<%= course.thumbnail %>" alt="<%= course.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-            <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-              <span class="px-2.5 py-1 rounded-lg bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider">
-                <%= course.code %>
-              </span>
-            </div>
-            <div class="absolute top-2.5 right-2.5">
-              <span class="px-2.5 py-1 rounded-lg bg-brand-500/90 backdrop-blur-md text-white text-[10px] font-bold">
-                <%= course.category %>
-              </span>
-            </div>
+          </div>
+
+          <!-- Metadata Pill Bar (Clean & Teratur) -->
+          <div class="flex items-center gap-2 mb-2.5">
+            <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono text-[10px] font-bold">
+              <%= course.code %>
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-medium">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+              <%= course.category %>
+            </span>
           </div>
 
           <!-- Info Kursus -->
@@ -183,7 +175,7 @@
             <h4 class="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-brand-500 transition-colors line-clamp-2 leading-snug">
               <a href="/courses/<%= course.slug %>"><%= course.title %></a>
             </h4>
-            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-2 leading-relaxed">
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-normal line-clamp-2 leading-relaxed">
               <%= course.description || 'Pelajari materi terstruktur dan praktik langsung langkah demi langkah.' %>
             </p>
           </div>
@@ -191,12 +183,12 @@
           <!-- Indikator Metrik Bab & Materi -->
           <div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium py-2 border-y border-slate-100 dark:border-slate-800">
             <div class="flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-              <span><%= course.chapters ? course.chapters.length : 0 %> Bab Turunan</span>
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+              <span><%= course.chapters ? course.chapters.length : 0 %> Bab</span>
             </div>
             <span>•</span>
             <div class="flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
               <span><%= course.total_lessons || 0 %> Materi</span>
             </div>
           </div>
@@ -205,12 +197,12 @@
           <div class="mt-3.5 space-y-1.5">
             <div class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-400">
               <span>Progres Belajar</span>
-              <span class="font-extrabold text-slate-800 dark:text-white"><%= course.percent %>%</span>
+              <span class="font-extrabold text-slate-900 dark:text-white"><%= course.percent %>%</span>
             </div>
-            <div class="w-full bg-slate-200/70 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+            <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
               <div class="h-full rounded-full transition-all duration-500 dashboard-bar" data-progress="<%= course.percent || 0 %>" data-color="<%= course.barColor || '#6c5dd3' %>"></div>
             </div>
-            <div class="text-[11px] text-slate-400 font-medium">
+            <div class="text-[11px] text-slate-400 font-normal">
               <%= course.completed_lessons || 0 %> dari <%= course.total_lessons || 0 %> materi selesai
             </div>
           </div>
@@ -221,10 +213,10 @@
           <!-- Accordion Toggle Bab Turunan -->
           <button type="button" 
                   onclick="toggleBentoChapterDrawer(event, '<%= course.id %>')" 
-                  class="w-full py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-brand-500 dark:hover:text-brand-400 text-xs font-bold flex items-center justify-between transition-colors">
-            <span class="flex items-center gap-1.5">
-              <span>📂</span>
-              <span>Daftar Bab & Materi</span>
+                  class="w-full py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-300 text-xs font-semibold flex items-center justify-between transition-colors">
+            <span class="flex items-center gap-2">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+              <span>Silabus Bab & Materi</span>
             </span>
             <svg id="bentoDrawerIcon-<%= course.id %>" class="w-4 h-4 transition-transform duration-200 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -238,7 +230,7 @@
                 <div class="p-2.5 rounded-xl bg-white dark:bg-slate-850 border border-slate-100 dark:border-slate-700/80 space-y-1.5 shadow-2xs">
                   <div class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
                     <span class="truncate">Bab <%= chIdx + 1 %>: <%= ch.title %></span>
-                    <span class="text-[10px] text-slate-400 font-semibold shrink-0 ml-1"><%= ch.lessons ? ch.lessons.length : 0 %> v</span>
+                    <span class="text-[10px] text-slate-400 font-semibold shrink-0 ml-1"><%= ch.lessons ? ch.lessons.length : 0 %> materi</span>
                   </div>
                   <div class="space-y-1 pl-2 border-l border-brand-200 dark:border-brand-800">
                     <% if (ch.lessons && ch.lessons.length > 0) { %>
@@ -248,7 +240,7 @@
                             <span class="w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] <%= l.is_completed ? 'bg-emerald-500 text-white font-bold' : 'border border-slate-300 dark:border-slate-600 text-transparent' %>">✓</span>
                             <span><%= l.title %></span>
                           </span>
-                          <span class="text-[10px] text-brand-500 font-bold shrink-0 ml-1 group-hover/l:underline">Tonton ▶</span>
+                          <span class="text-[10px] text-slate-500 hover:text-slate-900 font-semibold shrink-0 ml-1">Buka →</span>
                         </a>
                       <% }) %>
                     <% } %>
@@ -261,8 +253,9 @@
           </div>
 
           <!-- Tombol Lanjut Belajar -->
-          <a href="/courses/<%= course.slug %>" class="w-full py-2.5 px-4 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold text-center block transition-all shadow-sm shadow-dynamic-glow">
-            Lanjutkan Belajar ▶
+          <a href="/courses/<%= course.slug %>" class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-white text-xs font-semibold text-center flex items-center justify-center gap-2 transition-all shadow-2xs">
+            <span>Lanjutkan Belajar</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
           </a>
         </div>
 
@@ -310,8 +303,9 @@
                   </h4>
                   <div class="flex items-center gap-2 mt-0.5">
                     <span class="text-[10px] text-slate-400 font-medium"><%= course.category %></span>
-                    <span class="text-[10px] text-brand-500 font-bold bg-brand-50 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-brand-100 dark:border-slate-700">
-                      📂 <%= (course.chapters ? course.chapters.length : 0) %> Bab Turunan
+                    <span class="text-[10px] text-brand-600 dark:text-brand-400 font-semibold bg-brand-50 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-brand-100 dark:border-slate-700 inline-flex items-center gap-1">
+                      <svg class="w-3 h-3 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                      <span><%= (course.chapters ? course.chapters.length : 0) %> Bab</span>
                     </span>
                   </div>
                 </div>
@@ -574,17 +568,18 @@
     // Modul Kursus
     if (courses.length > 0) {
       html += `
-        <div class="p-3 bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-violet-700 border-b border-slate-100">
-          📚 Modul Kursus
+        <div class="px-3.5 py-2 bg-slate-50 dark:bg-slate-800 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-700/60 flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+          <span>Modul Kursus</span>
         </div>
         <div class="p-1 space-y-0.5">
       `;
       courses.forEach(c => {
         html += `
-          <a href="/courses/${c.slug}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors group">
-            <img src="${c.thumbnail}" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-slate-200">
+          <a href="/courses/${c.slug}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/60 transition-colors group">
+            <img src="${c.thumbnail}" class="w-8 h-8 rounded-lg object-cover shrink-0 border border-slate-200/80 dark:border-slate-700">
             <div class="min-w-0 flex-1">
-              <h5 class="text-xs font-bold text-slate-800 group-hover:text-violet-600 truncate">${escapeHtml(c.title)}</h5>
+              <h5 class="text-xs font-semibold text-slate-900 dark:text-white group-hover:text-brand-500 truncate">${escapeHtml(c.title)}</h5>
               <span class="text-[10px] text-slate-400">${escapeHtml(c.category)}</span>
             </div>
           </a>
@@ -596,22 +591,25 @@
     // Materi Pembelajaran
     if (lessons.length > 0) {
       html += `
-        <div class="p-3 bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-emerald-700 border-b border-slate-100">
-          📖 Materi
+        <div class="px-3.5 py-2 bg-slate-50 dark:bg-slate-800 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-700/60 flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <span>Materi Pembelajaran</span>
         </div>
         <div class="p-1 space-y-0.5">
       `;
       lessons.forEach(l => {
         html += `
-          <a href="/learn/${l.course_slug}/${l.id}" class="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition-colors group">
+          <a href="/learn/${l.course_slug}/${l.id}" class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/60 transition-colors group">
             <div class="flex items-center gap-2.5 min-w-0">
-              <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 text-xs font-bold">📄</span>
+              <span class="w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              </span>
               <div class="min-w-0">
-                <h5 class="text-xs font-bold text-slate-800 group-hover:text-emerald-700 truncate">${escapeHtml(l.title)}</h5>
+                <h5 class="text-xs font-semibold text-slate-900 dark:text-white group-hover:text-brand-500 truncate">${escapeHtml(l.title)}</h5>
                 <span class="text-[10px] text-slate-400">${escapeHtml(l.course_title)}</span>
               </div>
             </div>
-            <span class="text-[10px] text-slate-400 shrink-0 ml-2">${l.duration_minutes}m</span>
+            <span class="text-[10px] text-slate-400 shrink-0 ml-2 font-mono">${l.duration_minutes}m</span>
           </a>
         `;
       });

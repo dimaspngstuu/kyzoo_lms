@@ -61,7 +61,8 @@
     <% if (simulated) { %>
       <div class="mb-5 p-4 bg-violet-50 border border-violet-200 rounded-2xl text-xs text-violet-800 space-y-1 shadow-xs">
         <div class="font-bold flex items-center gap-1.5 text-violet-900">
-          <span>📬 Mode Simulasi Cepat:</span>
+          <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+          <span>Mode Simulasi Cepat:</span>
         </div>
         <p class="text-[11px] text-violet-700">
           Kode OTP Anda adalah: <strong class="text-base font-black font-mono tracking-widest text-violet-900 bg-white px-2.5 py-0.5 rounded-lg border border-violet-200 inline-block ml-1"><%= simulated %></strong>
@@ -91,8 +92,9 @@
             class="w-full py-3.5 text-center text-2xl sm:text-3xl font-mono font-black tracking-[12px] bg-slate-50 border-2 border-slate-200 hover:border-violet-400 focus:border-violet-600 focus:bg-white rounded-2xl text-slate-900 focus:outline-none focus:ring-4 focus:ring-violet-500/15 transition-all shadow-inner"
           />
         </div>
-        <p class="text-[11px] text-slate-400 text-center mt-2">
-          ⏱️ Berlaku selama 10 menit
+        <p class="text-[11px] text-slate-400 text-center mt-2 flex items-center justify-center gap-1">
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"></circle><polyline points="12 6 12 12 16 14" stroke-width="2" stroke-linecap="round"></polyline></svg>
+          <span>Berlaku selama 10 menit</span>
         </p>
       </div>
 

@@ -12,6 +12,7 @@ router.get('/login', (req, res) => {
   res.render('login', {
     title: 'Masuk - Kyzoo LMS',
     tab: req.query.tab || 'password',
+    reason: req.query.reason || null,
     error: req.query.error || null,
     success: req.query.success || null
   });
@@ -67,9 +68,9 @@ router.get('/logout', (req, res) => {
   req.session = null;
   res.clearCookie('kyzoo_session', { path: '/' });
   if (req.query.reason === 'inactivity') {
-    return res.redirect('/login?error=' + encodeURIComponent('Sesi Anda telah berakhir otomatis karena tidak ada pergerakan/aktivitas selama 10 menit. Silakan masuk kembali.'));
+    return res.redirect('/login?reason=inactivity&error=' + encodeURIComponent('Sesi Anda telah berakhir otomatis karena tidak ada pergerakan/aktivitas selama 30 menit. Silakan masuk kembali.'));
   }
-  res.redirect('/login?success=Anda+berhasil+keluar');
+  res.redirect('/login?reason=logout&success=' + encodeURIComponent('Anda telah berhasil keluar (logout) dari akun Kyzoo LMS. Terima kasih telah belajar hari ini!'));
 });
 
 // ==============================================================

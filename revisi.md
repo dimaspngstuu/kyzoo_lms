@@ -76,3 +76,16 @@ Tampilan aplikasi saat ini masih memiliki karakteristik khas buatan generator AI
   3. **Dot Matrix Grid**: Pola titik-titik modern dengan masking radial untuk estetika SaaS premium.
   4. **Perlindungan Kode**: Kartu form login/OTP tetap berada di atas (`relative z-10 backdrop-blur-xl`) dan lapisan kanvas diatur `pointer-events-none` agar interaksi form, tab, input, dan tombol login 100% aman dan tidak terganggu.
 - **Status Pengujian**: ✅ Lulus pengujian kompilasi EJS dan render animasi 60fps.
+
+---
+
+## 8. Pembaruan Ucapan Waktu Dinamis Atraktif & Sesi Inaktivitas 30 Menit + Notice Logout
+- **Latar Belakang**:
+  1. Ucapan waktu pada dashboard sebelumnya terpengaruh jam server UTC (sehingga kerap tampil *Selamat Pagi* tidak sesuai waktu lokal pengguna) dan tampil terlalu datar.
+  2. Batas waktu inaktivitas sesi ditingkatkan dari 10 menit menjadi **30 menit** dengan tambahan **notice informasi yang jelas** saat pengguna logout manual maupun otomatis.
+- **Implementasi**:
+  1. `routes/dashboardRoutes.js`: Fallback ucapan server menggunakan zona waktu `Asia/Jakarta` (WIB).
+  2. `views/dashboard.ejs`: Hero Header ditingkatkan dengan *ambient glow* adaptif waktu (Pagi/Siang/Sore/Malam), *dot matrix backdrop*, pill jam lokal live, ikon fase waktu SVG, nama bergradasi + ikon sparkle, serta subjudul motivasional kontekstual berbasis waktu lokal browser.
+  3. `server.js`, `middleware/auth.js`, `public/js/app.js`, `views/layout.ejs`: Batas inaktivitas diubah ke **30 menit** (peringatan muncul di menit ke-29), ditambah transisi notice saat otomatis logout dan toast saat logout manual.
+  4. `routes/authRoutes.js` & `views/login.ejs`: Menambahkan parameter `reason` (`inactivity` / `logout`) untuk menampilkan kartu *Notice Informasi* yang jelas di halaman login saat pengguna keluar atau sesi berakhir otomatis.
+- **Status Pengujian**: ✅ Lulus `node -c`, kompilasi EJS, dan unit test batas sesi 25 menit (valid) vs 31 menit (auto logout).

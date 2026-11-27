@@ -40,8 +40,13 @@ router.get('/dashboard', async (req, res) => {
       res.locals.currentUser = req.session.user;
     }
 
-    // Hitung Ucapan Waktu Dinamis (Pagi / Siang / Sore / Malam)
-    const hour = new Date().getHours();
+    // Hitung Ucapan Waktu Dinamis berdasarkan zona waktu Asia/Jakarta (WIB) sebagai fallback server
+    const jakartaHourStr = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Jakarta',
+      hour: 'numeric',
+      hour12: false
+    }).format(new Date());
+    const hour = parseInt(jakartaHourStr, 10) % 24;
     let greeting = 'Selamat Pagi';
     if (hour >= 11 && hour < 15) {
       greeting = 'Selamat Siang';

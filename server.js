@@ -45,7 +45,7 @@ app.use(express.static(publicDir, {
 app.use(cookieSession({
   name: 'kyzoo_session',
   keys: [process.env.SESSION_SECRET || 'kyzoo-lms-secure-key-2026'],
-  maxAge: 10 * 60 * 1000, // 10 menit (otomatis logout jika tidak ada pergerakan/aktivitas)
+  maxAge: 30 * 60 * 1000, // 30 menit (otomatis logout jika tidak ada pergerakan/aktivitas)
   httpOnly: true,
   sameSite: 'lax'
 }));

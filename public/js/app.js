@@ -160,21 +160,38 @@ function showToast(message, type = 'success') {
   }, 3000);
 }
 
-// 4. Sistem Deteksi Inaktivitas & Otomatis Logout (10 Menit Tanpa Pergerakan)
+// 4. Sistem Deteksi Inaktivitas & Otomatis Logout (30 Menit Tanpa Pergerakan)
 function initInactivityTimer() {
   const isUserLoggedIn = document.body.getAttribute('data-user-logged-in') === 'true';
   if (!isUserLoggedIn) return;
 
-  const INACTIVITY_LIMIT_MS = 10 * 60 * 1000; // 10 menit = 600.000 ms
-  const WARNING_BEFORE_MS = 60 * 1000;        // Peringatan 60 detik sebelum logout (menit ke-9)
+  const INACTIVITY_LIMIT_MS = 30 * 60 * 1000; // 30 menit = 1.800.000 ms
+  const WARNING_BEFORE_MS = 60 * 1000;        // Peringatan 60 detik sebelum logout (menit ke-29)
   const STORAGE_KEY = 'kyzoo_lms_last_activity';
 
   const modal = document.getElementById('inactivityModal');
+  const modalTitle = document.getElementById('inactivityModalTitle');
+  const modalSubtitle = document.getElementById('inactivityModalSubtitle');
+  const modalBox = document.getElementById('inactivityModalBox');
+  const modalActions = document.getElementById('inactivityModalActions');
   const countdownEl = document.getElementById('inactivityCountdown');
   const btnStayActive = document.getElementById('btnStayActive');
 
   let lastActivity = Date.now();
   let lastRecordedMovement = Date.now();
+  let isLoggingOut = false;
+
+  // Bersihkan stempel aktivitas saat user mengklik Logout manual dan tampilkan notice
+  document.querySelectorAll('a[href="/logout"]').forEach(link => {
+    link.addEventListener('click', () => {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (e) {}
+      if (typeof showToast === 'function') {
+        showToast('Anda sedang keluar (logout) dari sesi Kyzoo LMS...');
+      }
+    });
+  });
 
   // Sinkronisasi awal atau buat baru jika belum ada
   try {
@@ -188,6 +205,7 @@ function initInactivityTimer() {
 
   // Fungsi saat terdeteksi pergerakan pengguna (mouse, keyboard, touch, scroll)
   function recordUserActivity() {
+    if (isLoggingOut) return;
     const now = Date.now();
     // Throttle pembaruan maksimal sekali tiap 1 detik agar hemat resource
     if (now - lastRecordedMovement > 1000) {
@@ -216,13 +234,15 @@ function initInactivityTimer() {
       recordUserActivity();
       if (modal) modal.classList.add('hidden');
       if (typeof showToast === 'function') {
-        showToast('Sesi belajar Anda telah diperpanjang.');
+        showToast('Sesi belajar Anda telah diperpanjang 30 menit.');
       }
     });
   }
 
   // Fungsi pengecekan inaktivitas berkala
   function checkInactivity() {
+    if (isLoggingOut) return;
+
     let currentLast = lastActivity;
     try {
       const stored = parseInt(localStorage.getItem(STORAGE_KEY), 10);
@@ -234,12 +254,31 @@ function initInactivityTimer() {
     const idleTime = Date.now() - currentLast;
     const remainingMs = INACTIVITY_LIMIT_MS - idleTime;
 
-    // 1. Waktu habis (10 menit tanpa pergerakan): Logout otomatis
+    // 1. Waktu habis (30 menit tanpa pergerakan): Tampilkan notice singkat lalu logout otomatis
     if (remainingMs <= 0) {
+      isLoggingOut = true;
       try {
         localStorage.removeItem(STORAGE_KEY);
       } catch (e) {}
-      window.location.href = '/logout?reason=inactivity';
+
+      if (modal) {
+        modal.classList.remove('hidden');
+        if (modalTitle) modalTitle.textContent = 'Sesi Berakhir Otomatis (30 Menit)';
+        if (modalSubtitle) modalSubtitle.textContent = 'Tidak ada pergerakan terdeteksi selama 30 menit.';
+        if (modalBox) {
+          modalBox.className = 'p-3 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 rounded-xl text-xs text-rose-700 dark:text-rose-300 font-medium';
+          modalBox.textContent = 'Demi keamanan akun, Anda sedang dikeluarkan secara otomatis ke halaman login...';
+        }
+        if (modalActions) modalActions.classList.add('hidden');
+      }
+
+      if (typeof showToast === 'function') {
+        showToast('Sesi berakhir karena tidak ada pergerakan 30 menit. Logout otomatis...', 'error');
+      }
+
+      setTimeout(() => {
+        window.location.href = '/logout?reason=inactivity';
+      }, 900);
       return;
     }
 
@@ -262,7 +301,7 @@ function initInactivityTimer() {
   // Interval deteksi setiap 1 detik
   setInterval(checkInactivity, 1000);
 
-  // Jika tab kembali dibuka setelah layar mati/laptop ditutup lebih dari 10 menit
+  // Jika tab kembali dibuka setelah layar mati/laptop ditutup lebih dari 30 menit
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
       checkInactivity();

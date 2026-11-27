@@ -1,5 +1,5 @@
-// Batas waktu inaktivitas sesi: 10 Menit (600.000 ms)
-const INACTIVITY_TIMEOUT_MS = 10 * 60 * 1000;
+// Batas waktu inaktivitas sesi: 30 Menit (1.800.000 ms)
+const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000;
 
 function checkSessionInactivity(req, res) {
   if (!req.session || !req.session.user) return false;
@@ -9,7 +9,7 @@ function checkSessionInactivity(req, res) {
     req.session = null;
     res.clearCookie('kyzoo_session', { path: '/' });
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.redirect('/login?error=' + encodeURIComponent('Sesi Anda telah berakhir otomatis karena tidak ada pergerakan/aktivitas selama 10 menit. Silakan masuk kembali.'));
+    res.redirect('/login?reason=inactivity&error=' + encodeURIComponent('Sesi Anda telah berakhir otomatis karena tidak ada pergerakan/aktivitas selama 30 menit. Silakan masuk kembali.'));
     return true; // Sesi telah kedaluwarsa
   }
 

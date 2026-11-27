@@ -89,3 +89,14 @@ Tampilan aplikasi saat ini masih memiliki karakteristik khas buatan generator AI
   3. `server.js`, `middleware/auth.js`, `public/js/app.js`, `views/layout.ejs`: Batas inaktivitas diubah ke **30 menit** (peringatan muncul di menit ke-29), ditambah transisi notice saat otomatis logout dan toast saat logout manual.
   4. `routes/authRoutes.js` & `views/login.ejs`: Menambahkan parameter `reason` (`inactivity` / `logout`) untuk menampilkan kartu *Notice Informasi* yang jelas di halaman login saat pengguna keluar atau sesi berakhir otomatis.
 - **Status Pengujian**: ✅ Lulus `node -c`, kompilasi EJS, dan unit test batas sesi 25 menit (valid) vs 31 menit (auto logout).
+
+---
+
+## 9. Sentuhan Gradasi Loop Halus pada Hero Dashboard & Kartu Metrik (Anti-Norak)
+- **Latar Belakang**: Hero Dashboard terlihat terlalu polos/sepi; perlu gradasi yang dianimasikan secara loop agar hidup dan menarik namun tetap menjaga estetika *Clean Editorial SaaS*.
+- **Implementasi**:
+  1. `views/layout.ejs`: Menambahkan `@keyframes` GPU-accelerated (`kyzooMeshDrift`, `kyzooMeshDriftReverse`, `kyzooGradientFlow`, `kyzooBeamSweep`, `kyzooWaveFloat`) serta kelas `.kyzoo-hero-surface` yang mengikuti variabel aksen dinamis (`--brand-50`, `--brand-100`).
+  2. `views/dashboard.ejs`:
+     - Latar kartu hero diberi animasi loop gradasi lembut + 2 aurora orb mengorbit halus + sapuan cahaya tipis (`2px`) di tepi atas + kontur gelombang arsitektural SVG di sisi kanan + pill cepat *"Lanjutkan: [Kursus]"*.
+     - Nama pengguna menggunakan animasi aliran gradasi halus (`.animate-kyzoo-gradient`).
+     - Tiga kartu metrik diberi sapuan gradasi sudut tipis, micro-lift saat hover, dan bar progres beranimasi gradasi lembut.

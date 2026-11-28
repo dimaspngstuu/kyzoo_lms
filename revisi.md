@@ -100,3 +100,13 @@ Tampilan aplikasi saat ini masih memiliki karakteristik khas buatan generator AI
      - Latar kartu hero diberi animasi loop gradasi lembut + 2 aurora orb mengorbit halus + sapuan cahaya tipis (`2px`) di tepi atas + kontur gelombang arsitektural SVG di sisi kanan + pill cepat *"Lanjutkan: [Kursus]"*.
      - Nama pengguna menggunakan animasi aliran gradasi halus (`.animate-kyzoo-gradient`).
      - Tiga kartu metrik diberi sapuan gradasi sudut tipis, micro-lift saat hover, dan bar progres beranimasi gradasi lembut.
+
+---
+
+## 10. Fitur Kotak Prompt / Blok Kode ala macOS & Tombol Editor Admin
+- **Latar Belakang**: Memudahkan Admin menyisipkan blok prompt/kode multi-baris di materi kurikulum serta memberi pengalaman belajar interaktif bagi member (tombol Salin & Simpan/Tersimpan langsung di header kotak).
+- **Implementasi**:
+  1. `helpers/contentFormatter.js`: Ekstraksi blok ` ``` ... ``` ` sebelum pemecahan paragraf ganda sehingga baris kosong di dalam satu prompt tetap utuh dalam satu kotak macOS (`#ff5f56`, `#ffbd2e`, `#27c93f`), lengkap dengan tombol **Simpan/Tersimpan** dan **Salin**.
+  2. `views/course_view.ejs`: Menambahkan fungsi `copyPromptBlock` (salin 1-klik + fallback clipboard + feedback *"Tersalin!"*) dan `togglePromptBookmark` (toggle *Simpan* ⇄ *Tersimpan* tersimpan di `localStorage`).
+  3. `views/admin/curriculum.ejs`: Menambahkan tombol **"Kotak Prompt"** pada toolbar form *Tambah Episode* dan *Edit Episode* untuk membungkus teks terpilih dengan ` ``` ... ``` ` secara instan.
+- **Status Pengujian**: ✅ Lulus `node -c`, kompilasi EJS, dan unit test `formatLessonContent` dengan blok multi-baris.

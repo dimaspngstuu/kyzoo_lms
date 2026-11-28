@@ -278,8 +278,14 @@
           </button>
           <button type="button" onclick="formatLessonText('add', 'code')"
             class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-mono shadow-2xs transition-colors"
-            title="Kode / Istilah (`kode`)">
+            title="Kode / Istilah sebaris (`kode`)">
             &lt;/&gt;
+          </button>
+          <button type="button" onclick="formatLessonText('add', 'promptbox')"
+            class="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200/80 rounded-lg text-xs font-bold shadow-2xs transition-colors flex items-center gap-1 shrink-0"
+            title="Kotak Prompt / Kode ala macOS dengan tombol Salin & Simpan (``` ... ```)">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <span>Kotak Prompt</span>
           </button>
           <button type="button" onclick="formatLessonText('add', 'link')"
             class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-medium shadow-2xs transition-colors flex items-center gap-1"
@@ -487,8 +493,14 @@
           </button>
           <button type="button" onclick="formatLessonText('edit', 'code')"
             class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-mono shadow-2xs transition-colors"
-            title="Kode / Istilah (`kode`)">
+            title="Kode / Istilah sebaris (`kode`)">
             &lt;/&gt;
+          </button>
+          <button type="button" onclick="formatLessonText('edit', 'promptbox')"
+            class="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200/80 rounded-lg text-xs font-bold shadow-2xs transition-colors flex items-center gap-1 shrink-0"
+            title="Kotak Prompt / Kode ala macOS dengan tombol Salin & Simpan (``` ... ```)">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <span>Kotak Prompt</span>
           </button>
           <button type="button" onclick="formatLessonText('edit', 'link')"
             class="px-2 py-1 bg-white hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-medium shadow-2xs transition-colors flex items-center gap-1"
@@ -801,6 +813,22 @@
         replacement = selected ? `\`${selected}\`` : '`kode_atau_istilah`';
         cursorOffset = selected ? replacement.length : 1;
         break;
+      case 'promptbox': {
+        const placeholder = 'Tulis atau tempel isi prompt di sini...';
+        const inner = selected ? selected.replace(/^\r?\n+|\r?\n+$/g, '') : placeholder;
+        const prefixNl = start > 0 && !text.substring(0, start).endsWith('\n\n') ? '\n\n' : '';
+        replacement = `${prefixNl}\`\`\`\n${inner}\n\`\`\`\n\n`;
+        textarea.value = text.substring(0, start) + replacement + text.substring(end);
+        textarea.focus();
+        if (!selected) {
+          const selStart = start + prefixNl.length + 4;
+          textarea.setSelectionRange(selStart, selStart + placeholder.length);
+        } else {
+          const endPos = start + replacement.length;
+          textarea.setSelectionRange(endPos, endPos);
+        }
+        return;
+      }
       case 'link':
         const url = prompt('Masukkan URL tautan:', 'https://');
         if (url) {
